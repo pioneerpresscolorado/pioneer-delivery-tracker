@@ -191,6 +191,12 @@
       background: #fff;
     }
 
+    .status-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #374151;
+    }
+
     @media (min-width: 700px) {
       .form-row {
         grid-template-columns: 1fr 1fr;
@@ -251,6 +257,7 @@
         </div>
 
         <button type="submit" class="primary-btn">Add Job</button>
+        <div id="statusMessage" class="status-message"></div>
       </form>
     </div>
 
@@ -266,15 +273,41 @@
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = "pioneer_delivery_jobs";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    let jobs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyAb0A3o4AAW8mh-FgXmmrzpXZBiFFTd32I",
+      authDomain: "pioneer-delivery.firebaseapp.com",
+      projectId: "pioneer-delivery",
+      storageBucket: "pioneer-delivery.firebasestorage.app",
+      messagingSenderId: "708839929057",
+      appId: "1:708839929057:web:8fcf906445e436ea59f3a0",
+      measurementId: "G-4GDHB8KKHT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const jobsCollection = collection(db, "deliveryJobs");
+
+    let jobs = [];
     let currentRoute = "South Run";
 
     const jobForm = document.getElementById("jobForm");
     const jobList = document.getElementById("jobList");
     const routeTitle = document.getElementById("routeTitle");
+    const statusMessage = document.getElementById("statusMessage");
 
     const customerNameInput = document.getElementById("customerName");
     const jobNumberInput = document.getElementById("jobNumber");
@@ -284,10 +317,6 @@
     const southTab = document.getElementById("southTab");
     const northTab = document.getElementById("northTab");
     const localTab = document.getElementById("localTab");
-
-    function saveJobs() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
-    }
 
     function renderJobs() {
       jobList.innerHTML = "";
@@ -307,23 +336,34 @@
         card.className = "job-card";
 
         card.innerHTML = `
-          <h3>${job.customerName}</h3>
-          ${job.jobNumber ? `<p><strong>Job #:</strong> ${job.jobNumber}</p>` : ""}
-          <p><strong>Address:</strong> ${job.address}</p>
+          <h3>${escapeHtml(job.customerName)}</h3>
+          ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
+          <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
           <div class="job-actions">
-            <button class="small-btn maps-btn" onclick="window.open('${mapsLink}', '_blank')">Open in Maps</button>
-            <button class="small-btn delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
+            <button class="small-btn maps-btn">Open in Maps</button>
+            <button class="small-btn delete-btn">Delete</button>
           </div>
         `;
 
+        const mapsButton = card.querySelector(".maps-btn");
+        const deleteButton = card.querySelector(".delete-btn");
+
+        mapsButton.addEventListener("click", () => {
+          window.open(mapsLink, "_blank");
+        });
+
+        deleteButton.addEventListener("click", async () => {
+          try {
+            await deleteDoc(doc(db, "deliveryJobs", job.id));
+            statusMessage.textContent = "Job deleted.";
+          } catch (error) {
+            console.error(error);
+            statusMessage.textContent = "Could not delete job.";
+          }
+        });
+
         jobList.appendChild(card);
       });
-    }
-
-    function deleteJob(id) {
-      jobs = jobs.filter(job => job.id !== id);
-      saveJobs();
-      renderJobs();
     }
 
     function setRoute(route) {
@@ -340,25 +380,37 @@
       renderJobs();
     }
 
-    jobForm.addEventListener("submit", function (e) {
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = value ?? "";
+      return div.innerHTML;
+    }
+
+    jobForm.addEventListener("submit", async function (e) {
       e.preventDefault();
+      statusMessage.textContent = "Adding job...";
 
       const newJob = {
-        id: Date.now().toString(),
         customerName: customerNameInput.value.trim(),
         jobNumber: jobNumberInput.value.trim(),
         address: addressInput.value.trim(),
-        route: routeInput.value
+        route: routeInput.value,
+        createdAt: serverTimestamp()
       };
 
       if (!newJob.customerName || !newJob.address || !newJob.route) {
+        statusMessage.textContent = "Please fill in customer name, address, and route.";
         return;
       }
 
-      jobs.push(newJob);
-      saveJobs();
-      renderJobs();
-      jobForm.reset();
+      try {
+        await addDoc(jobsCollection, newJob);
+        jobForm.reset();
+        statusMessage.textContent = "Job added.";
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not add job. Check your Firebase setup.";
+      }
     });
 
     southTab.addEventListener("click", function () {
@@ -371,6 +423,19 @@
 
     localTab.addEventListener("click", function () {
       setRoute("Local Delivery");
+    });
+
+    const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
+
+    onSnapshot(jobsQuery, (snapshot) => {
+      jobs = snapshot.docs.map(docItem => ({
+        id: docItem.id,
+        ...docItem.data()
+      }));
+      renderJobs();
+    }, (error) => {
+      console.error(error);
+      statusMessage.textContent = "Could not load jobs. Check Firestore rules and config.";
     });
 
     renderJobs();
