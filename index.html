@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pioneer Delivery Tracker</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .header p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 1.2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-row {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    .primary-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .primary-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: #e5e7eb;
+      border: none;
+      font-weight: bold;
+      padding: 12px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .route-title {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+    }
+
+    .job-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .job-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      background: #f9fafb;
+    }
+
+    .job-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+
+    .job-card p {
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+
+    .job-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .maps-btn {
+      background: #10b981;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #6b7280;
+      border: 2px dashed #d1d5db;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    @media (min-width: 700px) {
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>Pioneer Delivery Tracker</h1>
+      <p>North, South, and Local Delivery Runs</p>
+    </div>
+
+    <div class="card">
+      <h2>Add a Delivery Job</h2>
+
+      <form id="jobForm" class="form-grid">
+        <div class="form-row">
+          <div>
+            <label for="customerName">Customer Name</label>
+            <input
+              type="text"
+              id="customerName"
+              placeholder="Enter customer name"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="jobNumber">Job Number (optional)</label>
+            <input
+              type="text"
+              id="jobNumber"
+              placeholder="Enter job number if needed"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="address">Delivery Address</label>
+          <textarea
+            id="address"
+            placeholder="Enter full delivery address"
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="route">Route</label>
+          <select id="route" required>
+            <option value="">Select Route</option>
+            <option value="South Run">South Run</option>
+            <option value="North Run">North Run</option>
+            <option value="Local Delivery">Local Delivery</option>
+          </select>
+        </div>
+
+        <button type="submit" class="primary-btn">Add Job</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" id="southTab" type="button">South</button>
+        <button class="tab-btn" id="northTab" type="button">North</button>
+        <button class="tab-btn" id="localTab" type="button">Local</button>
+      </div>
+
+      <h2 class="route-title" id="routeTitle">South Run</h2>
+      <div class="job-list" id="jobList"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "pioneer_delivery_jobs";
+
+    let jobs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let currentRoute = "South Run";
+
+    const jobForm = document.getElementById("jobForm");
+    const jobList = document.getElementById("jobList");
+    const routeTitle = document.getElementById("routeTitle");
+
+    const customerNameInput = document.getElementById("customerName");
+    const jobNumberInput = document.getElementById("jobNumber");
+    const addressInput = document.getElementById("address");
+    const routeInput = document.getElementById("route");
+
+    const southTab = document.getElementById("southTab");
+    const northTab = document.getElementById("northTab");
+    const localTab = document.getElementById("localTab");
+
+    function saveJobs() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+    }
+
+    function renderJobs() {
+      jobList.innerHTML = "";
+
+      const filteredJobs = jobs.filter(job => job.route === currentRoute);
+      routeTitle.textContent = currentRoute;
+
+      if (filteredJobs.length === 0) {
+        jobList.innerHTML = `<div class="empty-state">No jobs added for ${currentRoute} yet.</div>`;
+        return;
+      }
+
+      filteredJobs.forEach(job => {
+        const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
+
+        const card = document.createElement("div");
+        card.className = "job-card";
+
+        card.innerHTML = `
+          <h3>${job.customerName}</h3>
+          ${job.jobNumber ? `<p><strong>Job #:</strong> ${job.jobNumber}</p>` : ""}
+          <p><strong>Address:</strong> ${job.address}</p>
+          <div class="job-actions">
+            <button class="small-btn maps-btn" onclick="window.open('${mapsLink}', '_blank')">Open in Maps</button>
+            <button class="small-btn delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
+          </div>
+        `;
+
+        jobList.appendChild(card);
+      });
+    }
+
+    function deleteJob(id) {
+      jobs = jobs.filter(job => job.id !== id);
+      saveJobs();
+      renderJobs();
+    }
+
+    function setRoute(route) {
+      currentRoute = route;
+
+      southTab.classList.remove("active");
+      northTab.classList.remove("active");
+      localTab.classList.remove("active");
+
+      if (route === "South Run") southTab.classList.add("active");
+      if (route === "North Run") northTab.classList.add("active");
+      if (route === "Local Delivery") localTab.classList.add("active");
+
+      renderJobs();
+    }
+
+    jobForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const newJob = {
+        id: Date.now().toString(),
+        customerName: customerNameInput.value.trim(),
+        jobNumber: jobNumberInput.value.trim(),
+        address: addressInput.value.trim(),
+        route: routeInput.value
+      };
+
+      if (!newJob.customerName || !newJob.address || !newJob.route) {
+        return;
+      }
+
+      jobs.push(newJob);
+      saveJobs();
+      renderJobs();
+      jobForm.reset();
+    });
+
+    southTab.addEventListener("click", function () {
+      setRoute("South Run");
+    });
+
+    northTab.addEventListener("click", function () {
+      setRoute("North Run");
+    });
+
+    localTab.addEventListener("click", function () {
+      setRoute("Local Delivery");
+    });
+
+    renderJobs();
+  </script>
+</body>
+</html>
