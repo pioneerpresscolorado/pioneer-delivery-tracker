@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pioneer Delivery Tracker</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -18,7 +16,7 @@
     }
 
     .app {
-      max-width: 900px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -40,17 +38,43 @@
     }
 
     .card {
-      background: #ffffff;
+      background: #fff;
       border-radius: 16px;
       padding: 18px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
       margin-bottom: 20px;
     }
 
-    .card h2 {
+    .card h2, .card h3 {
       margin-top: 0;
-      margin-bottom: 14px;
-      font-size: 1.2rem;
+    }
+
+    .top-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .route-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: #e5e7eb;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: #2563eb;
+      color: white;
     }
 
     .form-grid {
@@ -70,10 +94,7 @@
       font-size: 0.95rem;
     }
 
-    input,
-    select,
-    textarea,
-    button {
+    input, select, textarea, button {
       width: 100%;
       padding: 12px 14px;
       border-radius: 10px;
@@ -87,47 +108,23 @@
       min-height: 100px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus,
-    button:focus {
-      outline: 2px solid #2563eb;
-      outline-offset: 2px;
-    }
-
     .primary-btn {
       background: #2563eb;
       color: white;
       border: none;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s ease;
     }
 
     .primary-btn:hover {
       background: #1d4ed8;
     }
 
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      background: #e5e7eb;
-      border: none;
-      font-weight: bold;
-      padding: 12px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: #2563eb;
-      color: white;
+    .status-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #374151;
+      min-height: 20px;
     }
 
     .route-title {
@@ -138,6 +135,7 @@
     .job-list {
       display: grid;
       gap: 12px;
+      min-height: 120px;
     }
 
     .job-card {
@@ -145,6 +143,12 @@
       border-radius: 14px;
       padding: 14px;
       background: #f9fafb;
+      cursor: grab;
+    }
+
+    .job-card.dragging {
+      opacity: 0.55;
+      border: 2px dashed #2563eb;
     }
 
     .job-card h3 {
@@ -166,7 +170,7 @@
 
     .small-btn {
       flex: 1;
-      min-width: 120px;
+      min-width: 130px;
       border: none;
       cursor: pointer;
       font-weight: bold;
@@ -177,9 +181,27 @@
       color: white;
     }
 
-    .delete-btn {
-      background: #ef4444;
+    .deliver-btn {
+      background: #2563eb;
       color: white;
+    }
+
+    .restore-btn {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      background: #fcfdff;
+      transition: 0.2s ease;
+    }
+
+    .drop-zone.over {
+      border-color: #2563eb;
+      background: #eff6ff;
     }
 
     .empty-state {
@@ -191,15 +213,157 @@
       background: #fff;
     }
 
-    .status-message {
-      margin-top: 10px;
+    .full-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .full-column {
+      background: #f8fafc;
+      border: 1px solid #dbe3ee;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .column-header {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #dbe3ee;
+    }
+
+    .column-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .schedule-note {
+      margin-top: -6px;
+      margin-bottom: 18px;
+      color: #6b7280;
       font-size: 0.95rem;
-      color: #374151;
+    }
+
+    .schedule-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .schedule-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-left: 6px solid #2563eb;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .schedule-card h4 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .schedule-card .meta {
+      font-size: 0.92rem;
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
+    .schedule-card .address {
+      font-size: 0.96rem;
+      line-height: 1.45;
+      color: #111827;
+      white-space: pre-line;
+    }
+
+    .south-accent {
+      border-left-color: #0ea5e9;
+    }
+
+    .north-accent {
+      border-left-color: #22c55e;
+    }
+
+    .local-accent {
+      border-left-color: #f59e0b;
+    }
+
+    .completed-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .completed-card {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      background: #f3f4f6;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    .danger-zone {
+      border: 2px solid #fecaca;
+      background: #fff7f7;
+    }
+
+    .danger-zone h2 {
+      color: #b91c1c;
+      margin-bottom: 8px;
+    }
+
+    .danger-zone p {
+      margin-top: 0;
+      color: #7f1d1d;
+    }
+
+    .danger-row {
+      display: grid;
+      gap: 12px;
+    }
+
+    .clear-input {
+      border: 1px solid #fca5a5;
+    }
+
+    .clear-btn {
+      background: #b91c1c;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover {
+      background: #991b1b;
+    }
+
+    .clear-btn:disabled {
+      background: #d1d5db;
+      color: #6b7280;
+      cursor: not-allowed;
     }
 
     @media (min-width: 700px) {
       .form-row {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .danger-row {
+        grid-template-columns: 1fr auto;
+        align-items: end;
+      }
+
+      .danger-row .clear-btn {
+        width: auto;
+        min-width: 220px;
+      }
+    }
+
+    @media (min-width: 950px) {
+      .full-grid {
+        grid-template-columns: 1fr 1fr 1fr;
       }
     }
   </style>
@@ -209,67 +373,124 @@
   <div class="app">
     <div class="header">
       <h1>Pioneer Delivery Tracker</h1>
-      <p>North, South, and Local Delivery Runs</p>
+      <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
     </div>
 
     <div class="card">
-      <h2>Add a Delivery Job</h2>
-
-      <form id="jobForm" class="form-grid">
-        <div class="form-row">
-          <div>
-            <label for="customerName">Customer Name</label>
-            <input
-              type="text"
-              id="customerName"
-              placeholder="Enter customer name"
-              required
-            />
-          </div>
-
-          <div>
-            <label for="jobNumber">Job Number (optional)</label>
-            <input
-              type="text"
-              id="jobNumber"
-              placeholder="Enter job number if needed"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label for="address">Delivery Address</label>
-          <textarea
-            id="address"
-            placeholder="Enter full delivery address"
-            required
-          ></textarea>
-        </div>
-
-        <div>
-          <label for="route">Route</label>
-          <select id="route" required>
-            <option value="">Select Route</option>
-            <option value="South Run">South Run</option>
-            <option value="North Run">North Run</option>
-            <option value="Local Delivery">Local Delivery</option>
-          </select>
-        </div>
-
-        <button type="submit" class="primary-btn">Add Job</button>
-        <div id="statusMessage" class="status-message"></div>
-      </form>
+      <div class="top-nav">
+        <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
+        <button class="tab-btn" id="fullPageBtn" type="button">Full Schedule</button>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="tabs">
-        <button class="tab-btn active" id="southTab" type="button">South</button>
-        <button class="tab-btn" id="northTab" type="button">North</button>
-        <button class="tab-btn" id="localTab" type="button">Local</button>
+    <div id="mainPage">
+      <div class="card">
+        <h2>Add Delivery</h2>
+
+        <form id="jobForm" class="form-grid">
+          <div class="form-row">
+            <div>
+              <label for="customerName">Customer Name</label>
+              <input id="customerName" type="text" placeholder="Enter customer name" required />
+            </div>
+
+            <div>
+              <label for="jobNumber">Job Number (optional)</label>
+              <input id="jobNumber" type="text" placeholder="Enter job number if needed" />
+            </div>
+          </div>
+
+          <div>
+            <label for="address">Delivery Address</label>
+            <textarea id="address" placeholder="Enter full delivery address" required></textarea>
+          </div>
+
+          <div>
+            <label for="route">Route</label>
+            <select id="route" required>
+              <option value="">Select Route</option>
+              <option value="South Run">South Run</option>
+              <option value="North Run">North Run</option>
+              <option value="Local Delivery">Local Delivery</option>
+            </select>
+          </div>
+
+          <button class="primary-btn" type="submit">Add Delivery</button>
+          <div id="statusMessage" class="status-message"></div>
+        </form>
       </div>
 
-      <h2 class="route-title" id="routeTitle">South Run</h2>
-      <div class="job-list" id="jobList"></div>
+      <div class="card">
+        <div class="route-tabs">
+          <button class="tab-btn active" id="southTab" type="button">South</button>
+          <button class="tab-btn" id="northTab" type="button">North</button>
+          <button class="tab-btn" id="localTab" type="button">Local</button>
+        </div>
+
+        <h2 class="route-title" id="routeTitle">South Run</h2>
+        <div class="drop-zone" id="singleRouteDropZone" data-route="South Run">
+          <div class="job-list" id="jobList"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Completed Deliveries</h2>
+        <div class="completed-list" id="completedList"></div>
+      </div>
+
+      <div class="card danger-zone">
+        <h2>Clear Schedule</h2>
+        <p>
+          This permanently deletes every job in the system. To continue, type
+          <strong>CLEAR</strong> below.
+        </p>
+
+        <div class="danger-row">
+          <div>
+            <label for="clearScheduleInput">Type CLEAR to unlock</label>
+            <input
+              id="clearScheduleInput"
+              class="clear-input"
+              type="text"
+              placeholder="Type CLEAR"
+            />
+          </div>
+
+          <button id="clearScheduleBtn" class="clear-btn" type="button" disabled>
+            Clear Entire Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="fullPage" style="display:none;">
+      <div class="card">
+        <h2>Full Schedule</h2>
+        <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
+
+        <div class="full-grid">
+          <div class="full-column">
+            <div class="column-header">
+              <h3>South Run</h3>
+            </div>
+            <div class="schedule-list" id="southList"></div>
+          </div>
+
+          <div class="full-column">
+            <div class="column-header">
+              <h3>North Run</h3>
+            </div>
+            <div class="schedule-list" id="northList"></div>
+          </div>
+
+          <div class="full-column">
+            <div class="column-header">
+              <h3>Local Delivery</h3>
+            </div>
+            <div class="schedule-list" id="localList"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -279,8 +500,11 @@
       getFirestore,
       collection,
       addDoc,
+      updateDoc,
       deleteDoc,
       doc,
+      getDocs,
+      writeBatch,
       onSnapshot,
       query,
       orderBy,
@@ -303,11 +527,20 @@
 
     let jobs = [];
     let currentRoute = "South Run";
+    let draggedJobId = null;
+    let dragTargetIndex = null;
+
+    const mainPage = document.getElementById("mainPage");
+    const fullPage = document.getElementById("fullPage");
+
+    const mainPageBtn = document.getElementById("mainPageBtn");
+    const fullPageBtn = document.getElementById("fullPageBtn");
 
     const jobForm = document.getElementById("jobForm");
     const jobList = document.getElementById("jobList");
     const routeTitle = document.getElementById("routeTitle");
     const statusMessage = document.getElementById("statusMessage");
+    const completedList = document.getElementById("completedList");
 
     const customerNameInput = document.getElementById("customerName");
     const jobNumberInput = document.getElementById("jobNumber");
@@ -318,51 +551,212 @@
     const northTab = document.getElementById("northTab");
     const localTab = document.getElementById("localTab");
 
-    function renderJobs() {
-      jobList.innerHTML = "";
+    const singleRouteDropZone = document.getElementById("singleRouteDropZone");
+    const southList = document.getElementById("southList");
+    const northList = document.getElementById("northList");
+    const localList = document.getElementById("localList");
 
-      const filteredJobs = jobs.filter(job => job.route === currentRoute);
-      routeTitle.textContent = currentRoute;
+    const clearScheduleInput = document.getElementById("clearScheduleInput");
+    const clearScheduleBtn = document.getElementById("clearScheduleBtn");
 
-      if (filteredJobs.length === 0) {
-        jobList.innerHTML = `<div class="empty-state">No jobs added for ${currentRoute} yet.</div>`;
-        return;
-      }
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = value ?? "";
+      return div.innerHTML;
+    }
 
-      filteredJobs.forEach(job => {
-        const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
+    function getActiveJobs() {
+      return jobs.filter(job => job.status !== "delivered");
+    }
 
-        const card = document.createElement("div");
-        card.className = "job-card";
+    function getDeliveredJobs() {
+      return jobs.filter(job => job.status === "delivered");
+    }
 
-        card.innerHTML = `
-          <h3>${escapeHtml(job.customerName)}</h3>
-          ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
-          <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
-          <div class="job-actions">
-            <button class="small-btn maps-btn">Open in Maps</button>
-            <button class="small-btn delete-btn">Delete</button>
-          </div>
-        `;
+    function getJobsForRoute(routeName) {
+      return getActiveJobs()
+        .filter(job => job.route === routeName)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
 
-        const mapsButton = card.querySelector(".maps-btn");
-        const deleteButton = card.querySelector(".delete-btn");
+    function createJobCard(job, showDeliverButton = true) {
+      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
 
-        mapsButton.addEventListener("click", () => {
-          window.open(mapsLink, "_blank");
-        });
+      const card = document.createElement("div");
+      card.className = "job-card";
+      card.draggable = showDeliverButton;
+      card.dataset.id = job.id;
 
-        deleteButton.addEventListener("click", async () => {
+      card.innerHTML = `
+        <h3>${escapeHtml(job.customerName)}</h3>
+        ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
+        <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
+        <p class="muted"><strong>Route:</strong> ${escapeHtml(job.route)}</p>
+        <div class="job-actions">
+          <button class="small-btn maps-btn" type="button">Open in Maps</button>
+          ${showDeliverButton ? `<button class="small-btn deliver-btn" type="button">Mark Delivered</button>` : `<button class="small-btn restore-btn" type="button">Restore</button>`}
+        </div>
+      `;
+
+      const mapsButton = card.querySelector(".maps-btn");
+      mapsButton.addEventListener("click", () => {
+        window.open(mapsLink, "_blank");
+      });
+
+      if (showDeliverButton) {
+        const deliverButton = card.querySelector(".deliver-btn");
+        deliverButton.addEventListener("click", async () => {
           try {
-            await deleteDoc(doc(db, "deliveryJobs", job.id));
-            statusMessage.textContent = "Job deleted.";
+            await updateDoc(doc(db, "deliveryJobs", job.id), {
+              status: "delivered",
+              deliveredAt: serverTimestamp()
+            });
+            statusMessage.textContent = "Delivery marked complete.";
           } catch (error) {
             console.error(error);
-            statusMessage.textContent = "Could not delete job.";
+            statusMessage.textContent = "Could not mark delivery complete.";
           }
         });
 
+        card.addEventListener("dragstart", () => {
+          draggedJobId = job.id;
+          card.classList.add("dragging");
+        });
+
+        card.addEventListener("dragend", () => {
+          draggedJobId = null;
+          dragTargetIndex = null;
+          card.classList.remove("dragging");
+          document.querySelectorAll(".drop-zone").forEach(zone => zone.classList.remove("over"));
+        });
+      } else {
+        card.draggable = false;
+        const restoreButton = card.querySelector(".restore-btn");
+        restoreButton.addEventListener("click", async () => {
+          try {
+            const routeJobs = getJobsForRoute(job.route);
+            const nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
+
+            await updateDoc(doc(db, "deliveryJobs", job.id), {
+              status: "active",
+              deliveredAt: null,
+              order: nextOrder
+            });
+            statusMessage.textContent = "Delivery restored.";
+          } catch (error) {
+            console.error(error);
+            statusMessage.textContent = "Could not restore delivery.";
+          }
+        });
+      }
+
+      return card;
+    }
+
+    function createScheduleCard(job, accentClass) {
+      const card = document.createElement("div");
+      card.className = `schedule-card ${accentClass}`;
+
+      card.innerHTML = `
+        <h4>${escapeHtml(job.customerName)}</h4>
+        ${job.jobNumber ? `<div class="meta"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
+        <div class="address">${escapeHtml(job.address)}</div>
+      `;
+
+      return card;
+    }
+
+    function renderJobs() {
+      jobList.innerHTML = "";
+      routeTitle.textContent = currentRoute;
+      singleRouteDropZone.dataset.route = currentRoute;
+
+      const filteredJobs = getJobsForRoute(currentRoute);
+
+      if (filteredJobs.length === 0) {
+        jobList.innerHTML = `<div class="empty-state">No active jobs for ${currentRoute} yet.</div>`;
+        return;
+      }
+
+      filteredJobs.forEach((job, index) => {
+        const card = createJobCard(job, true);
+        card.dataset.index = index;
+
+        card.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dragTargetIndex = index;
+        });
+
         jobList.appendChild(card);
+      });
+    }
+
+    function renderCompleted() {
+      completedList.innerHTML = "";
+      const deliveredJobs = getDeliveredJobs();
+
+      if (deliveredJobs.length === 0) {
+        completedList.innerHTML = `<div class="empty-state">No completed deliveries yet.</div>`;
+        return;
+      }
+
+      deliveredJobs.forEach(job => {
+        const card = document.createElement("div");
+        card.className = "completed-card";
+        card.innerHTML = `
+          <strong>${escapeHtml(job.customerName)}</strong>
+          ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
+          <div>${escapeHtml(job.address)}</div>
+          <div class="muted">${escapeHtml(job.route)}</div>
+          <div class="job-actions">
+            <button class="small-btn restore-btn" type="button">Restore</button>
+          </div>
+        `;
+
+        card.querySelector(".restore-btn").addEventListener("click", async () => {
+          try {
+            const routeJobs = getJobsForRoute(job.route);
+            const nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
+
+            await updateDoc(doc(db, "deliveryJobs", job.id), {
+              status: "active",
+              deliveredAt: null,
+              order: nextOrder
+            });
+            statusMessage.textContent = "Delivery restored.";
+          } catch (error) {
+            console.error(error);
+            statusMessage.textContent = "Could not restore delivery.";
+          }
+        });
+
+        completedList.appendChild(card);
+      });
+    }
+
+    function renderFullSchedule() {
+      southList.innerHTML = "";
+      northList.innerHTML = "";
+      localList.innerHTML = "";
+
+      const southJobs = getJobsForRoute("South Run");
+      const northJobs = getJobsForRoute("North Run");
+      const localJobs = getJobsForRoute("Local Delivery");
+
+      renderScheduleColumn(southJobs, southList, "south-accent");
+      renderScheduleColumn(northJobs, northList, "north-accent");
+      renderScheduleColumn(localJobs, localList, "local-accent");
+    }
+
+    function renderScheduleColumn(routeJobs, container, accentClass) {
+      if (routeJobs.length === 0) {
+        container.innerHTML = `<div class="empty-state">No active jobs.</div>`;
+        return;
+      }
+
+      routeJobs.forEach(job => {
+        const card = createScheduleCard(job, accentClass);
+        container.appendChild(card);
       });
     }
 
@@ -380,21 +774,126 @@
       renderJobs();
     }
 
-    function escapeHtml(value) {
-      const div = document.createElement("div");
-      div.textContent = value ?? "";
-      return div.innerHTML;
+    function showMainPage() {
+      mainPage.style.display = "block";
+      fullPage.style.display = "none";
+      mainPageBtn.classList.add("active");
+      fullPageBtn.classList.remove("active");
     }
 
-    jobForm.addEventListener("submit", async function (e) {
+    function showFullPage() {
+      mainPage.style.display = "none";
+      fullPage.style.display = "block";
+      fullPageBtn.classList.add("active");
+      mainPageBtn.classList.remove("active");
+      renderFullSchedule();
+    }
+
+    async function moveDraggedJobToRoute(targetRoute, targetIndex = null) {
+      if (!draggedJobId) return;
+
+      const draggedJob = jobs.find(job => job.id === draggedJobId);
+      if (!draggedJob) return;
+
+      const targetRouteJobs = getJobsForRoute(targetRoute).filter(job => job.id !== draggedJobId);
+      let newOrderList = [...targetRouteJobs];
+
+      if (targetIndex === null || targetIndex > newOrderList.length) {
+        newOrderList.push(draggedJob);
+      } else {
+        newOrderList.splice(targetIndex, 0, draggedJob);
+      }
+
+      try {
+        await updateDoc(doc(db, "deliveryJobs", draggedJobId), {
+          route: targetRoute,
+          status: "active"
+        });
+
+        const updates = newOrderList.map((job, index) => {
+          return updateDoc(doc(db, "deliveryJobs", job.id), {
+            order: index
+          });
+        });
+
+        await Promise.all(updates);
+        statusMessage.textContent = "Route updated.";
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not move delivery.";
+      }
+    }
+
+    function setupDropZone(zone, getIndexFn = null) {
+      zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.classList.add("over");
+      });
+
+      zone.addEventListener("dragleave", () => {
+        zone.classList.remove("over");
+      });
+
+      zone.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        zone.classList.remove("over");
+
+        const targetRoute = zone.dataset.route;
+        const targetIndex = getIndexFn ? getIndexFn(e) : null;
+        await moveDraggedJobToRoute(targetRoute, targetIndex);
+      });
+    }
+
+    async function clearEntireSchedule() {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to permanently delete all jobs from the schedule?"
+      );
+
+      if (!confirmDelete) return;
+
+      try {
+        statusMessage.textContent = "Clearing schedule...";
+
+        const snapshot = await getDocs(jobsCollection);
+
+        if (snapshot.empty) {
+          statusMessage.textContent = "There are no jobs to delete.";
+          clearScheduleInput.value = "";
+          clearScheduleBtn.disabled = true;
+          return;
+        }
+
+        const batch = writeBatch(db);
+
+        snapshot.forEach((docItem) => {
+          batch.delete(doc(db, "deliveryJobs", docItem.id));
+        });
+
+        await batch.commit();
+
+        statusMessage.textContent = "Schedule cleared.";
+        clearScheduleInput.value = "";
+        clearScheduleBtn.disabled = true;
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not clear the schedule.";
+      }
+    }
+
+    jobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      statusMessage.textContent = "Adding job...";
+      statusMessage.textContent = "Adding delivery...";
+
+      const routeJobs = getJobsForRoute(routeInput.value);
+      const nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
 
       const newJob = {
         customerName: customerNameInput.value.trim(),
         jobNumber: jobNumberInput.value.trim(),
         address: addressInput.value.trim(),
         route: routeInput.value,
+        status: "active",
+        order: nextOrder,
         createdAt: serverTimestamp()
       };
 
@@ -406,39 +905,53 @@
       try {
         await addDoc(jobsCollection, newJob);
         jobForm.reset();
-        statusMessage.textContent = "Job added.";
+        statusMessage.textContent = "Delivery added.";
       } catch (error) {
         console.error(error);
-        statusMessage.textContent = "Could not add job. Check your Firebase setup.";
+        statusMessage.textContent = "Could not add delivery.";
       }
     });
 
-    southTab.addEventListener("click", function () {
-      setRoute("South Run");
+    mainPageBtn.addEventListener("click", showMainPage);
+    fullPageBtn.addEventListener("click", showFullPage);
+
+    southTab.addEventListener("click", () => setRoute("South Run"));
+    northTab.addEventListener("click", () => setRoute("North Run"));
+    localTab.addEventListener("click", () => setRoute("Local Delivery"));
+
+    clearScheduleInput.addEventListener("input", () => {
+      clearScheduleBtn.disabled = clearScheduleInput.value.trim() !== "CLEAR";
     });
 
-    northTab.addEventListener("click", function () {
-      setRoute("North Run");
-    });
+    clearScheduleBtn.addEventListener("click", clearEntireSchedule);
 
-    localTab.addEventListener("click", function () {
-      setRoute("Local Delivery");
-    });
+    setupDropZone(singleRouteDropZone, () => dragTargetIndex);
 
     const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
 
-    onSnapshot(jobsQuery, (snapshot) => {
-      jobs = snapshot.docs.map(docItem => ({
-        id: docItem.id,
-        ...docItem.data()
-      }));
-      renderJobs();
-    }, (error) => {
-      console.error(error);
-      statusMessage.textContent = "Could not load jobs. Check Firestore rules and config.";
-    });
+    onSnapshot(
+      jobsQuery,
+      (snapshot) => {
+        jobs = snapshot.docs.map(docItem => ({
+          id: docItem.id,
+          ...docItem.data()
+        }));
+
+        renderJobs();
+        renderCompleted();
+
+        if (fullPage.style.display !== "none") {
+          renderFullSchedule();
+        }
+      },
+      (error) => {
+        console.error(error);
+        statusMessage.textContent = "Could not load deliveries. Check Firebase setup.";
+      }
+    );
 
     renderJobs();
+    renderCompleted();
   </script>
 </body>
 </html>
