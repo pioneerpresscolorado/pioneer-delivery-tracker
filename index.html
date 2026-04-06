@@ -8,11 +8,16 @@
   <style>
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f7fb;
       color: #1f2937;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+      height: 100vh;
     }
 
     .app {
@@ -120,6 +125,18 @@
       background: #1d4ed8;
     }
 
+    .secondary-btn {
+      background: #0f766e;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .secondary-btn:hover {
+      background: #115e59;
+    }
+
     .status-message {
       margin-top: 10px;
       font-size: 0.95rem;
@@ -213,66 +230,100 @@
       background: #fff;
     }
 
+    .full-page-wrap {
+      height: calc(100vh - 175px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .full-page-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 14px;
+    }
+
     .full-grid {
       display: grid;
-      gap: 16px;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
     }
 
     .full-column {
       background: #f8fafc;
       border: 1px solid #dbe3ee;
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .column-header {
-      margin-bottom: 12px;
-      padding-bottom: 10px;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
       border-bottom: 2px solid #dbe3ee;
+      flex-shrink: 0;
     }
 
     .column-header h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
     }
 
     .schedule-note {
-      margin-top: -6px;
-      margin-bottom: 18px;
+      margin-top: -4px;
+      margin-bottom: 10px;
       color: #6b7280;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+      flex-shrink: 0;
     }
 
     .schedule-list {
       display: grid;
-      gap: 10px;
+      gap: 6px;
+      min-height: 0;
+      overflow: hidden;
+      align-content: start;
+    }
+
+    .schedule-list.double-stack {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 6px;
+      row-gap: 6px;
     }
 
     .schedule-card {
       background: #ffffff;
       border: 1px solid #e5e7eb;
-      border-left: 6px solid #2563eb;
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-left: 4px solid #2563eb;
+      border-radius: 9px;
+      padding: 7px 8px;
+      min-width: 0;
     }
 
     .schedule-card h4 {
-      margin: 0 0 8px;
-      font-size: 1rem;
+      margin: 0 0 3px;
+      font-size: 0.88rem;
       color: #111827;
+      line-height: 1.1;
     }
 
     .schedule-card .meta {
-      font-size: 0.92rem;
+      font-size: 0.74rem;
       color: #4b5563;
-      margin-bottom: 6px;
+      margin-bottom: 3px;
+      line-height: 1.1;
     }
 
     .schedule-card .address {
-      font-size: 0.96rem;
-      line-height: 1.45;
+      font-size: 0.78rem;
+      line-height: 1.15;
       color: #111827;
-      white-space: pre-line;
+      white-space: normal;
+      word-break: break-word;
     }
 
     .south-accent {
@@ -345,6 +396,63 @@
       cursor: not-allowed;
     }
 
+    .summary-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-box {
+      min-height: 220px;
+      background: #f8fafc;
+    }
+
+    .copy-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: #1e293b;
+    }
+
+    .dispatch-fit-1 .full-page-card { padding: 12px; }
+    .dispatch-fit-1 .full-grid { gap: 8px; }
+    .dispatch-fit-1 .full-column { padding: 8px; }
+    .dispatch-fit-1 .schedule-list { gap: 6px; }
+    .dispatch-fit-1 .schedule-card { padding: 6px 8px; }
+    .dispatch-fit-1 .schedule-card h4 { font-size: 0.84rem; }
+    .dispatch-fit-1 .schedule-card .meta { font-size: 0.72rem; }
+    .dispatch-fit-1 .schedule-card .address { font-size: 0.75rem; line-height: 1.12; }
+
+    .dispatch-fit-2 .full-page-card { padding: 10px; }
+    .dispatch-fit-2 .full-grid { gap: 6px; }
+    .dispatch-fit-2 .full-column { padding: 6px; border-radius: 12px; }
+    .dispatch-fit-2 .column-header { margin-bottom: 4px; padding-bottom: 4px; }
+    .dispatch-fit-2 .column-header h3 { font-size: 0.88rem; }
+    .dispatch-fit-2 .schedule-note { font-size: 0.78rem; margin-bottom: 8px; }
+    .dispatch-fit-2 .schedule-list { gap: 4px; }
+    .dispatch-fit-2 .schedule-list.double-stack { column-gap: 4px; row-gap: 4px; }
+    .dispatch-fit-2 .schedule-card { padding: 5px 6px; border-radius: 8px; }
+    .dispatch-fit-2 .schedule-card h4 { font-size: 0.78rem; margin-bottom: 2px; }
+    .dispatch-fit-2 .schedule-card .meta { font-size: 0.66rem; margin-bottom: 2px; }
+    .dispatch-fit-2 .schedule-card .address { font-size: 0.69rem; line-height: 1.05; }
+
+    .dispatch-fit-3 .full-page-card { padding: 8px; }
+    .dispatch-fit-3 .full-grid { gap: 4px; }
+    .dispatch-fit-3 .full-column { padding: 5px; border-radius: 10px; }
+    .dispatch-fit-3 .column-header { margin-bottom: 3px; padding-bottom: 3px; }
+    .dispatch-fit-3 .column-header h3 { font-size: 0.8rem; }
+    .dispatch-fit-3 .schedule-note { font-size: 0.72rem; margin-bottom: 6px; }
+    .dispatch-fit-3 .schedule-list { gap: 3px; }
+    .dispatch-fit-3 .schedule-list.double-stack { column-gap: 3px; row-gap: 3px; }
+    .dispatch-fit-3 .schedule-card { padding: 4px 5px; border-radius: 6px; border-left-width: 3px; }
+    .dispatch-fit-3 .schedule-card h4 { font-size: 0.71rem; margin-bottom: 1px; }
+    .dispatch-fit-3 .schedule-card .meta { font-size: 0.6rem; margin-bottom: 1px; }
+    .dispatch-fit-3 .schedule-card .address { font-size: 0.62rem; line-height: 1; }
+
     @media (min-width: 700px) {
       .form-row {
         grid-template-columns: 1fr 1fr;
@@ -359,6 +467,10 @@
         width: auto;
         min-width: 220px;
       }
+
+      .summary-actions {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     @media (min-width: 950px) {
@@ -370,7 +482,7 @@
 </head>
 
 <body>
-  <div class="app">
+  <div class="app" id="appRoot">
     <div class="header">
       <h1>Pioneer Delivery Tracker</h1>
       <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
@@ -438,6 +550,21 @@
         <div class="completed-list" id="completedList"></div>
       </div>
 
+      <div class="card">
+        <h2>Summarize Schedule</h2>
+        <p class="muted">Create the morning shipping email text for today’s deliveries.</p>
+
+        <div class="summary-actions">
+          <button id="summarizeBtn" class="secondary-btn" type="button">Generate Summary</button>
+          <button id="copySummaryBtn" class="copy-btn" type="button">Copy Summary</button>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <label for="summaryOutput">Shipping Summary</label>
+          <textarea id="summaryOutput" class="summary-box" placeholder="Your summary will appear here..."></textarea>
+        </div>
+      </div>
+
       <div class="card danger-zone">
         <h2>Clear Schedule</h2>
         <p>
@@ -464,30 +591,32 @@
     </div>
 
     <div id="fullPage" style="display:none;">
-      <div class="card">
-        <h2>Full Schedule</h2>
-        <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
+      <div class="full-page-wrap">
+        <div class="card full-page-card">
+          <h2>Full Schedule</h2>
+          <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
 
-        <div class="full-grid">
-          <div class="full-column">
-            <div class="column-header">
-              <h3>South Run</h3>
+          <div class="full-grid">
+            <div class="full-column">
+              <div class="column-header">
+                <h3>South Run</h3>
+              </div>
+              <div class="schedule-list" id="southList"></div>
             </div>
-            <div class="schedule-list" id="southList"></div>
-          </div>
 
-          <div class="full-column">
-            <div class="column-header">
-              <h3>North Run</h3>
+            <div class="full-column">
+              <div class="column-header">
+                <h3>North Run</h3>
+              </div>
+              <div class="schedule-list" id="northList"></div>
             </div>
-            <div class="schedule-list" id="northList"></div>
-          </div>
 
-          <div class="full-column">
-            <div class="column-header">
-              <h3>Local Delivery</h3>
+            <div class="full-column">
+              <div class="column-header">
+                <h3>Local Delivery</h3>
+              </div>
+              <div class="schedule-list" id="localList"></div>
             </div>
-            <div class="schedule-list" id="localList"></div>
           </div>
         </div>
       </div>
@@ -501,7 +630,6 @@
       collection,
       addDoc,
       updateDoc,
-      deleteDoc,
       doc,
       getDocs,
       writeBatch,
@@ -530,6 +658,7 @@
     let draggedJobId = null;
     let dragTargetIndex = null;
 
+    const appRoot = document.getElementById("appRoot");
     const mainPage = document.getElementById("mainPage");
     const fullPage = document.getElementById("fullPage");
 
@@ -559,6 +688,10 @@
     const clearScheduleInput = document.getElementById("clearScheduleInput");
     const clearScheduleBtn = document.getElementById("clearScheduleBtn");
 
+    const summarizeBtn = document.getElementById("summarizeBtn");
+    const copySummaryBtn = document.getElementById("copySummaryBtn");
+    const summaryOutput = document.getElementById("summaryOutput");
+
     function escapeHtml(value) {
       const div = document.createElement("div");
       div.textContent = value ?? "";
@@ -577,6 +710,24 @@
       return getActiveJobs()
         .filter(job => job.route === routeName)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+
+    function getDispatchFitClass(totalJobs) {
+      if (totalJobs >= 25) return "dispatch-fit-3";
+      if (totalJobs >= 16) return "dispatch-fit-2";
+      if (totalJobs >= 10) return "dispatch-fit-1";
+      return "";
+    }
+
+    function shouldDoubleStack(routeJobs) {
+      return routeJobs.length >= 12;
+    }
+
+    function applyDispatchDensity() {
+      appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
+      const totalJobs = getActiveJobs().length;
+      const fitClass = getDispatchFitClass(totalJobs);
+      if (fitClass) appRoot.classList.add(fitClass);
     }
 
     function createJobCard(job, showDeliverButton = true) {
@@ -735,6 +886,8 @@
     }
 
     function renderFullSchedule() {
+      applyDispatchDensity();
+
       southList.innerHTML = "";
       northList.innerHTML = "";
       localList.innerHTML = "";
@@ -749,9 +902,15 @@
     }
 
     function renderScheduleColumn(routeJobs, container, accentClass) {
+      container.classList.remove("double-stack");
+
       if (routeJobs.length === 0) {
         container.innerHTML = `<div class="empty-state">No active jobs.</div>`;
         return;
+      }
+
+      if (shouldDoubleStack(routeJobs)) {
+        container.classList.add("double-stack");
       }
 
       routeJobs.forEach(job => {
@@ -779,6 +938,8 @@
       fullPage.style.display = "none";
       mainPageBtn.classList.add("active");
       fullPageBtn.classList.remove("active");
+      document.body.classList.remove("no-scroll");
+      appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
     }
 
     function showFullPage() {
@@ -786,6 +947,7 @@
       fullPage.style.display = "block";
       fullPageBtn.classList.add("active");
       mainPageBtn.classList.remove("active");
+      document.body.classList.add("no-scroll");
       renderFullSchedule();
     }
 
@@ -874,10 +1036,51 @@
         statusMessage.textContent = "Schedule cleared.";
         clearScheduleInput.value = "";
         clearScheduleBtn.disabled = true;
+        summaryOutput.value = "";
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not clear the schedule.";
       }
+    }
+
+    function buildSummaryText() {
+      const southJobs = getJobsForRoute("South Run");
+      const northJobs = getJobsForRoute("North Run");
+      const localJobs = getJobsForRoute("Local Delivery");
+      const totalCount = southJobs.length + northJobs.length + localJobs.length;
+
+      let text = `Good morning,\n\nToday's deliveries include ${totalCount} job${totalCount === 1 ? "" : "s"} shipping out.\n\n`;
+
+      text += `South Run (${southJobs.length}):\n`;
+      if (southJobs.length) {
+        southJobs.forEach(job => {
+          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+        });
+      } else {
+        text += `- No South Run deliveries.\n`;
+      }
+
+      text += `\nNorth Run (${northJobs.length}):\n`;
+      if (northJobs.length) {
+        northJobs.forEach(job => {
+          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+        });
+      } else {
+        text += `- No North Run deliveries.\n`;
+      }
+
+      text += `\nLocal Delivery (${localJobs.length}):\n`;
+      if (localJobs.length) {
+        localJobs.forEach(job => {
+          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+        });
+      } else {
+        text += `- No Local Delivery jobs.\n`;
+      }
+
+      text += `\nPlease let us know if anything needs to be adjusted.\n\nThank you.`;
+
+      return text;
     }
 
     jobForm.addEventListener("submit", async (e) => {
@@ -924,6 +1127,25 @@
     });
 
     clearScheduleBtn.addEventListener("click", clearEntireSchedule);
+
+    summarizeBtn.addEventListener("click", () => {
+      summaryOutput.value = buildSummaryText();
+      statusMessage.textContent = "Summary generated.";
+    });
+
+    copySummaryBtn.addEventListener("click", async () => {
+      try {
+        if (!summaryOutput.value.trim()) {
+          summaryOutput.value = buildSummaryText();
+        }
+
+        await navigator.clipboard.writeText(summaryOutput.value);
+        statusMessage.textContent = "Summary copied.";
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not copy summary.";
+      }
+    });
 
     setupDropZone(singleRouteDropZone, () => dragTargetIndex);
 
