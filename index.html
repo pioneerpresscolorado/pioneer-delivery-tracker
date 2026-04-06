@@ -15,10 +15,17 @@
       color: #1f2937;
     }
 
-    body.no-scroll {
-      overflow: hidden;
-      height: 100vh;
-    }
+body.no-scroll {
+  overflow: auto;
+  height: auto;
+}
+
+@media (min-width: 950px) {
+  body.no-scroll {
+    overflow: hidden;
+    height: 100vh;
+  }
+}
 
     .app {
       max-width: 1280px;
@@ -230,11 +237,16 @@
       background: #fff;
     }
 
-    .full-page-wrap {
-      height: calc(100vh - 175px);
-      display: flex;
-      flex-direction: column;
-    }
+.full-page-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 950px) {
+  .full-page-wrap {
+    height: calc(100vh - 175px);
+  }
+}
 
     .full-page-card {
       flex: 1;
