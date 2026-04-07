@@ -766,7 +766,7 @@
       <div class="card danger-zone">
         <h2>Clear Schedule</h2>
         <p>
-          This clears today’s active local deliveries and completed jobs. Next Day Shipments will be moved back into today’s schedule. Outside shipments stay separate.
+          This clears all of today’s jobs, including outside shipments and completed jobs. Next Day Shipments will be moved back into today’s schedule.
           To continue, type <strong>CLEAR</strong> below.
         </p>
 
@@ -812,7 +812,6 @@
       collection,
       addDoc,
       updateDoc,
-      deleteDoc,
       doc,
       getDocs,
       writeBatch,
@@ -1462,7 +1461,7 @@
 
     async function clearEntireSchedule() {
       const confirmDelete = window.confirm(
-        "Are you sure you want to clear today’s schedule? Active local deliveries and completed jobs will be deleted, and Next Day Shipments will be moved to today. Outside shipments will stay separate."
+        "Are you sure you want to clear today’s schedule? Active deliveries, outside shipments, and completed jobs will be deleted, and Next Day Shipments will be moved to today."
       );
 
       if (!confirmDelete) return;
@@ -1485,24 +1484,21 @@
         const groupedRouteCounts = {
           "South Run": getJobsForRoute("South Run").filter(j => !j.isRush).length,
           "North Run": getJobsForRoute("North Run").filter(j => !j.isRush).length,
-          "Local Delivery": getJobsForRoute("Local Delivery").filter(j => !j.isRush).length
+          "Local Delivery": getJobsForRoute("Local Delivery").filter(j => !j.isRush).length,
+          "UPS": getOutsideJobs().filter(j => j.route === "UPS" && !j.isRush).length,
+          "FedEx": getOutsideJobs().filter(j => j.route === "FedEx" && !j.isRush).length
         };
 
         snapshot.forEach((docItem) => {
           const data = docItem.data();
-          const isLocal = isLocalRoute(data.route);
 
-          if ((data.status === "active" && isLocal) || data.status === "delivered") {
+          if (data.status === "active" || data.status === "delivered") {
             batch.delete(doc(db, "deliveryJobs", docItem.id));
           }
         });
 
         nextDayJobs.forEach((job) => {
-          if (isOutsideRoute(job.route)) {
-            batch.update(doc(db, "deliveryJobs", job.id), {
-              status: "active"
-            });
-          } else if (job.isRush) {
+          if (job.isRush) {
             batch.update(doc(db, "deliveryJobs", job.id), {
               status: "active",
               order: -1
@@ -1641,6 +1637,13 @@
         } else {
           const routeJobs = getJobsForRoute(routeInput.value).filter(job => !job.isRush);
           nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
+        }
+      } else if (shipmentStatus === "active" && isOutsideRoute(routeInput.value)) {
+        if (isRush) {
+          nextOrder = -1;
+        } else {
+          const outsideRouteJobs = getOutsideJobs().filter(job => job.route === routeInput.value && !job.isRush);
+          nextOrder = outsideRouteJobs.length ? Math.max(...outsideRouteJobs.map(job => job.order ?? 0)) + 1 : 0;
         }
       }
 
