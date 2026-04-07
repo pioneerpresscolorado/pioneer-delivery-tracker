@@ -120,6 +120,20 @@
       min-height: 100px;
     }
 
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      padding: 0;
+    }
+
     .primary-btn {
       background: #2563eb;
       color: white;
@@ -591,6 +605,13 @@
             </select>
           </div>
 
+          <div>
+            <label class="checkbox-row">
+              <input id="shipWhen" type="checkbox" />
+              <span>Mark as Next Day Shipment</span>
+            </label>
+          </div>
+
           <button class="primary-btn" type="submit">Add Delivery</button>
           <div id="statusMessage" class="status-message"></div>
         </form>
@@ -764,6 +785,7 @@
     const jobNumberInput = document.getElementById("jobNumber");
     const addressInput = document.getElementById("address");
     const routeInput = document.getElementById("route");
+    const shipWhenInput = document.getElementById("shipWhen");
 
     const southTab = document.getElementById("southTab");
     const northTab = document.getElementById("northTab");
@@ -1402,8 +1424,10 @@
       e.preventDefault();
       statusMessage.textContent = "Adding delivery...";
 
+      const shipmentStatus = shipWhenInput.checked ? "nextDay" : "active";
+
       let nextOrder = 0;
-      if (routeInput.value !== "UPS" && routeInput.value !== "FedEx") {
+      if (shipmentStatus === "active" && routeInput.value !== "UPS" && routeInput.value !== "FedEx") {
         const routeJobs = getJobsForRoute(routeInput.value);
         nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
       }
@@ -1413,7 +1437,7 @@
         jobNumber: jobNumberInput.value.trim(),
         address: addressInput.value.trim(),
         route: routeInput.value,
-        status: "active",
+        status: shipmentStatus,
         order: nextOrder,
         createdAt: serverTimestamp()
       };
@@ -1426,8 +1450,10 @@
       try {
         await addDoc(jobsCollection, newJob);
         jobForm.reset();
+        shipWhenInput.checked = false;
         statusMessage.textContent = "Delivery added.";
-        setNotification(`${ACTOR_NAME} added a new ${newJob.route} delivery.`, "success");
+        const timingLabel = newJob.status === "nextDay" ? "next day" : "today";
+        setNotification(`${ACTOR_NAME} added a new ${timingLabel} ${newJob.route} delivery.`, "success");
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not add delivery.";
