@@ -120,6 +120,11 @@
       min-height: 100px;
     }
 
+    .checkbox-row-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
     .checkbox-row {
       display: flex;
       align-items: center;
@@ -156,6 +161,21 @@
 
     .secondary-btn:hover {
       background: #115e59;
+    }
+
+    .fullscreen-btn {
+      background: #111827;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      width: auto;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+
+    .fullscreen-btn:hover {
+      background: #000;
     }
 
     .status-message {
@@ -219,11 +239,17 @@
       padding: 14px;
       background: #f9fafb;
       cursor: grab;
+      position: relative;
     }
 
     .job-card.dragging {
       opacity: 0.55;
       border: 2px dashed #2563eb;
+    }
+
+    .job-card.rush-card {
+      background: #fef2f2;
+      border: 2px solid #dc2626;
     }
 
     .job-card h3 {
@@ -234,6 +260,19 @@
     .job-card p {
       margin: 6px 0;
       line-height: 1.4;
+    }
+
+    .rush-badge {
+      display: inline-block;
+      background: #dc2626;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
     .job-actions {
@@ -349,6 +388,13 @@
       flex-shrink: 0;
     }
 
+    .schedule-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
     .schedule-list {
       display: grid;
       gap: 6px;
@@ -370,6 +416,12 @@
       border-radius: 9px;
       padding: 7px 8px;
       min-width: 0;
+    }
+
+    .schedule-card.rush-card {
+      background: #fef2f2;
+      border: 2px solid #dc2626;
+      border-left-width: 6px;
     }
 
     .schedule-card h4 {
@@ -416,6 +468,11 @@
       border-radius: 12px;
       padding: 12px;
       background: #f3f4f6;
+    }
+
+    .completed-card.rush-card {
+      background: #fef2f2;
+      border: 2px solid #dc2626;
     }
 
     .muted {
@@ -526,6 +583,10 @@
         grid-template-columns: 1fr 1fr;
       }
 
+      .checkbox-row-wrap {
+        grid-template-columns: 1fr 1fr;
+      }
+
       .danger-row {
         grid-template-columns: 1fr auto;
         align-items: end;
@@ -556,18 +617,56 @@
       <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
     </div>
 
-    <div class="card notification-box" id="notificationBox">
-      <div class="notification-title">Last Action</div>
-      <p class="notification-text" id="notificationText">No recent actions yet.</p>
-      <div class="notification-time" id="notificationTime">Waiting for updates...</div>
-    </div>
-
     <div class="card">
       <div class="top-nav">
         <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
         <button class="tab-btn" id="fullPageBtn" type="button">Full Schedule</button>
         <button class="tab-btn" id="nextDayPageBtn" type="button">Next Day Shipments</button>
         <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
+      </div>
+    </div>
+
+    <div id="scheduleFullscreenArea">
+      <div class="card notification-box" id="notificationBox">
+        <div class="notification-title">Last Action</div>
+        <p class="notification-text" id="notificationText">No recent actions yet.</p>
+        <div class="notification-time" id="notificationTime">Waiting for updates...</div>
+      </div>
+
+      <div id="fullPage" style="display:none;">
+        <div class="full-page-wrap">
+          <div class="card full-page-card">
+            <div class="schedule-toolbar">
+              <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
+            </div>
+
+            <h2>Full Schedule</h2>
+            <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
+
+            <div class="full-grid">
+              <div class="full-column">
+                <div class="column-header">
+                  <h3>South Run</h3>
+                </div>
+                <div class="schedule-list" id="southList"></div>
+              </div>
+
+              <div class="full-column">
+                <div class="column-header">
+                  <h3>North Run</h3>
+                </div>
+                <div class="schedule-list" id="northList"></div>
+              </div>
+
+              <div class="full-column">
+                <div class="column-header">
+                  <h3>Local Delivery</h3>
+                </div>
+                <div class="schedule-list" id="localList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -605,10 +704,15 @@
             </select>
           </div>
 
-          <div>
+          <div class="checkbox-row-wrap">
             <label class="checkbox-row">
               <input id="shipWhen" type="checkbox" />
               <span>Mark as Next Day Shipment</span>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="rushDelivery" type="checkbox" />
+              <span>Mark as Rush</span>
             </label>
           </div>
 
@@ -675,38 +779,6 @@
       </div>
     </div>
 
-    <div id="fullPage" style="display:none;">
-      <div class="full-page-wrap">
-        <div class="card full-page-card">
-          <h2>Full Schedule</h2>
-          <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
-
-          <div class="full-grid">
-            <div class="full-column">
-              <div class="column-header">
-                <h3>South Run</h3>
-              </div>
-              <div class="schedule-list" id="southList"></div>
-            </div>
-
-            <div class="full-column">
-              <div class="column-header">
-                <h3>North Run</h3>
-              </div>
-              <div class="schedule-list" id="northList"></div>
-            </div>
-
-            <div class="full-column">
-              <div class="column-header">
-                <h3>Local Delivery</h3>
-              </div>
-              <div class="schedule-list" id="localList"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div id="nextDayPage" style="display:none;">
       <div class="card">
         <h2>Next Day Shipments</h2>
@@ -763,6 +835,7 @@
     let dragTargetIndex = null;
 
     const appRoot = document.getElementById("appRoot");
+    const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
     const mainPage = document.getElementById("mainPage");
     const fullPage = document.getElementById("fullPage");
     const nextDayPage = document.getElementById("nextDayPage");
@@ -786,6 +859,7 @@
     const addressInput = document.getElementById("address");
     const routeInput = document.getElementById("route");
     const shipWhenInput = document.getElementById("shipWhen");
+    const rushDeliveryInput = document.getElementById("rushDelivery");
 
     const southTab = document.getElementById("southTab");
     const northTab = document.getElementById("northTab");
@@ -806,6 +880,7 @@
     const notificationBox = document.getElementById("notificationBox");
     const notificationText = document.getElementById("notificationText");
     const notificationTime = document.getElementById("notificationTime");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -836,14 +911,23 @@
       return jobs.filter(job => job.status === "active" && (job.route === "UPS" || job.route === "FedEx"));
     }
 
+    function sortJobsList(list) {
+      return [...list].sort((a, b) => {
+        const rushA = a.isRush ? 1 : 0;
+        const rushB = b.isRush ? 1 : 0;
+        if (rushA !== rushB) return rushB - rushA;
+        return (a.order ?? 0) - (b.order ?? 0);
+      });
+    }
+
     function getJobsForRoute(routeName) {
-      return getActiveJobs()
-        .filter(job =>
+      return sortJobsList(
+        getActiveJobs().filter(job =>
           job.route === routeName &&
           job.route !== "UPS" &&
           job.route !== "FedEx"
         )
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      );
     }
 
     function getDispatchFitClass(totalJobs) {
@@ -864,15 +948,20 @@
       if (fitClass) appRoot.classList.add(fitClass);
     }
 
+    function getRushBadge() {
+      return `<div class="rush-badge">Rush</div>`;
+    }
+
     function createJobCard(job, showDeliverButton = true, showNextDayButton = true) {
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
 
       const card = document.createElement("div");
-      card.className = "job-card";
+      card.className = `job-card ${job.isRush ? "rush-card" : ""}`;
       card.draggable = showDeliverButton;
       card.dataset.id = job.id;
 
       card.innerHTML = `
+        ${job.isRush ? getRushBadge() : ""}
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
         <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
@@ -940,8 +1029,9 @@
 
     function createCompletedCard(job) {
       const card = document.createElement("div");
-      card.className = "completed-card";
+      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
@@ -955,7 +1045,7 @@
         try {
           let nextOrder = 0;
           if (job.route !== "UPS" && job.route !== "FedEx") {
-            const routeJobs = getJobsForRoute(job.route);
+            const routeJobs = getJobsForRoute(job.route).filter(j => !j.isRush);
             nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
           }
 
@@ -978,8 +1068,9 @@
 
     function createNextDayCard(job) {
       const card = document.createElement("div");
-      card.className = "completed-card";
+      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
@@ -993,7 +1084,7 @@
         try {
           let nextOrder = 0;
           if (job.route !== "UPS" && job.route !== "FedEx") {
-            const routeJobs = getJobsForRoute(job.route);
+            const routeJobs = getJobsForRoute(job.route).filter(j => !j.isRush);
             nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
           }
 
@@ -1015,8 +1106,9 @@
 
     function createOutsideCard(job) {
       const card = document.createElement("div");
-      card.className = "completed-card";
+      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
@@ -1036,9 +1128,10 @@
 
     function createScheduleCard(job, accentClass) {
       const card = document.createElement("div");
-      card.className = `schedule-card ${accentClass}`;
+      card.className = `schedule-card ${accentClass} ${job.isRush ? "rush-card" : ""}`;
 
       card.innerHTML = `
+        ${job.isRush ? getRushBadge() : ""}
         <h4>${escapeHtml(job.customerName)}</h4>
         ${job.jobNumber ? `<div class="meta"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div class="address">${escapeHtml(job.address)}</div>
@@ -1062,19 +1155,17 @@
       filteredJobs.forEach((job, index) => {
         const card = createJobCard(job, true, true);
         card.dataset.index = index;
-
         card.addEventListener("dragover", (e) => {
           e.preventDefault();
           dragTargetIndex = index;
         });
-
         jobList.appendChild(card);
       });
     }
 
     function renderCompleted() {
       completedList.innerHTML = "";
-      const deliveredJobs = getDeliveredJobs();
+      const deliveredJobs = sortJobsList(getDeliveredJobs());
 
       if (deliveredJobs.length === 0) {
         completedList.innerHTML = `<div class="empty-state">No completed deliveries yet.</div>`;
@@ -1088,34 +1179,30 @@
 
     function renderNextDay() {
       nextDayList.innerHTML = "";
-      const nextDayJobs = getNextDayJobs();
+      const nextDayJobs = sortJobsList(getNextDayJobs());
 
       if (nextDayJobs.length === 0) {
         nextDayList.innerHTML = `<div class="empty-state">No next day shipments right now.</div>`;
         return;
       }
 
-      nextDayJobs
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .forEach(job => {
-          nextDayList.appendChild(createNextDayCard(job));
-        });
+      nextDayJobs.forEach(job => {
+        nextDayList.appendChild(createNextDayCard(job));
+      });
     }
 
     function renderOutside() {
       outsideList.innerHTML = "";
-      const outsideJobs = getOutsideJobs();
+      const outsideJobs = sortJobsList(getOutsideJobs());
 
       if (outsideJobs.length === 0) {
         outsideList.innerHTML = `<div class="empty-state">No outside shipments right now.</div>`;
         return;
       }
 
-      outsideJobs
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .forEach(job => {
-          outsideList.appendChild(createOutsideCard(job));
-        });
+      outsideJobs.forEach(job => {
+        outsideList.appendChild(createOutsideCard(job));
+      });
     }
 
     function renderFullSchedule() {
@@ -1300,9 +1387,9 @@
 
         const nextDayJobs = allDocs.filter(job => job.status === "nextDay");
         const groupedRouteCounts = {
-          "South Run": getJobsForRoute("South Run").length,
-          "North Run": getJobsForRoute("North Run").length,
-          "Local Delivery": getJobsForRoute("Local Delivery").length
+          "South Run": getJobsForRoute("South Run").filter(j => !j.isRush).length,
+          "North Run": getJobsForRoute("North Run").filter(j => !j.isRush).length,
+          "Local Delivery": getJobsForRoute("Local Delivery").filter(j => !j.isRush).length
         };
 
         snapshot.forEach((docItem) => {
@@ -1318,6 +1405,11 @@
           if (job.route === "UPS" || job.route === "FedEx") {
             batch.update(doc(db, "deliveryJobs", job.id), {
               status: "active"
+            });
+          } else if (job.isRush) {
+            batch.update(doc(db, "deliveryJobs", job.id), {
+              status: "active",
+              order: -1
             });
           } else {
             const nextOrder = groupedRouteCounts[job.route] ?? 0;
@@ -1348,9 +1440,9 @@
       const southJobs = getJobsForRoute("South Run");
       const northJobs = getJobsForRoute("North Run");
       const localJobs = getJobsForRoute("Local Delivery");
-      const completedJobs = getDeliveredJobs();
-      const nextDayJobs = getNextDayJobs();
-      const outsideJobs = getOutsideJobs();
+      const completedJobs = sortJobsList(getDeliveredJobs());
+      const nextDayJobs = sortJobsList(getNextDayJobs());
+      const outsideJobs = sortJobsList(getOutsideJobs());
 
       const activeTotal = southJobs.length + northJobs.length + localJobs.length;
       const completedTotal = completedJobs.length;
@@ -1364,7 +1456,7 @@
       text += `South Run (${southJobs.length} active):\n`;
       if (southJobs.length) {
         southJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
         });
       } else {
         text += `- No active South Run deliveries.\n`;
@@ -1373,7 +1465,7 @@
       text += `\nNorth Run (${northJobs.length} active):\n`;
       if (northJobs.length) {
         northJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
         });
       } else {
         text += `- No active North Run deliveries.\n`;
@@ -1382,7 +1474,7 @@
       text += `\nLocal Delivery (${localJobs.length} active):\n`;
       if (localJobs.length) {
         localJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
         });
       } else {
         text += `- No active Local Delivery jobs.\n`;
@@ -1391,7 +1483,7 @@
       text += `\nCompleted Deliveries (${completedJobs.length}):\n`;
       if (completedJobs.length) {
         completedJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
         });
       } else {
         text += `- No completed deliveries yet.\n`;
@@ -1400,7 +1492,7 @@
       text += `\nNext Day Shipments (${nextDayJobs.length}):\n`;
       if (nextDayJobs.length) {
         nextDayJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
         });
       } else {
         text += `- No next day shipments.\n`;
@@ -1409,7 +1501,7 @@
       text += `\nOutside Shipments (${outsideJobs.length}):\n`;
       if (outsideJobs.length) {
         outsideJobs.forEach(job => {
-          text += `- ${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
         });
       } else {
         text += `- No outside shipments.\n`;
@@ -1420,16 +1512,40 @@
       return text;
     }
 
+    async function toggleFullScreen() {
+      try {
+        if (!document.fullscreenElement) {
+          await scheduleFullscreenArea.requestFullscreen();
+          fullscreenBtn.textContent = "Exit Full Screen";
+        } else {
+          await document.exitFullscreen();
+          fullscreenBtn.textContent = "Full Screen";
+        }
+      } catch (error) {
+        console.error(error);
+        setNotification("Could not enter full screen.", "danger");
+      }
+    }
+
+    document.addEventListener("fullscreenchange", () => {
+      fullscreenBtn.textContent = document.fullscreenElement ? "Exit Full Screen" : "Full Screen";
+    });
+
     jobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       statusMessage.textContent = "Adding delivery...";
 
       const shipmentStatus = shipWhenInput.checked ? "nextDay" : "active";
+      const isRush = rushDeliveryInput.checked;
 
       let nextOrder = 0;
       if (shipmentStatus === "active" && routeInput.value !== "UPS" && routeInput.value !== "FedEx") {
-        const routeJobs = getJobsForRoute(routeInput.value);
-        nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
+        if (isRush) {
+          nextOrder = -1;
+        } else {
+          const routeJobs = getJobsForRoute(routeInput.value).filter(job => !job.isRush);
+          nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
+        }
       }
 
       const newJob = {
@@ -1438,6 +1554,7 @@
         address: addressInput.value.trim(),
         route: routeInput.value,
         status: shipmentStatus,
+        isRush,
         order: nextOrder,
         createdAt: serverTimestamp()
       };
@@ -1451,9 +1568,11 @@
         await addDoc(jobsCollection, newJob);
         jobForm.reset();
         shipWhenInput.checked = false;
+        rushDeliveryInput.checked = false;
         statusMessage.textContent = "Delivery added.";
         const timingLabel = newJob.status === "nextDay" ? "next day" : "today";
-        setNotification(`${ACTOR_NAME} added a new ${timingLabel} ${newJob.route} delivery.`, "success");
+        const rushLabel = newJob.isRush ? "rush " : "";
+        setNotification(`${ACTOR_NAME} added a new ${timingLabel} ${rushLabel}${newJob.route} delivery.`, "success");
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not add delivery.";
@@ -1465,6 +1584,7 @@
     fullPageBtn.addEventListener("click", showFullPage);
     nextDayPageBtn.addEventListener("click", showNextDayPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
+    fullscreenBtn.addEventListener("click", toggleFullScreen);
 
     southTab.addEventListener("click", () => setRoute("South Run"));
     northTab.addEventListener("click", () => setRoute("North Run"));
