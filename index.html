@@ -310,6 +310,15 @@
       color: white;
     }
 
+    .rush-toggle-btn {
+      background: #374151;
+      color: white;
+    }
+
+    .rush-toggle-btn.is-rush {
+      background: #b91c1c;
+    }
+
     .drop-zone {
       border: 2px dashed #cbd5e1;
       border-radius: 14px;
@@ -895,6 +904,14 @@
       notificationBox.classList.add(type);
     }
 
+    function isOutsideRoute(route) {
+      return route === "UPS" || route === "FedEx";
+    }
+
+    function isLocalRoute(route) {
+      return route === "South Run" || route === "North Run" || route === "Local Delivery";
+    }
+
     function getActiveJobs() {
       return jobs.filter(job => job.status === "active");
     }
@@ -908,7 +925,7 @@
     }
 
     function getOutsideJobs() {
-      return jobs.filter(job => job.status === "active" && (job.route === "UPS" || job.route === "FedEx"));
+      return jobs.filter(job => job.status === "active" && isOutsideRoute(job.route));
     }
 
     function sortJobsList(list) {
@@ -924,10 +941,70 @@
       return sortJobsList(
         getActiveJobs().filter(job =>
           job.route === routeName &&
-          job.route !== "UPS" &&
-          job.route !== "FedEx"
+          !isOutsideRoute(job.route)
         )
       );
+    }
+
+    function getComparableJobs(job) {
+      if (job.status === "active" && isLocalRoute(job.route)) {
+        return getActiveJobs().filter(item =>
+          item.id !== job.id &&
+          item.status === "active" &&
+          item.route === job.route &&
+          !isOutsideRoute(item.route)
+        );
+      }
+
+      if (job.status === "nextDay") {
+        return getNextDayJobs().filter(item =>
+          item.id !== job.id &&
+          item.status === "nextDay" &&
+          item.route === job.route
+        );
+      }
+
+      if (job.status === "active" && isOutsideRoute(job.route)) {
+        return getOutsideJobs().filter(item =>
+          item.id !== job.id &&
+          item.route === job.route
+        );
+      }
+
+      return [];
+    }
+
+    function getNextNonRushOrder(job) {
+      const comparable = getComparableJobs(job).filter(item => !item.isRush);
+      if (!comparable.length) return 0;
+      return Math.max(...comparable.map(item => item.order ?? 0)) + 1;
+    }
+
+    async function toggleRushStatus(job) {
+      try {
+        const nextRushState = !job.isRush;
+        const updates = { isRush: nextRushState };
+
+        if (nextRushState) {
+          updates.order = -1;
+        } else {
+          updates.order = getNextNonRushOrder(job);
+        }
+
+        await updateDoc(doc(db, "deliveryJobs", job.id), updates);
+
+        if (nextRushState) {
+          setNotification(`${job.customerName} marked as rush.`, "warning");
+        } else {
+          setNotification(`${job.customerName} removed from rush.`, "success");
+        }
+
+        statusMessage.textContent = nextRushState ? "Delivery marked as rush." : "Rush removed from delivery.";
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not update rush status.";
+        setNotification("Could not update rush status.", "danger");
+      }
     }
 
     function getDispatchFitClass(totalJobs) {
@@ -952,6 +1029,15 @@
       return `<div class="rush-badge">Rush</div>`;
     }
 
+    function createRushToggleButton(job) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `small-btn rush-toggle-btn ${job.isRush ? "is-rush" : ""}`;
+      button.textContent = job.isRush ? "Remove Rush" : "Mark Rush";
+      button.addEventListener("click", () => toggleRushStatus(job));
+      return button;
+    }
+
     function createJobCard(job, showDeliverButton = true, showNextDayButton = true) {
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
 
@@ -972,6 +1058,9 @@
           ${showNextDayButton ? `<button class="small-btn nextday-btn" type="button">Move to Next Day</button>` : ""}
         </div>
       `;
+
+      const actions = card.querySelector(".job-actions");
+      actions.appendChild(createRushToggleButton(job));
 
       card.querySelector(".maps-btn").addEventListener("click", () => {
         window.open(mapsLink, "_blank");
@@ -1041,12 +1130,14 @@
         </div>
       `;
 
+      const actions = card.querySelector(".job-actions");
+      actions.appendChild(createRushToggleButton(job));
+
       card.querySelector(".restore-btn").addEventListener("click", async () => {
         try {
           let nextOrder = 0;
-          if (job.route !== "UPS" && job.route !== "FedEx") {
-            const routeJobs = getJobsForRoute(job.route).filter(j => !j.isRush);
-            nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
+          if (!isOutsideRoute(job.route)) {
+            nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" });
           }
 
           await updateDoc(doc(db, "deliveryJobs", job.id), {
@@ -1080,12 +1171,14 @@
         </div>
       `;
 
+      const actions = card.querySelector(".job-actions");
+      actions.appendChild(createRushToggleButton(job));
+
       card.querySelector(".restore-btn").addEventListener("click", async () => {
         try {
           let nextOrder = 0;
-          if (job.route !== "UPS" && job.route !== "FedEx") {
-            const routeJobs = getJobsForRoute(job.route).filter(j => !j.isRush);
-            nextOrder = routeJobs.length ? Math.max(...routeJobs.map(j => j.order ?? 0)) + 1 : 0;
+          if (!isOutsideRoute(job.route)) {
+            nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" });
           }
 
           await updateDoc(doc(db, "deliveryJobs", job.id), {
@@ -1117,6 +1210,9 @@
           <button class="small-btn maps-btn" type="button">Open in Maps</button>
         </div>
       `;
+
+      const actions = card.querySelector(".job-actions");
+      actions.appendChild(createRushToggleButton(job));
 
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
       card.querySelector(".maps-btn").addEventListener("click", () => {
@@ -1311,7 +1407,7 @@
       const draggedJob = jobs.find(job => job.id === draggedJobId);
       if (!draggedJob) return;
 
-      if (targetRoute === "UPS" || targetRoute === "FedEx") return;
+      if (isOutsideRoute(targetRoute)) return;
 
       const targetRouteJobs = getJobsForRoute(targetRoute).filter(job => job.id !== draggedJobId);
       let newOrderList = [...targetRouteJobs];
@@ -1394,15 +1490,15 @@
 
         snapshot.forEach((docItem) => {
           const data = docItem.data();
-          const isLocalRoute = data.route === "South Run" || data.route === "North Run" || data.route === "Local Delivery";
+          const isLocal = isLocalRoute(data.route);
 
-          if ((data.status === "active" && isLocalRoute) || data.status === "delivered") {
+          if ((data.status === "active" && isLocal) || data.status === "delivered") {
             batch.delete(doc(db, "deliveryJobs", docItem.id));
           }
         });
 
         nextDayJobs.forEach((job) => {
-          if (job.route === "UPS" || job.route === "FedEx") {
+          if (isOutsideRoute(job.route)) {
             batch.update(doc(db, "deliveryJobs", job.id), {
               status: "active"
             });
@@ -1539,7 +1635,7 @@
       const isRush = rushDeliveryInput.checked;
 
       let nextOrder = 0;
-      if (shipmentStatus === "active" && routeInput.value !== "UPS" && routeInput.value !== "FedEx") {
+      if (shipmentStatus === "active" && !isOutsideRoute(routeInput.value)) {
         if (isRush) {
           nextOrder = -1;
         } else {
