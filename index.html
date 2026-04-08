@@ -61,10 +61,48 @@
       margin-top: 0;
     }
 
+    .top-nav-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mobile-nav-bar {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mobile-nav-title {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .menu-toggle-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      width: auto;
+    }
+
+    .menu-toggle-btn:hover {
+      background: #1d4ed8;
+    }
+
     .top-nav {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
+    }
+
+    .top-nav.mobile-open {
+      display: grid;
     }
 
     .route-tabs {
@@ -587,6 +625,37 @@
     .dispatch-fit-3 .schedule-card .meta { font-size: 0.6rem; margin-bottom: 1px; }
     .dispatch-fit-3 .schedule-card .address { font-size: 0.62rem; line-height: 1; }
 
+    @media (max-width: 700px) {
+      .mobile-nav-bar {
+        display: flex;
+      }
+
+      .top-nav {
+        display: none;
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav.mobile-open {
+        display: grid;
+      }
+
+      .top-nav .tab-btn {
+        text-align: left;
+      }
+
+      .route-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .job-actions {
+        flex-direction: column;
+      }
+
+      .small-btn {
+        min-width: 100%;
+      }
+    }
+
     @media (min-width: 700px) {
       .form-row {
         grid-template-columns: 1fr 1fr;
@@ -611,6 +680,12 @@
       }
     }
 
+    @media (min-width: 701px) {
+      .top-nav {
+        display: grid !important;
+      }
+    }
+
     @media (min-width: 950px) {
       .full-grid {
         grid-template-columns: 1fr 1fr 1fr;
@@ -627,11 +702,18 @@
     </div>
 
     <div class="card">
-      <div class="top-nav">
-        <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
-        <button class="tab-btn" id="fullPageBtn" type="button">Full Schedule</button>
-        <button class="tab-btn" id="nextDayPageBtn" type="button">Next Day Shipments</button>
-        <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
+      <div class="top-nav-wrap">
+        <div class="mobile-nav-bar">
+          <div class="mobile-nav-title" id="mobileNavTitle">Delivery Manager</div>
+          <button class="menu-toggle-btn" id="menuToggleBtn" type="button">Menu</button>
+        </div>
+
+        <div class="top-nav" id="topNav">
+          <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
+          <button class="tab-btn" id="fullPageBtn" type="button">Full Schedule</button>
+          <button class="tab-btn" id="nextDayPageBtn" type="button">Next Day Shipments</button>
+          <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
+        </div>
       </div>
     </div>
 
@@ -853,6 +935,10 @@
     const fullPageBtn = document.getElementById("fullPageBtn");
     const nextDayPageBtn = document.getElementById("nextDayPageBtn");
     const outsidePageBtn = document.getElementById("outsidePageBtn");
+
+    const topNav = document.getElementById("topNav");
+    const menuToggleBtn = document.getElementById("menuToggleBtn");
+    const mobileNavTitle = document.getElementById("mobileNavTitle");
 
     const jobForm = document.getElementById("jobForm");
     const jobList = document.getElementById("jobList");
@@ -1347,6 +1433,20 @@
       renderJobs();
     }
 
+    function updateMobileNavTitle(title) {
+      mobileNavTitle.textContent = title;
+    }
+
+    function closeMobileMenu() {
+      topNav.classList.remove("mobile-open");
+      menuToggleBtn.textContent = "Menu";
+    }
+
+    function toggleMobileMenu() {
+      topNav.classList.toggle("mobile-open");
+      menuToggleBtn.textContent = topNav.classList.contains("mobile-open") ? "Close" : "Menu";
+    }
+
     function resetTopTabs() {
       mainPageBtn.classList.remove("active");
       fullPageBtn.classList.remove("active");
@@ -1361,6 +1461,8 @@
       outsidePage.style.display = "none";
       resetTopTabs();
       mainPageBtn.classList.add("active");
+      updateMobileNavTitle("Delivery Manager");
+      closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
     }
@@ -1372,6 +1474,8 @@
       outsidePage.style.display = "none";
       resetTopTabs();
       fullPageBtn.classList.add("active");
+      updateMobileNavTitle("Full Schedule");
+      closeMobileMenu();
       document.body.classList.add("no-scroll");
       renderFullSchedule();
     }
@@ -1383,6 +1487,8 @@
       outsidePage.style.display = "none";
       resetTopTabs();
       nextDayPageBtn.classList.add("active");
+      updateMobileNavTitle("Next Day Shipments");
+      closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
       renderNextDay();
@@ -1395,6 +1501,8 @@
       outsidePage.style.display = "block";
       resetTopTabs();
       outsidePageBtn.classList.add("active");
+      updateMobileNavTitle("Outside Shipments");
+      closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
       renderOutside();
@@ -1679,6 +1787,8 @@
       }
     });
 
+    menuToggleBtn.addEventListener("click", toggleMobileMenu);
+
     mainPageBtn.addEventListener("click", showMainPage);
     fullPageBtn.addEventListener("click", showFullPage);
     nextDayPageBtn.addEventListener("click", showNextDayPage);
@@ -1744,6 +1854,12 @@
         setNotification("Could not load deliveries. Check Firebase setup.", "danger");
       }
     );
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 700) {
+        closeMobileMenu();
+      }
+    });
 
     renderJobs();
     renderCompleted();
