@@ -216,6 +216,33 @@
       background: #000;
     }
 
+    .print-btn {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      width: auto;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+
+    .print-btn:hover {
+      background: #6d28d9;
+    }
+
+    .cancel-btn {
+      background: #6b7280;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background: #4b5563;
+    }
+
     .status-message {
       margin-top: 10px;
       font-size: 0.95rem;
@@ -258,6 +285,31 @@
       margin-top: 6px;
       font-size: 0.85rem;
       color: #6b7280;
+    }
+
+    .totals-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .total-card {
+      border-radius: 14px;
+      padding: 14px;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+
+    .total-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+
+    .total-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      line-height: 1;
     }
 
     .route-title {
@@ -313,6 +365,35 @@
       letter-spacing: 0.4px;
     }
 
+    .route-badge {
+      display: inline-block;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      margin-right: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-south { background: #0ea5e9; }
+    .badge-north { background: #22c55e; }
+    .badge-local { background: #f59e0b; }
+    .badge-ups { background: #8b5cf6; }
+    .badge-fedex { background: #ec4899; }
+
+    .notes-box {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #334155;
+      font-size: 0.92rem;
+      border: 1px solid #c7d2fe;
+    }
+
     .job-actions {
       margin-top: 12px;
       display: flex;
@@ -357,6 +438,11 @@
       background: #b91c1c;
     }
 
+    .edit-btn {
+      background: #0f766e;
+      color: white;
+    }
+
     .drop-zone {
       border: 2px dashed #cbd5e1;
       border-radius: 14px;
@@ -385,24 +471,24 @@
     }
 
     @media (min-width: 950px) {
-      .full-page-wrap {
+      .is-fullscreen .full-page-wrap {
         height: calc(100vh - 175px);
       }
     }
 
     .full-page-card {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: visible;
       padding: 14px;
     }
 
     .full-grid {
       display: grid;
       gap: 10px;
-      flex: 1;
       min-height: 0;
+      overflow: visible;
+      padding-right: 0;
     }
 
     .full-column {
@@ -438,15 +524,17 @@
     .schedule-toolbar {
       display: flex;
       justify-content: flex-end;
+      gap: 10px;
       margin-bottom: 10px;
       flex-shrink: 0;
+      flex-wrap: wrap;
     }
 
     .schedule-list {
       display: grid;
       gap: 6px;
       min-height: 0;
-      overflow: hidden;
+      overflow: visible;
       align-content: start;
     }
 
@@ -491,6 +579,15 @@
       color: #111827;
       white-space: normal;
       word-break: break-word;
+    }
+
+    .schedule-card .notes-mini {
+      font-size: 0.72rem;
+      line-height: 1.15;
+      color: #475569;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed #dbe3ee;
     }
 
     .south-accent {
@@ -598,6 +695,7 @@
     .dispatch-fit-1 .schedule-card h4 { font-size: 0.84rem; }
     .dispatch-fit-1 .schedule-card .meta { font-size: 0.72rem; }
     .dispatch-fit-1 .schedule-card .address { font-size: 0.75rem; line-height: 1.12; }
+    .dispatch-fit-1 .schedule-card .notes-mini { font-size: 0.68rem; }
 
     .dispatch-fit-2 .full-page-card { padding: 10px; }
     .dispatch-fit-2 .full-grid { gap: 6px; }
@@ -611,6 +709,7 @@
     .dispatch-fit-2 .schedule-card h4 { font-size: 0.78rem; margin-bottom: 2px; }
     .dispatch-fit-2 .schedule-card .meta { font-size: 0.66rem; margin-bottom: 2px; }
     .dispatch-fit-2 .schedule-card .address { font-size: 0.69rem; line-height: 1.05; }
+    .dispatch-fit-2 .schedule-card .notes-mini { font-size: 0.63rem; }
 
     .dispatch-fit-3 .full-page-card { padding: 8px; }
     .dispatch-fit-3 .full-grid { gap: 4px; }
@@ -624,6 +723,67 @@
     .dispatch-fit-3 .schedule-card h4 { font-size: 0.71rem; margin-bottom: 1px; }
     .dispatch-fit-3 .schedule-card .meta { font-size: 0.6rem; margin-bottom: 1px; }
     .dispatch-fit-3 .schedule-card .address { font-size: 0.62rem; line-height: 1; }
+    .dispatch-fit-3 .schedule-card .notes-mini { font-size: 0.58rem; }
+
+    .fullscreen-fit-1 .full-page-card { padding: 10px; }
+    .fullscreen-fit-1 .full-grid { gap: 6px; }
+    .fullscreen-fit-1 .full-column { padding: 6px; }
+    .fullscreen-fit-1 .column-header { margin-bottom: 4px; padding-bottom: 4px; }
+    .fullscreen-fit-1 .column-header h3 { font-size: 0.84rem; }
+    .fullscreen-fit-1 .schedule-note { font-size: 0.74rem; margin-bottom: 6px; }
+    .fullscreen-fit-1 .schedule-card { padding: 4px 6px; }
+    .fullscreen-fit-1 .schedule-card h4 { font-size: 0.74rem; }
+    .fullscreen-fit-1 .schedule-card .meta { font-size: 0.62rem; }
+    .fullscreen-fit-1 .schedule-card .address { font-size: 0.65rem; line-height: 1.02; }
+    .fullscreen-fit-1 .schedule-card .notes-mini { font-size: 0.58rem; line-height: 1; }
+    .fullscreen-fit-1 .route-badge,
+    .fullscreen-fit-1 .rush-badge { font-size: 0.62rem; padding: 3px 6px; margin-bottom: 4px; }
+
+    .fullscreen-fit-2 .full-page-card { padding: 8px; }
+    .fullscreen-fit-2 .full-grid { gap: 4px; }
+    .fullscreen-fit-2 .full-column { padding: 4px; border-radius: 10px; }
+    .fullscreen-fit-2 .column-header { margin-bottom: 2px; padding-bottom: 2px; }
+    .fullscreen-fit-2 .column-header h3 { font-size: 0.76rem; }
+    .fullscreen-fit-2 .schedule-note { font-size: 0.68rem; margin-bottom: 4px; }
+    .fullscreen-fit-2 .schedule-list { gap: 2px; }
+    .fullscreen-fit-2 .schedule-list.double-stack { column-gap: 2px; row-gap: 2px; }
+    .fullscreen-fit-2 .schedule-card { padding: 3px 4px; border-radius: 5px; }
+    .fullscreen-fit-2 .schedule-card h4 { font-size: 0.66rem; margin-bottom: 1px; }
+    .fullscreen-fit-2 .schedule-card .meta { font-size: 0.55rem; margin-bottom: 1px; }
+    .fullscreen-fit-2 .schedule-card .address { font-size: 0.57rem; line-height: 0.98; }
+    .fullscreen-fit-2 .schedule-card .notes-mini { font-size: 0.5rem; line-height: 0.95; margin-top: 2px; padding-top: 2px; }
+    .fullscreen-fit-2 .route-badge,
+    .fullscreen-fit-2 .rush-badge { font-size: 0.56rem; padding: 2px 5px; margin-bottom: 3px; }
+
+    .fullscreen-fit-3 .full-page-card { padding: 6px; }
+    .fullscreen-fit-3 .full-grid { gap: 3px; }
+    .fullscreen-fit-3 .full-column { padding: 3px; border-radius: 8px; }
+    .fullscreen-fit-3 .column-header { margin-bottom: 2px; padding-bottom: 2px; }
+    .fullscreen-fit-3 .column-header h3 { font-size: 0.68rem; }
+    .fullscreen-fit-3 .schedule-note { font-size: 0.62rem; margin-bottom: 3px; }
+    .fullscreen-fit-3 .schedule-list { gap: 2px; }
+    .fullscreen-fit-3 .schedule-list.double-stack { column-gap: 2px; row-gap: 2px; }
+    .fullscreen-fit-3 .schedule-card { padding: 2px 3px; border-radius: 4px; }
+    .fullscreen-fit-3 .schedule-card h4 { font-size: 0.58rem; margin-bottom: 0; }
+    .fullscreen-fit-3 .schedule-card .meta { font-size: 0.5rem; margin-bottom: 0; }
+    .fullscreen-fit-3 .schedule-card .address { font-size: 0.51rem; line-height: 0.92; }
+    .fullscreen-fit-3 .schedule-card .notes-mini { font-size: 0.46rem; line-height: 0.9; margin-top: 1px; padding-top: 1px; }
+    .fullscreen-fit-3 .route-badge,
+    .fullscreen-fit-3 .rush-badge { font-size: 0.5rem; padding: 2px 4px; margin-bottom: 2px; }
+
+    .is-fullscreen #quickTotalsCard {
+      display: none !important;
+    }
+
+    .is-fullscreen .full-page-card {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .is-fullscreen .full-grid {
+      flex: 1;
+      overflow: hidden;
+    }
 
     @media (max-width: 700px) {
       .mobile-nav-bar {
@@ -654,6 +814,10 @@
       .small-btn {
         min-width: 100%;
       }
+
+      .schedule-toolbar {
+        flex-direction: column;
+      }
     }
 
     @media (min-width: 700px) {
@@ -677,6 +841,10 @@
 
       .summary-actions {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .totals-grid {
+        grid-template-columns: repeat(5, 1fr);
       }
     }
 
@@ -724,17 +892,44 @@
         <div class="notification-time" id="notificationTime">Waiting for updates...</div>
       </div>
 
+      <div class="card" id="quickTotalsCard">
+        <h2>Quick Totals</h2>
+        <div class="totals-grid">
+          <div class="total-card">
+            <h3>Active Today</h3>
+            <div class="total-number" id="activeTodayCount">0</div>
+          </div>
+          <div class="total-card">
+            <h3>Rush Jobs</h3>
+            <div class="total-number" id="rushCount">0</div>
+          </div>
+          <div class="total-card">
+            <h3>Next Day</h3>
+            <div class="total-number" id="nextDayCount">0</div>
+          </div>
+          <div class="total-card">
+            <h3>Outside</h3>
+            <div class="total-number" id="outsideCount">0</div>
+          </div>
+          <div class="total-card">
+            <h3>Completed</h3>
+            <div class="total-number" id="completedCount">0</div>
+          </div>
+        </div>
+      </div>
+
       <div id="fullPage" style="display:none;">
         <div class="full-page-wrap">
-          <div class="card full-page-card">
+          <div class="card full-page-card" id="fullPageCard">
             <div class="schedule-toolbar">
+              <button id="printSheetBtn" class="print-btn" type="button">Print Dispatch Sheet</button>
               <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
             </div>
 
             <h2>Full Schedule</h2>
             <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
 
-            <div class="full-grid">
+            <div class="full-grid" id="fullGrid">
               <div class="full-column">
                 <div class="column-header">
                   <h3>South Run</h3>
@@ -784,6 +979,11 @@
           </div>
 
           <div>
+            <label for="deliveryNotes">Notes (optional)</label>
+            <textarea id="deliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
+          </div>
+
+          <div>
             <label for="route">Route</label>
             <select id="route" required>
               <option value="">Select Route</option>
@@ -809,6 +1009,63 @@
 
           <button class="primary-btn" type="submit">Add Delivery</button>
           <div id="statusMessage" class="status-message"></div>
+        </form>
+      </div>
+
+      <div class="card" id="editDeliveryCard" style="display:none;">
+        <h2>Edit Delivery</h2>
+
+        <form id="editJobForm" class="form-grid">
+          <div class="form-row">
+            <div>
+              <label for="editCustomerName">Customer Name</label>
+              <input id="editCustomerName" type="text" required />
+            </div>
+
+            <div>
+              <label for="editJobNumber">Job Number (optional)</label>
+              <input id="editJobNumber" type="text" />
+            </div>
+          </div>
+
+          <div>
+            <label for="editAddress">Delivery Address</label>
+            <textarea id="editAddress" required></textarea>
+          </div>
+
+          <div>
+            <label for="editDeliveryNotes">Notes (optional)</label>
+            <textarea id="editDeliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
+          </div>
+
+          <div>
+            <label for="editRoute">Route</label>
+            <select id="editRoute" required>
+              <option value="">Select Route</option>
+              <option value="South Run">South Run</option>
+              <option value="North Run">North Run</option>
+              <option value="Local Delivery">Local Delivery</option>
+              <option value="UPS">UPS</option>
+              <option value="FedEx">FedEx</option>
+            </select>
+          </div>
+
+          <div class="checkbox-row-wrap">
+            <label class="checkbox-row">
+              <input id="editShipWhen" type="checkbox" />
+              <span>Mark as Next Day Shipment</span>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="editRushDelivery" type="checkbox" />
+              <span>Mark as Rush</span>
+            </label>
+          </div>
+
+          <div class="summary-actions">
+            <button class="primary-btn" type="submit">Save Changes</button>
+            <button class="cancel-btn" id="cancelEditBtn" type="button">Cancel</button>
+          </div>
         </form>
       </div>
 
@@ -923,6 +1180,8 @@
     let currentRoute = "South Run";
     let draggedJobId = null;
     let dragTargetIndex = null;
+    let currentPageView = "main";
+    let editingJobId = null;
 
     const appRoot = document.getElementById("appRoot");
     const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
@@ -930,6 +1189,8 @@
     const fullPage = document.getElementById("fullPage");
     const nextDayPage = document.getElementById("nextDayPage");
     const outsidePage = document.getElementById("outsidePage");
+    const quickTotalsCard = document.getElementById("quickTotalsCard");
+    const fullGrid = document.getElementById("fullGrid");
 
     const mainPageBtn = document.getElementById("mainPageBtn");
     const fullPageBtn = document.getElementById("fullPageBtn");
@@ -951,9 +1212,21 @@
     const customerNameInput = document.getElementById("customerName");
     const jobNumberInput = document.getElementById("jobNumber");
     const addressInput = document.getElementById("address");
+    const deliveryNotesInput = document.getElementById("deliveryNotes");
     const routeInput = document.getElementById("route");
     const shipWhenInput = document.getElementById("shipWhen");
     const rushDeliveryInput = document.getElementById("rushDelivery");
+
+    const editDeliveryCard = document.getElementById("editDeliveryCard");
+    const editJobForm = document.getElementById("editJobForm");
+    const editCustomerNameInput = document.getElementById("editCustomerName");
+    const editJobNumberInput = document.getElementById("editJobNumber");
+    const editAddressInput = document.getElementById("editAddress");
+    const editDeliveryNotesInput = document.getElementById("editDeliveryNotes");
+    const editRouteInput = document.getElementById("editRoute");
+    const editShipWhenInput = document.getElementById("editShipWhen");
+    const editRushDeliveryInput = document.getElementById("editRushDelivery");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
 
     const southTab = document.getElementById("southTab");
     const northTab = document.getElementById("northTab");
@@ -975,6 +1248,13 @@
     const notificationText = document.getElementById("notificationText");
     const notificationTime = document.getElementById("notificationTime");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const printSheetBtn = document.getElementById("printSheetBtn");
+
+    const activeTodayCount = document.getElementById("activeTodayCount");
+    const rushCount = document.getElementById("rushCount");
+    const nextDayCount = document.getElementById("nextDayCount");
+    const outsideCount = document.getElementById("outsideCount");
+    const completedCount = document.getElementById("completedCount");
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -987,6 +1267,22 @@
       notificationTime.textContent = `Updated: ${new Date().toLocaleString()}`;
       notificationBox.classList.remove("success", "warning", "danger");
       notificationBox.classList.add(type);
+    }
+
+    function updateQuickTotalsVisibility() {
+      const isFullscreen = !!document.fullscreenElement;
+
+      if (currentPageView === "main") {
+        quickTotalsCard.style.display = isFullscreen ? "none" : "block";
+        return;
+      }
+
+      if (currentPageView === "full") {
+        quickTotalsCard.style.display = isFullscreen ? "none" : "block";
+        return;
+      }
+
+      quickTotalsCard.style.display = "none";
     }
 
     function isOutsideRoute(route) {
@@ -1011,6 +1307,10 @@
 
     function getOutsideJobs() {
       return jobs.filter(job => job.status === "active" && isOutsideRoute(job.route));
+    }
+
+    function getRushJobsCount() {
+      return jobs.filter(job => job.isRush && (job.status === "active" || job.status === "nextDay" || job.status === "delivered")).length;
     }
 
     function sortJobsList(list) {
@@ -1065,6 +1365,27 @@
       return Math.max(...comparable.map(item => item.order ?? 0)) + 1;
     }
 
+    function getRouteBadgeClass(route) {
+      if (route === "South Run") return "badge-south";
+      if (route === "North Run") return "badge-north";
+      if (route === "Local Delivery") return "badge-local";
+      if (route === "UPS") return "badge-ups";
+      if (route === "FedEx") return "badge-fedex";
+      return "";
+    }
+
+    function getRouteBadge(route) {
+      return `<div class="route-badge ${getRouteBadgeClass(route)}">${escapeHtml(route)}</div>`;
+    }
+
+    function updateQuickTotals() {
+      activeTodayCount.textContent = getJobsForRoute("South Run").length + getJobsForRoute("North Run").length + getJobsForRoute("Local Delivery").length;
+      rushCount.textContent = getRushJobsCount();
+      nextDayCount.textContent = getNextDayJobs().length;
+      outsideCount.textContent = getOutsideJobs().length;
+      completedCount.textContent = getDeliveredJobs().length;
+    }
+
     async function toggleRushStatus(job) {
       try {
         const nextRushState = !job.isRush;
@@ -1092,6 +1413,26 @@
       }
     }
 
+    function openEditDelivery(job) {
+      editingJobId = job.id;
+      editCustomerNameInput.value = job.customerName || "";
+      editJobNumberInput.value = job.jobNumber || "";
+      editAddressInput.value = job.address || "";
+      editDeliveryNotesInput.value = job.notes || "";
+      editRouteInput.value = job.route || "";
+      editShipWhenInput.checked = job.status === "nextDay";
+      editRushDeliveryInput.checked = !!job.isRush;
+
+      editDeliveryCard.style.display = "block";
+      editDeliveryCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeEditDelivery() {
+      editingJobId = null;
+      editDeliveryCard.style.display = "none";
+      editJobForm.reset();
+    }
+
     function getDispatchFitClass(totalJobs) {
       if (totalJobs >= 25) return "dispatch-fit-3";
       if (totalJobs >= 16) return "dispatch-fit-2";
@@ -1110,8 +1451,44 @@
       if (fitClass) appRoot.classList.add(fitClass);
     }
 
+    function applyFullscreenFit() {
+      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
+
+      if (!document.fullscreenElement || currentPageView !== "full") return;
+
+      const fitClasses = ["fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3"];
+
+      let applied = false;
+      for (const fitClass of fitClasses) {
+        appRoot.classList.add(fitClass);
+
+        const needsScroll =
+          fullGrid.scrollHeight > fullGrid.clientHeight + 2 ||
+          fullGrid.scrollWidth > fullGrid.clientWidth + 2;
+
+        if (!needsScroll) {
+          applied = true;
+          break;
+        }
+      }
+
+      if (!applied) {
+        appRoot.classList.add("fullscreen-fit-3");
+      }
+    }
+
     function getRushBadge() {
       return `<div class="rush-badge">Rush</div>`;
+    }
+
+    function getNotesHtml(notes) {
+      if (!notes || !notes.trim()) return "";
+      return `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
+    }
+
+    function getMiniNotesHtml(notes) {
+      if (!notes || !notes.trim()) return "";
+      return `<div class="notes-mini"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
     }
 
     function createRushToggleButton(job) {
@@ -1123,7 +1500,16 @@
       return button;
     }
 
-    function createJobCard(job, showDeliverButton = true, showNextDayButton = true) {
+    function createEditButton(job) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "small-btn edit-btn";
+      button.textContent = "Edit Delivery";
+      button.addEventListener("click", () => openEditDelivery(job));
+      return button;
+    }
+
+    function createJobCard(job, showDeliverButton = true, showNextDayButton = true, showEditButton = false) {
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
 
       const card = document.createElement("div");
@@ -1132,11 +1518,13 @@
       card.dataset.id = job.id;
 
       card.innerHTML = `
+        ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
         <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
         <p class="muted"><strong>Route:</strong> ${escapeHtml(job.route)}</p>
+        ${getNotesHtml(job.notes)}
         <div class="job-actions">
           <button class="small-btn maps-btn" type="button">Open in Maps</button>
           ${showDeliverButton ? `<button class="small-btn deliver-btn" type="button">Mark Delivered</button>` : ""}
@@ -1145,6 +1533,11 @@
       `;
 
       const actions = card.querySelector(".job-actions");
+
+      if (showEditButton) {
+        actions.appendChild(createEditButton(job));
+      }
+
       actions.appendChild(createRushToggleButton(job));
 
       card.querySelector(".maps-btn").addEventListener("click", () => {
@@ -1205,11 +1598,13 @@
       const card = document.createElement("div");
       card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
         <div class="muted">${escapeHtml(job.route)}</div>
+        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
           <button class="small-btn restore-btn" type="button">Restore</button>
         </div>
@@ -1246,11 +1641,13 @@
       const card = document.createElement("div");
       card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
         <div class="muted">${escapeHtml(job.route)}</div>
+        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
           <button class="small-btn restore-btn" type="button">Move Back to Today</button>
         </div>
@@ -1286,11 +1683,13 @@
       const card = document.createElement("div");
       card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
       card.innerHTML = `
+        ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
         <div class="muted">${escapeHtml(job.route)}</div>
+        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
           <button class="small-btn maps-btn" type="button">Open in Maps</button>
         </div>
@@ -1312,10 +1711,12 @@
       card.className = `schedule-card ${accentClass} ${job.isRush ? "rush-card" : ""}`;
 
       card.innerHTML = `
+        ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         <h4>${escapeHtml(job.customerName)}</h4>
         ${job.jobNumber ? `<div class="meta"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div class="address">${escapeHtml(job.address)}</div>
+        ${getMiniNotesHtml(job.notes)}
       `;
 
       return card;
@@ -1334,7 +1735,7 @@
       }
 
       filteredJobs.forEach((job, index) => {
-        const card = createJobCard(job, true, true);
+        const card = createJobCard(job, true, true, true);
         card.dataset.index = index;
         card.addEventListener("dragover", (e) => {
           e.preventDefault();
@@ -1400,6 +1801,10 @@
       renderScheduleColumn(southJobs, southList, "south-accent");
       renderScheduleColumn(northJobs, northList, "north-accent");
       renderScheduleColumn(localJobs, localList, "local-accent");
+
+      requestAnimationFrame(() => {
+        applyFullscreenFit();
+      });
     }
 
     function renderScheduleColumn(routeJobs, container, accentClass) {
@@ -1455,6 +1860,7 @@
     }
 
     function showMainPage() {
+      currentPageView = "main";
       mainPage.style.display = "block";
       fullPage.style.display = "none";
       nextDayPage.style.display = "none";
@@ -1465,9 +1871,12 @@
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
+      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
+      updateQuickTotalsVisibility();
     }
 
     function showFullPage() {
+      currentPageView = "full";
       mainPage.style.display = "none";
       fullPage.style.display = "block";
       nextDayPage.style.display = "none";
@@ -1476,11 +1885,13 @@
       fullPageBtn.classList.add("active");
       updateMobileNavTitle("Full Schedule");
       closeMobileMenu();
-      document.body.classList.add("no-scroll");
+      document.body.classList.remove("no-scroll");
       renderFullSchedule();
+      updateQuickTotalsVisibility();
     }
 
     function showNextDayPage() {
+      currentPageView = "nextDay";
       mainPage.style.display = "none";
       fullPage.style.display = "none";
       nextDayPage.style.display = "block";
@@ -1491,10 +1902,13 @@
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
+      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
       renderNextDay();
+      updateQuickTotalsVisibility();
     }
 
     function showOutsidePage() {
+      currentPageView = "outside";
       mainPage.style.display = "none";
       fullPage.style.display = "none";
       nextDayPage.style.display = "none";
@@ -1505,7 +1919,9 @@
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
+      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
       renderOutside();
+      updateQuickTotalsVisibility();
     }
 
     async function moveDraggedJobToRoute(targetRoute, targetIndex = null) {
@@ -1628,6 +2044,7 @@
         clearScheduleInput.value = "";
         clearScheduleBtn.disabled = true;
         summaryOutput.value = "";
+        closeEditDelivery();
         setNotification("Schedule cleared. Next day shipments moved into today’s schedule.", "danger");
       } catch (error) {
         console.error(error);
@@ -1656,7 +2073,7 @@
       text += `South Run (${southJobs.length} active):\n`;
       if (southJobs.length) {
         southJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No active South Run deliveries.\n`;
@@ -1665,7 +2082,7 @@
       text += `\nNorth Run (${northJobs.length} active):\n`;
       if (northJobs.length) {
         northJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No active North Run deliveries.\n`;
@@ -1674,7 +2091,7 @@
       text += `\nLocal Delivery (${localJobs.length} active):\n`;
       if (localJobs.length) {
         localJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No active Local Delivery jobs.\n`;
@@ -1683,7 +2100,7 @@
       text += `\nCompleted Deliveries (${completedJobs.length}):\n`;
       if (completedJobs.length) {
         completedJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No completed deliveries yet.\n`;
@@ -1692,7 +2109,7 @@
       text += `\nNext Day Shipments (${nextDayJobs.length}):\n`;
       if (nextDayJobs.length) {
         nextDayJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No next day shipments.\n`;
@@ -1701,7 +2118,7 @@
       text += `\nOutside Shipments (${outsideJobs.length}):\n`;
       if (outsideJobs.length) {
         outsideJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}\n`;
+          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
         text += `- No outside shipments.\n`;
@@ -1712,9 +2129,105 @@
       return text;
     }
 
+    function buildPrintSheetHtml() {
+      const southJobs = getJobsForRoute("South Run");
+      const northJobs = getJobsForRoute("North Run");
+      const localJobs = getJobsForRoute("Local Delivery");
+      const outsideJobs = sortJobsList(getOutsideJobs());
+      const nextDayJobs = sortJobsList(getNextDayJobs());
+
+      function renderPrintList(title, list) {
+        if (!list.length) {
+          return `
+            <div style="margin-bottom:24px;">
+              <h2 style="margin:0 0 10px; border-bottom:2px solid #ddd; padding-bottom:6px;">${title}</h2>
+              <p style="margin:0; color:#666;">No jobs.</p>
+            </div>
+          `;
+        }
+
+        return `
+          <div style="margin-bottom:24px;">
+            <h2 style="margin:0 0 10px; border-bottom:2px solid #ddd; padding-bottom:6px;">${title}</h2>
+            ${list.map(job => `
+              <div style="border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
+                <div style="font-weight:bold; font-size:16px;">
+                  ${job.customerName}
+                  ${job.isRush ? `<span style="background:#dc2626;color:white;padding:2px 8px;border-radius:999px;font-size:11px;margin-left:8px;">RUSH</span>` : ""}
+                </div>
+                ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${job.jobNumber}</div>` : ""}
+                <div style="margin-top:4px;"><strong>Address:</strong> ${job.address}</div>
+                <div style="margin-top:4px;"><strong>Route:</strong> ${job.route}</div>
+                ${job.notes ? `<div style="margin-top:4px;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      return `
+        <html>
+          <head>
+            <title>Dispatch Sheet</title>
+          </head>
+          <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
+            <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
+            <p style="margin:0 0 20px; color:#6b7280;">Dispatch Sheet - ${new Date().toLocaleString()}</p>
+
+            <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:24px;">
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+                <div style="font-size:12px; color:#666;">Active Today</div>
+                <div style="font-size:24px; font-weight:bold;">${southJobs.length + northJobs.length + localJobs.length}</div>
+              </div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+                <div style="font-size:12px; color:#666;">Rush Jobs</div>
+                <div style="font-size:24px; font-weight:bold;">${getRushJobsCount()}</div>
+              </div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+                <div style="font-size:12px; color:#666;">Next Day</div>
+                <div style="font-size:24px; font-weight:bold;">${nextDayJobs.length}</div>
+              </div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+                <div style="font-size:12px; color:#666;">Outside</div>
+                <div style="font-size:24px; font-weight:bold;">${outsideJobs.length}</div>
+              </div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+                <div style="font-size:12px; color:#666;">Completed</div>
+                <div style="font-size:24px; font-weight:bold;">${getDeliveredJobs().length}</div>
+              </div>
+            </div>
+
+            ${renderPrintList("South Run", southJobs)}
+            ${renderPrintList("North Run", northJobs)}
+            ${renderPrintList("Local Delivery", localJobs)}
+            ${renderPrintList("Outside Shipments", outsideJobs)}
+            ${renderPrintList("Next Day Shipments", nextDayJobs)}
+          </body>
+        </html>
+      `;
+    }
+
+    function printDispatchSheet() {
+      const printWindow = window.open("", "_blank", "width=1000,height=800");
+      if (!printWindow) {
+        setNotification("Could not open print window.", "danger");
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(buildPrintSheetHtml());
+      printWindow.document.close();
+
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
+    }
+
     async function toggleFullScreen() {
       try {
         if (!document.fullscreenElement) {
+          document.body.classList.add("no-scroll");
           await scheduleFullscreenArea.requestFullscreen();
           fullscreenBtn.textContent = "Exit Full Screen";
         } else {
@@ -1723,12 +2236,30 @@
         }
       } catch (error) {
         console.error(error);
+        document.body.classList.remove("no-scroll");
         setNotification("Could not enter full screen.", "danger");
       }
     }
 
     document.addEventListener("fullscreenchange", () => {
-      fullscreenBtn.textContent = document.fullscreenElement ? "Exit Full Screen" : "Full Screen";
+      const isFullscreen = !!document.fullscreenElement;
+
+      fullscreenBtn.textContent = isFullscreen ? "Exit Full Screen" : "Full Screen";
+
+      if (isFullscreen) {
+        appRoot.classList.add("is-fullscreen");
+        document.body.classList.add("no-scroll");
+      } else {
+        appRoot.classList.remove("is-fullscreen");
+        appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
+        document.body.classList.remove("no-scroll");
+      }
+
+      updateQuickTotalsVisibility();
+
+      requestAnimationFrame(() => {
+        applyFullscreenFit();
+      });
     });
 
     jobForm.addEventListener("submit", async (e) => {
@@ -1759,6 +2290,7 @@
         customerName: customerNameInput.value.trim(),
         jobNumber: jobNumberInput.value.trim(),
         address: addressInput.value.trim(),
+        notes: deliveryNotesInput.value.trim(),
         route: routeInput.value,
         status: shipmentStatus,
         isRush,
@@ -1787,6 +2319,58 @@
       }
     });
 
+    editJobForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!editingJobId) return;
+
+      try {
+        const shipmentStatus = editShipWhenInput.checked ? "nextDay" : "active";
+        const isRush = editRushDeliveryInput.checked;
+        const selectedRoute = editRouteInput.value;
+
+        let nextOrder = 0;
+        if (shipmentStatus === "active" && !isOutsideRoute(selectedRoute)) {
+          if (isRush) {
+            nextOrder = -1;
+          } else {
+            const routeJobs = getJobsForRoute(selectedRoute)
+              .filter(job => job.id !== editingJobId && !job.isRush);
+            nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
+          }
+        } else if (shipmentStatus === "active" && isOutsideRoute(selectedRoute)) {
+          if (isRush) {
+            nextOrder = -1;
+          } else {
+            const outsideRouteJobs = getOutsideJobs()
+              .filter(job => job.id !== editingJobId && job.route === selectedRoute && !job.isRush);
+            nextOrder = outsideRouteJobs.length ? Math.max(...outsideRouteJobs.map(job => job.order ?? 0)) + 1 : 0;
+          }
+        }
+
+        await updateDoc(doc(db, "deliveryJobs", editingJobId), {
+          customerName: editCustomerNameInput.value.trim(),
+          jobNumber: editJobNumberInput.value.trim(),
+          address: editAddressInput.value.trim(),
+          notes: editDeliveryNotesInput.value.trim(),
+          route: selectedRoute,
+          status: shipmentStatus,
+          isRush,
+          order: nextOrder
+        });
+
+        closeEditDelivery();
+        statusMessage.textContent = "Delivery updated.";
+        setNotification("Delivery updated successfully.", "success");
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not update delivery.";
+        setNotification("Could not update delivery.", "danger");
+      }
+    });
+
+    cancelEditBtn.addEventListener("click", closeEditDelivery);
+
     menuToggleBtn.addEventListener("click", toggleMobileMenu);
 
     mainPageBtn.addEventListener("click", showMainPage);
@@ -1794,6 +2378,7 @@
     nextDayPageBtn.addEventListener("click", showNextDayPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
     fullscreenBtn.addEventListener("click", toggleFullScreen);
+    printSheetBtn.addEventListener("click", printDispatchSheet);
 
     southTab.addEventListener("click", () => setRoute("South Run"));
     northTab.addEventListener("click", () => setRoute("North Run"));
@@ -1843,10 +2428,13 @@
         renderCompleted();
         renderNextDay();
         renderOutside();
+        renderFullSchedule();
+        updateQuickTotals();
+        updateQuickTotalsVisibility();
 
-        if (fullPage.style.display !== "none") {
-          renderFullSchedule();
-        }
+        requestAnimationFrame(() => {
+          applyFullscreenFit();
+        });
       },
       (error) => {
         console.error(error);
@@ -1859,12 +2447,19 @@
       if (window.innerWidth > 700) {
         closeMobileMenu();
       }
+
+      requestAnimationFrame(() => {
+        applyFullscreenFit();
+      });
     });
 
     renderJobs();
     renderCompleted();
     renderNextDay();
     renderOutside();
+    renderFullSchedule();
+    updateQuickTotals();
+    showMainPage();
   </script>
 </body>
 </html>
