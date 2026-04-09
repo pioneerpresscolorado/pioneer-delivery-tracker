@@ -490,10 +490,26 @@
       flex-direction: column;
     }
 
-    @media (min-width: 950px) {
-      .is-fullscreen .full-page-wrap {
-        height: calc(100vh - 175px);
-      }
+    #scheduleFullscreenArea:fullscreen,
+    #scheduleFullscreenArea:-webkit-full-screen {
+      width: 100vw;
+      height: 100vh;
+      background: #f4f7fb;
+      padding: 8px;
+      overflow: hidden;
+    }
+
+    #scheduleFullscreenArea:fullscreen #fullPage,
+    #scheduleFullscreenArea:-webkit-full-screen #fullPage {
+      display: block;
+      height: 100%;
+    }
+
+    #scheduleFullscreenArea:fullscreen .full-page-wrap,
+    #scheduleFullscreenArea:-webkit-full-screen .full-page-wrap {
+      height: 100%;
+      min-height: 0;
+      flex: 1;
     }
 
     .full-page-card {
@@ -825,11 +841,26 @@
       font-size: 0.9rem;
     }
 
+    .is-fullscreen #scheduleFullscreenArea {
+      width: 100%;
+      height: 100vh;
+      background: #f4f7fb;
+      overflow: hidden;
+    }
+
+    .is-fullscreen #fullPage {
+      display: block;
+      height: 100%;
+    }
+
     .is-fullscreen .full-page-wrap {
-      height: calc(100vh - 112px) !important;
+      height: 100% !important;
+      min-height: 0;
+      flex: 1;
     }
 
     .is-fullscreen .full-page-card {
+      height: 100%;
       padding: 8px;
     }
 
@@ -935,17 +966,21 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex-shrink: 0;
     }
 
 
     .is-fullscreen .full-page-card {
       flex: 1;
       overflow: hidden;
+      min-height: 0;
     }
 
     .is-fullscreen .full-grid {
       flex: 1;
       overflow: hidden;
+      min-height: 0;
+      align-content: stretch;
     }
 
     .modal-overlay {
@@ -1095,6 +1130,74 @@
         grid-template-columns: 1fr 1fr 1fr;
       }
     }
+
+    .date-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .date-picker-wrap {
+      min-width: 220px;
+    }
+
+    .date-picker-wrap input {
+      margin-top: 6px;
+    }
+
+    .history-summary-chip {
+      background: #eef2ff;
+      color: #312e81;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .history-day-group {
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #f8fafc;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .history-day-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #dbe3ee;
+    }
+
+    .history-day-title {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .history-day-subtitle {
+      color: #6b7280;
+      font-size: 0.92rem;
+    }
+
+    .history-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 900px) {
+      .history-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
   </style>
 </head>
 
@@ -1114,9 +1217,9 @@
 
         <div class="top-nav" id="topNav">
           <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
-          <button class="tab-btn" id="fullPageBtn" type="button">Full Schedule</button>
-          <button class="tab-btn" id="nextDayPageBtn" type="button">Next Day Shipments</button>
+          <button class="tab-btn" id="fullPageBtn" type="button">Today&#39;s Schedule</button>
           <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
+          <button class="tab-btn" id="historyPageBtn" type="button">History</button>
         </div>
       </div>
     </div>
@@ -1132,24 +1235,24 @@
         <h2>Quick Totals</h2>
         <div class="totals-grid">
           <div class="total-card">
-            <h3>Active Today</h3>
+            <h3>On Screen Today</h3>
             <div class="total-number" id="activeTodayCount">0</div>
           </div>
           <div class="total-card">
-            <h3>Rush Jobs</h3>
+            <h3>Rush Today</h3>
             <div class="total-number" id="rushCount">0</div>
           </div>
           <div class="total-card">
-            <h3>Next Day</h3>
-            <div class="total-number" id="nextDayCount">0</div>
-          </div>
-          <div class="total-card">
-            <h3>Outside</h3>
+            <h3>Outside Today</h3>
             <div class="total-number" id="outsideCount">0</div>
           </div>
           <div class="total-card">
-            <h3>Completed</h3>
+            <h3>Completed Today</h3>
             <div class="total-number" id="completedCount">0</div>
+          </div>
+          <div class="total-card">
+            <h3>History 30d</h3>
+            <div class="total-number" id="historyCount">0</div>
           </div>
         </div>
       </div>
@@ -1163,13 +1266,13 @@
               <div class="fullscreen-totals" id="fullscreenTotals">
                 <div class="fullscreen-total-chip">Today <strong id="fsActiveTodayCount">0</strong></div>
                 <div class="fullscreen-total-chip">Rush <strong id="fsRushCount">0</strong></div>
-                <div class="fullscreen-total-chip">Next Day <strong id="fsNextDayCount">0</strong></div>
                 <div class="fullscreen-total-chip">Outside <strong id="fsOutsideCount">0</strong></div>
                 <div class="fullscreen-total-chip">Done <strong id="fsCompletedCount">0</strong></div>
+                <div class="fullscreen-total-chip">30d <strong id="fsHistoryCount">0</strong></div>
               </div>
             </div>
 
-            <h2>Full Schedule</h2>
+            <h2>Today&#39;s Schedule</h2>
             <p class="schedule-note">Read-only view for route planning and easy scanning.</p>
 
             <div class="full-grid" id="fullGrid">
@@ -1199,6 +1302,7 @@
       </div>
     </div>
 
+    
     <div id="mainPage">
       <div class="card">
         <h2>Add Delivery</h2>
@@ -1216,6 +1320,25 @@
             </div>
           </div>
 
+          <div class="form-row">
+            <div>
+              <label for="route">Route</label>
+              <select id="route" required>
+                <option value="">Select Route</option>
+                <option value="South Run">South Run</option>
+                <option value="North / West Run">North / West Run</option>
+                <option value="Local Delivery">Local Delivery</option>
+                <option value="UPS">UPS</option>
+                <option value="FedEx">FedEx</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="deliveryDate">Delivery Date</label>
+              <input id="deliveryDate" type="date" required />
+            </div>
+          </div>
+
           <div>
             <label for="address">Delivery Address</label>
             <textarea id="address" placeholder="Enter full delivery address" required></textarea>
@@ -1226,24 +1349,7 @@
             <textarea id="deliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
           </div>
 
-          <div>
-            <label for="route">Route</label>
-            <select id="route" required>
-              <option value="">Select Route</option>
-              <option value="South Run">South Run</option>
-              <option value="North / West Run">North / West Run</option>
-              <option value="Local Delivery">Local Delivery</option>
-              <option value="UPS">UPS</option>
-              <option value="FedEx">FedEx</option>
-            </select>
-          </div>
-
           <div class="checkbox-row-wrap">
-            <label class="checkbox-row">
-              <input id="shipWhen" type="checkbox" />
-              <span>Mark as Next Day Shipment</span>
-            </label>
-
             <label class="checkbox-row">
               <input id="rushDelivery" type="checkbox" />
               <span>Mark as Rush</span>
@@ -1256,6 +1362,17 @@
       </div>
 
       <div class="card">
+        <div class="date-toolbar">
+          <div>
+            <h2 style="margin:0 0 6px;">Delivery Manager</h2>
+            <p class="muted" style="margin:0;">Manage one delivery day at a time. Today's Schedule always follows the current Denver day automatically.</p>
+          </div>
+          <div class="date-picker-wrap">
+            <label for="managerDate" style="margin:0;">Viewing Delivery Date</label>
+            <input id="managerDate" type="date" />
+          </div>
+        </div>
+
         <div class="route-tabs">
           <button class="tab-btn active" id="southTab" type="button">South</button>
           <button class="tab-btn" id="northTab" type="button">North / West</button>
@@ -1263,6 +1380,7 @@
         </div>
 
         <h2 class="route-title" id="routeTitle">South Run</h2>
+        <div class="muted" id="managerDateLabel" style="margin-top:-8px; margin-bottom:12px;"></div>
         <div class="drop-zone" id="singleRouteDropZone" data-route="South Run">
           <div class="job-list" id="jobList"></div>
         </div>
@@ -1270,12 +1388,23 @@
 
       <div class="card">
         <h2>Completed Deliveries</h2>
+        <p class="muted" id="completedDateLabel">Completed jobs for the selected delivery date.</p>
         <div class="completed-list" id="completedList"></div>
       </div>
 
       <div class="card">
         <h2>Summarize Schedule</h2>
-        <p class="muted">Create the morning shipping email text for today’s deliveries, completed deliveries, next day shipments, and outside shipments.</p>
+        <p class="muted">Choose which delivery date to summarize. The summary will only include shipments for that selected date.</p>
+
+        <div class="date-toolbar" style="margin-bottom:12px;">
+          <div>
+            <label for="summaryDate" style="margin:0;">Summary Date</label>
+            <div class="muted" id="summaryDateLabel" style="margin-top:4px;">Select a date to summarize.</div>
+          </div>
+          <div class="date-picker-wrap">
+            <input id="summaryDate" type="date" />
+          </div>
+        </div>
 
         <div class="summary-actions">
           <button id="summarizeBtn" class="secondary-btn" type="button">Generate Summary</button>
@@ -1287,44 +1416,33 @@
           <textarea id="summaryOutput" class="summary-box" placeholder="Your summary will appear here..."></textarea>
         </div>
       </div>
-
-      <div class="card danger-zone">
-        <h2>Clear Schedule</h2>
-        <p>
-          This clears all of today’s jobs, including outside shipments and completed jobs. Next Day Shipments will be moved back into today’s schedule.
-          To continue, type <strong>CLEAR</strong> below.
-        </p>
-
-        <div class="danger-row">
-          <div>
-            <label for="clearScheduleInput">Type CLEAR to unlock</label>
-            <input
-              id="clearScheduleInput"
-              class="clear-input"
-              type="text"
-              placeholder="Type CLEAR"
-            />
-          </div>
-
-          <button id="clearScheduleBtn" class="clear-btn" type="button" disabled>
-            Clear Today’s Schedule
-          </button>
-        </div>
-      </div>
     </div>
 
-    <div id="nextDayPage" style="display:none;">
+    <div id="historyPage" style="display:none;">
       <div class="card">
-        <h2>Next Day Shipments</h2>
-        <p class="muted">Jobs moved here will not show on today’s schedule until the schedule is cleared.</p>
-        <div class="job-list" id="nextDayList"></div>
+        <div class="date-toolbar">
+          <div>
+            <h2 style="margin:0 0 6px;">History</h2>
+            <p class="muted" style="margin:0;">Last 30 days of shipments, grouped by delivery day.</p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+            <div class="history-summary-chip" id="historySummaryChip">0 jobs</div>
+            <button id="printHistoryBtn" class="print-btn" type="button" style="margin-bottom:0;">Print History Report</button>
+          </div>
+        </div>
+        <div id="historyList"></div>
       </div>
     </div>
 
     <div id="outsidePage" style="display:none;">
       <div class="card">
-        <h2>Outside Shipments</h2>
-        <p class="muted">These shipments go out by UPS or FedEx and do not appear on the delivery schedule.</p>
+        <div class="date-toolbar">
+          <div>
+            <h2 style="margin:0 0 6px;">Outside Shipments</h2>
+            <p class="muted" style="margin:0;">UPS and FedEx jobs for the selected delivery date.</p>
+          </div>
+          <div class="history-summary-chip" id="outsideDateChip"></div>
+        </div>
         <div class="job-list" id="outsideList"></div>
       </div>
     </div>
@@ -1360,24 +1478,26 @@
           <textarea id="editDeliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
         </div>
 
-        <div>
-          <label for="editRoute">Route</label>
-          <select id="editRoute" required>
-            <option value="">Select Route</option>
-            <option value="South Run">South Run</option>
-            <option value="North / West Run">North / West Run</option>
-            <option value="Local Delivery">Local Delivery</option>
-            <option value="UPS">UPS</option>
-            <option value="FedEx">FedEx</option>
-          </select>
+        <div class="form-row">
+          <div>
+            <label for="editRoute">Route</label>
+            <select id="editRoute" required>
+              <option value="">Select Route</option>
+              <option value="South Run">South Run</option>
+              <option value="North / West Run">North / West Run</option>
+              <option value="Local Delivery">Local Delivery</option>
+              <option value="UPS">UPS</option>
+              <option value="FedEx">FedEx</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="editDeliveryDate">Delivery Date</label>
+            <input id="editDeliveryDate" type="date" required />
+          </div>
         </div>
 
         <div class="checkbox-row-wrap">
-          <label class="checkbox-row">
-            <input id="editShipWhen" type="checkbox" />
-            <span>Mark as Next Day Shipment</span>
-          </label>
-
           <label class="checkbox-row">
             <input id="editRushDelivery" type="checkbox" />
             <span>Mark as Rush</span>
@@ -1393,6 +1513,7 @@
     </div>
   </div>
 
+  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -1402,8 +1523,6 @@
       updateDoc,
       deleteDoc,
       doc,
-      getDocs,
-      writeBatch,
       onSnapshot,
       query,
       orderBy,
@@ -1424,7 +1543,8 @@
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
 
-    const ACTOR_NAME = "Shipping Manager";
+    const ACTOR_NAME = "Cristina";
+    const DENVER_TZ = "America/Denver";
 
     let jobs = [];
     let currentRoute = "South Run";
@@ -1432,19 +1552,21 @@
     let dragTargetIndex = null;
     let currentPageView = "main";
     let editingJobId = null;
+    let currentDenverDate = getDenverTodayString();
+    let managerViewDate = currentDenverDate;
 
     const appRoot = document.getElementById("appRoot");
     const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
     const mainPage = document.getElementById("mainPage");
     const fullPage = document.getElementById("fullPage");
-    const nextDayPage = document.getElementById("nextDayPage");
+    const historyPage = document.getElementById("historyPage");
     const outsidePage = document.getElementById("outsidePage");
     const quickTotalsCard = document.getElementById("quickTotalsCard");
     const fullGrid = document.getElementById("fullGrid");
 
     const mainPageBtn = document.getElementById("mainPageBtn");
     const fullPageBtn = document.getElementById("fullPageBtn");
-    const nextDayPageBtn = document.getElementById("nextDayPageBtn");
+    const historyPageBtn = document.getElementById("historyPageBtn");
     const outsidePageBtn = document.getElementById("outsidePageBtn");
 
     const topNav = document.getElementById("topNav");
@@ -1456,16 +1578,21 @@
     const routeTitle = document.getElementById("routeTitle");
     const statusMessage = document.getElementById("statusMessage");
     const completedList = document.getElementById("completedList");
-    const nextDayList = document.getElementById("nextDayList");
     const outsideList = document.getElementById("outsideList");
+    const historyList = document.getElementById("historyList");
 
     const customerNameInput = document.getElementById("customerName");
     const jobNumberInput = document.getElementById("jobNumber");
     const addressInput = document.getElementById("address");
     const deliveryNotesInput = document.getElementById("deliveryNotes");
     const routeInput = document.getElementById("route");
-    const shipWhenInput = document.getElementById("shipWhen");
+    const deliveryDateInput = document.getElementById("deliveryDate");
     const rushDeliveryInput = document.getElementById("rushDelivery");
+    const managerDateInput = document.getElementById("managerDate");
+    const managerDateLabel = document.getElementById("managerDateLabel");
+    const completedDateLabel = document.getElementById("completedDateLabel");
+    const historySummaryChip = document.getElementById("historySummaryChip");
+    const outsideDateChip = document.getElementById("outsideDateChip");
 
     const editModalOverlay = document.getElementById("editModalOverlay");
     const editJobForm = document.getElementById("editJobForm");
@@ -1474,7 +1601,7 @@
     const editAddressInput = document.getElementById("editAddress");
     const editDeliveryNotesInput = document.getElementById("editDeliveryNotes");
     const editRouteInput = document.getElementById("editRoute");
-    const editShipWhenInput = document.getElementById("editShipWhen");
+    const editDeliveryDateInput = document.getElementById("editDeliveryDate");
     const editRushDeliveryInput = document.getElementById("editRushDelivery");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const deleteEditBtn = document.getElementById("deleteEditBtn");
@@ -1489,27 +1616,27 @@
     const northList = document.getElementById("northList");
     const localList = document.getElementById("localList");
 
-    const clearScheduleInput = document.getElementById("clearScheduleInput");
-    const clearScheduleBtn = document.getElementById("clearScheduleBtn");
-
     const summarizeBtn = document.getElementById("summarizeBtn");
     const copySummaryBtn = document.getElementById("copySummaryBtn");
     const summaryOutput = document.getElementById("summaryOutput");
+    const summaryDateInput = document.getElementById("summaryDate");
+    const summaryDateLabel = document.getElementById("summaryDateLabel");
 
     const notificationBox = document.getElementById("notificationBox");
     const notificationText = document.getElementById("notificationText");
     const notificationTime = document.getElementById("notificationTime");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
     const printSheetBtn = document.getElementById("printSheetBtn");
+    const printHistoryBtn = document.getElementById("printHistoryBtn");
 
     const activeTodayCount = document.getElementById("activeTodayCount");
     const rushCount = document.getElementById("rushCount");
-    const nextDayCount = document.getElementById("nextDayCount");
+    const historyCount = document.getElementById("historyCount");
     const outsideCount = document.getElementById("outsideCount");
     const completedCount = document.getElementById("completedCount");
     const fsActiveTodayCount = document.getElementById("fsActiveTodayCount");
     const fsRushCount = document.getElementById("fsRushCount");
-    const fsNextDayCount = document.getElementById("fsNextDayCount");
+    const fsHistoryCount = document.getElementById("fsHistoryCount");
     const fsOutsideCount = document.getElementById("fsOutsideCount");
     const fsCompletedCount = document.getElementById("fsCompletedCount");
 
@@ -1517,6 +1644,109 @@
       const div = document.createElement("div");
       div.textContent = value ?? "";
       return div.innerHTML;
+    }
+
+    function getDenverTodayString() {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: DENVER_TZ,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date());
+    }
+
+    function getDenverDateTimeLabel() {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: DENVER_TZ,
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(new Date());
+    }
+
+    function parseDateKey(dateKey) {
+      const [year, month, day] = (dateKey || getDenverTodayString()).split("-").map(Number);
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+
+    function addDaysToDateKey(dateKey, days) {
+      const date = parseDateKey(dateKey);
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatDateLabel(dateKey) {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: "UTC",
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(parseDateKey(dateKey));
+    }
+
+    function daysFromToday(dateKey) {
+      const current = parseDateKey(currentDenverDate);
+      const target = parseDateKey(dateKey);
+      return Math.round((target - current) / 86400000);
+    }
+
+    function isWithinLast30Days(dateKey) {
+      const diff = daysFromToday(dateKey);
+      return diff <= 0 && diff > -30;
+    }
+
+    function getSelectedSummaryDate() {
+      return summaryDateInput?.value || managerViewDate || currentDenverDate;
+    }
+
+    function syncDateInputs() {
+      deliveryDateInput.value = deliveryDateInput.value || currentDenverDate;
+      managerDateInput.value = managerViewDate;
+      if (summaryDateInput && !summaryDateInput.value) {
+        summaryDateInput.value = managerViewDate;
+      }
+      outsideDateChip.textContent = formatDateLabel(managerViewDate);
+      managerDateLabel.textContent = `Showing active ${currentRoute} jobs for ${formatDateLabel(managerViewDate)}.`;
+      completedDateLabel.textContent = `Completed jobs for ${formatDateLabel(managerViewDate)}.`;
+      if (summaryDateLabel) {
+        summaryDateLabel.textContent = `Summary will include only ${formatDateLabel(getSelectedSummaryDate())}.`;
+      }
+    }
+
+    function normalizeJob(id, data) {
+      let deliveryDate = data.deliveryDate;
+      let status = data.status || "active";
+
+      if (!deliveryDate) {
+        if (status === "nextDay") {
+          deliveryDate = addDaysToDateKey(getDenverTodayString(), 1);
+        } else {
+          deliveryDate = getDenverTodayString();
+        }
+      }
+
+      if (status === "nextDay") {
+        status = "active";
+      }
+
+      return {
+        id,
+        customerName: data.customerName || "",
+        jobNumber: data.jobNumber || "",
+        address: data.address || "",
+        notes: data.notes || "",
+        route: data.route || "South Run",
+        deliveryDate,
+        status,
+        isRush: !!data.isRush,
+        order: typeof data.order === "number" ? data.order : 0,
+        createdAt: data.createdAt || null,
+        deliveredAt: data.deliveredAt || null
+      };
     }
 
     function setNotification(message, type = "success") {
@@ -1528,18 +1758,13 @@
 
     function updateQuickTotalsVisibility() {
       const isFullscreen = !!document.fullscreenElement;
+      notificationBox.style.display = currentPageView === "main" ? "block" : "none";
 
-      if (currentPageView === "main") {
+      if (currentPageView === "main" || currentPageView === "full") {
         quickTotalsCard.style.display = isFullscreen ? "none" : "block";
-        return;
+      } else {
+        quickTotalsCard.style.display = "none";
       }
-
-      if (currentPageView === "full") {
-        quickTotalsCard.style.display = isFullscreen ? "none" : "block";
-        return;
-      }
-
-      quickTotalsCard.style.display = "none";
     }
 
     function isOutsideRoute(route) {
@@ -1550,24 +1775,26 @@
       return route === "South Run" || route === "North / West Run" || route === "Local Delivery";
     }
 
-    function getActiveJobs() {
-      return jobs.filter(job => job.status === "active");
+    function getJobsByDate(dateKey) {
+      return jobs.filter(job => job.deliveryDate === dateKey);
     }
 
-    function getDeliveredJobs() {
-      return jobs.filter(job => job.status === "delivered");
+    function getActiveJobsForDate(dateKey) {
+      return getJobsByDate(dateKey).filter(job => job.status === "active");
     }
 
-    function getNextDayJobs() {
-      return jobs.filter(job => job.status === "nextDay");
+    function getDeliveredJobsForDate(dateKey) {
+      return getJobsByDate(dateKey).filter(job => job.status === "delivered");
     }
 
-    function getOutsideJobs() {
-      return jobs.filter(job => job.status === "active" && isOutsideRoute(job.route));
+    function getOutsideJobsForDate(dateKey) {
+      return sortJobsList(
+        getActiveJobsForDate(dateKey).filter(job => isOutsideRoute(job.route))
+      );
     }
 
-    function getRushJobsCount() {
-      return jobs.filter(job => job.isRush && (job.status === "active" || job.status === "nextDay" || job.status === "delivered")).length;
+    function getRushJobsCountForDate(dateKey) {
+      return getJobsByDate(dateKey).filter(job => job.isRush && (job.status === "active" || job.status === "delivered")).length;
     }
 
     function sortJobsList(list) {
@@ -1581,9 +1808,9 @@
 
     function sortScheduleJobsList(list) {
       return [...list].sort((a, b) => {
-        const statusA = a.status === "delivered" ? 1 : 0;
-        const statusB = b.status === "delivered" ? 1 : 0;
-        if (statusA !== statusB) return statusA - statusB;
+        const deliveredA = a.status === "delivered" ? 1 : 0;
+        const deliveredB = b.status === "delivered" ? 1 : 0;
+        if (deliveredA !== deliveredB) return deliveredA - deliveredB;
 
         const rushA = a.isRush ? 1 : 0;
         const rushB = b.isRush ? 1 : 0;
@@ -1593,18 +1820,17 @@
       });
     }
 
-    function getJobsForRoute(routeName) {
+    function getManagerJobsForRoute(routeName) {
       return sortJobsList(
-        getActiveJobs().filter(job =>
-          job.route === routeName &&
-          !isOutsideRoute(job.route)
+        getActiveJobsForDate(managerViewDate).filter(job =>
+          job.route === routeName && !isOutsideRoute(job.route)
         )
       );
     }
 
     function getScheduleJobsForRoute(routeName) {
       return sortScheduleJobsList(
-        jobs.filter(job =>
+        getJobsByDate(currentDenverDate).filter(job =>
           (job.status === "active" || job.status === "delivered") &&
           job.route === routeName &&
           !isOutsideRoute(job.route)
@@ -1612,36 +1838,24 @@
       );
     }
 
-    function getComparableJobs(job) {
-      if (job.status === "active" && isLocalRoute(job.route)) {
-        return getActiveJobs().filter(item =>
-          item.id !== job.id &&
-          item.status === "active" &&
-          item.route === job.route &&
-          !isOutsideRoute(item.route)
-        );
+    function getComparableJobs(job, routeOverride = null, dateOverride = null) {
+      const routeName = routeOverride || job.route;
+      const dateKey = dateOverride || job.deliveryDate;
+
+      if (isOutsideRoute(routeName)) {
+        return getOutsideJobsForDate(dateKey).filter(item => item.id !== job.id && item.route === routeName);
       }
 
-      if (job.status === "nextDay") {
-        return getNextDayJobs().filter(item =>
-          item.id !== job.id &&
-          item.status === "nextDay" &&
-          item.route === job.route
-        );
-      }
-
-      if (job.status === "active" && isOutsideRoute(job.route)) {
-        return getOutsideJobs().filter(item =>
-          item.id !== job.id &&
-          item.route === job.route
-        );
-      }
-
-      return [];
+      return getActiveJobsForDate(dateKey).filter(item =>
+        item.id !== job.id &&
+        item.status === "active" &&
+        item.route === routeName &&
+        !isOutsideRoute(item.route)
+      );
     }
 
-    function getNextNonRushOrder(job) {
-      const comparable = getComparableJobs(job).filter(item => !item.isRush);
+    function getNextNonRushOrder(job, routeOverride = null, dateOverride = null) {
+      const comparable = getComparableJobs(job, routeOverride, dateOverride).filter(item => !item.isRush);
       if (!comparable.length) return 0;
       return Math.max(...comparable.map(item => item.order ?? 0)) + 1;
     }
@@ -1658,25 +1872,55 @@
     function getRouteBadge(route) {
       return `<div class="route-badge ${getRouteBadgeClass(route)}">${escapeHtml(route)}</div>`;
     }
+    function getRouteOrder(route) {
+      if (route === "South Run") return 1;
+      if (route === "North / West Run") return 2;
+      if (route === "Local Delivery") return 3;
+      if (route === "UPS") return 4;
+      if (route === "FedEx") return 5;
+      return 99;
+    }
+
+
+    function getRushBadge() {
+      return `<div class="rush-badge">Rush</div>`;
+    }
+
+    function getNotesHtml(notes) {
+      if (!notes || !notes.trim()) return "";
+      return `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
+    }
+
+    function getMiniNotesHtml(notes) {
+      if (!notes || !notes.trim()) return "";
+      return `<div class="notes-mini"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
+    }
+
+    function getHistoryCount() {
+      return jobs.filter(job => isWithinLast30Days(job.deliveryDate)).length;
+    }
 
     function updateQuickTotals() {
-      const activeToday = getJobsForRoute("South Run").length + getJobsForRoute("North / West Run").length + getJobsForRoute("Local Delivery").length;
-      const rushTotal = getRushJobsCount();
-      const nextDayTotal = getNextDayJobs().length;
-      const outsideTotal = getOutsideJobs().length;
-      const completedTotal = getDeliveredJobs().length;
+      const south = getScheduleJobsForRoute("South Run");
+      const north = getScheduleJobsForRoute("North / West Run");
+      const local = getScheduleJobsForRoute("Local Delivery");
+      const activeToday = south.filter(j => j.status === "active").length + north.filter(j => j.status === "active").length + local.filter(j => j.status === "active").length;
+      const rushTotal = getRushJobsCountForDate(currentDenverDate);
+      const outsideTotal = getOutsideJobsForDate(currentDenverDate).length;
+      const completedTotal = getDeliveredJobsForDate(currentDenverDate).length;
+      const historyTotal = getHistoryCount();
 
       activeTodayCount.textContent = activeToday;
       rushCount.textContent = rushTotal;
-      nextDayCount.textContent = nextDayTotal;
       outsideCount.textContent = outsideTotal;
       completedCount.textContent = completedTotal;
+      historyCount.textContent = historyTotal;
 
       fsActiveTodayCount.textContent = activeToday;
       fsRushCount.textContent = rushTotal;
-      fsNextDayCount.textContent = nextDayTotal;
       fsOutsideCount.textContent = outsideTotal;
       fsCompletedCount.textContent = completedTotal;
+      fsHistoryCount.textContent = historyTotal;
     }
 
     async function markJobDelivered(job) {
@@ -1698,26 +1942,38 @@
       try {
         const nextRushState = !job.isRush;
         const updates = { isRush: nextRushState };
-
-        if (nextRushState) {
-          updates.order = -1;
-        } else {
-          updates.order = getNextNonRushOrder(job);
-        }
+        updates.order = nextRushState ? -1 : getNextNonRushOrder(job);
 
         await updateDoc(doc(db, "deliveryJobs", job.id), updates);
 
-        if (nextRushState) {
-          setNotification(`${job.customerName} marked as rush.`, "warning");
-        } else {
-          setNotification(`${job.customerName} removed from rush.`, "success");
-        }
-
+        setNotification(
+          nextRushState ? `${job.customerName} marked as rush.` : `${job.customerName} removed from rush.`,
+          nextRushState ? "warning" : "success"
+        );
         statusMessage.textContent = nextRushState ? "Delivery marked as rush." : "Rush removed from delivery.";
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not update rush status.";
         setNotification("Could not update rush status.", "danger");
+      }
+    }
+
+    async function moveJobToNextDay(job) {
+      try {
+        const nextDate = addDaysToDateKey(job.deliveryDate, 1);
+        const updates = {
+          deliveryDate: nextDate,
+          status: "active",
+          deliveredAt: null,
+          order: job.isRush ? -1 : getNextNonRushOrder(job, job.route, nextDate)
+        };
+        await updateDoc(doc(db, "deliveryJobs", job.id), updates);
+        statusMessage.textContent = "Delivery moved to next day.";
+        setNotification(`${job.customerName} moved to ${formatDateLabel(nextDate)}.`, "warning");
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not move delivery.";
+        setNotification("Could not move delivery.", "danger");
       }
     }
 
@@ -1728,9 +1984,8 @@
       editAddressInput.value = job.address || "";
       editDeliveryNotesInput.value = job.notes || "";
       editRouteInput.value = job.route || "";
-      editShipWhenInput.checked = job.status === "nextDay";
+      editDeliveryDateInput.value = job.deliveryDate || currentDenverDate;
       editRushDeliveryInput.checked = !!job.isRush;
-
       editModalOverlay.classList.add("show");
     }
 
@@ -1748,27 +2003,19 @@
     }
 
     function shouldDoubleStack(routeJobs) {
-      const isFullscreenSchedule = !!document.fullscreenElement && currentPageView === "full";
-      const threshold = isFullscreenSchedule ? 7 : 12;
-      return routeJobs.length > threshold;
+      return routeJobs.length > 7;
     }
 
     function setFullGridColumns(count) {
       fullGrid.classList.remove("columns-1", "columns-2", "columns-3");
-
-      if (count <= 1) {
-        fullGrid.classList.add("columns-1");
-      } else if (count === 2) {
-        fullGrid.classList.add("columns-2");
-      } else {
-        fullGrid.classList.add("columns-3");
-      }
+      if (count <= 1) fullGrid.classList.add("columns-1");
+      else if (count === 2) fullGrid.classList.add("columns-2");
+      else fullGrid.classList.add("columns-3");
     }
 
     function updateScheduleColumnVisibility(routeJobs, listElement) {
       const column = listElement.closest(".full-column");
       const shouldShow = routeJobs.length > 0;
-
       column.style.display = shouldShow ? "flex" : "none";
       return shouldShow;
     }
@@ -1779,13 +2026,12 @@
         updateScheduleColumnVisibility(northJobs, northList),
         updateScheduleColumnVisibility(localJobs, localList)
       ].filter(Boolean).length;
-
       setFullGridColumns(visibleColumns || 1);
     }
 
     function applyDispatchDensity() {
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
-      const totalJobs = getJobsForRoute("South Run").length + getJobsForRoute("North / West Run").length + getJobsForRoute("Local Delivery").length;
+      const totalJobs = getManagerJobsForRoute("South Run").length + getManagerJobsForRoute("North / West Run").length + getManagerJobsForRoute("Local Delivery").length;
       const fitClass = getDispatchFitClass(totalJobs);
       if (fitClass) appRoot.classList.add(fitClass);
     }
@@ -1811,8 +2057,6 @@
       const visibleRoutes = [southJobs, northJobs, localJobs].filter(list => list.length > 0);
       const totalJobs = visibleRoutes.reduce((sum, list) => sum + list.length, 0);
       const maxColumnJobs = visibleRoutes.length ? Math.max(...visibleRoutes.map(list => list.length)) : 0;
-      const isDense = maxColumnJobs >= 7;
-
       const titleSize = maxColumnJobs >= 12 ? 1.02 : maxColumnJobs >= 9 ? 1.08 : 1.14;
       const cardTitleSize = maxColumnJobs >= 12 ? 0.96 : maxColumnJobs >= 9 ? 1.02 : 1.08;
       const metaSize = maxColumnJobs >= 12 ? 0.78 : maxColumnJobs >= 9 ? 0.84 : 0.9;
@@ -1821,7 +2065,7 @@
       const padY = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
       const padX = maxColumnJobs >= 12 ? 6 : maxColumnJobs >= 9 ? 7 : 9;
       const columnPad = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
-      const gap = isDense ? 4 : 6;
+      const gap = maxColumnJobs > 7 ? 4 : 6;
 
       appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
       appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -1834,10 +2078,7 @@
       appRoot.style.setProperty("--fs-column-padding", `${columnPad}px`);
       appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
 
-      [southList, northList, localList].forEach(list => {
-        list.classList.remove("double-stack");
-      });
-
+      [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
       if (southJobs.length > 7) southList.classList.add("double-stack");
       if (northJobs.length > 7) northList.classList.add("double-stack");
       if (localJobs.length > 7) localList.classList.add("double-stack");
@@ -1860,20 +2101,6 @@
       });
     }
 
-    function getRushBadge() {
-      return `<div class="rush-badge">Rush</div>`;
-    }
-
-    function getNotesHtml(notes) {
-      if (!notes || !notes.trim()) return "";
-      return `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
-    }
-
-    function getMiniNotesHtml(notes) {
-      if (!notes || !notes.trim()) return "";
-      return `<div class="notes-mini"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
-    }
-
     function createRushToggleButton(job) {
       const button = document.createElement("button");
       button.type = "button";
@@ -1892,9 +2119,8 @@
       return button;
     }
 
-    function createJobCard(job, showDeliverButton = true, showNextDayButton = true, showEditButton = false) {
+    function createJobCard(job, showDeliverButton = true, showMoveButton = true, showEditButton = false) {
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
-
       const card = document.createElement("div");
       card.className = `job-card ${job.isRush ? "rush-card" : ""}`;
       card.draggable = showDeliverButton;
@@ -1905,26 +2131,21 @@
         ${job.isRush ? getRushBadge() : ""}
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
+        <p><strong>Delivery Date:</strong> ${escapeHtml(formatDateLabel(job.deliveryDate))}</p>
         <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
         ${getNotesHtml(job.notes)}
         <div class="job-actions">
           <button class="small-btn maps-btn" type="button">Open in Maps</button>
           ${showDeliverButton ? `<button class="small-btn deliver-btn" type="button">Mark Delivered</button>` : ""}
-          ${showNextDayButton ? `<button class="small-btn nextday-btn" type="button">Move to Next Day</button>` : ""}
+          ${showMoveButton ? `<button class="small-btn nextday-btn" type="button">Move +1 Day</button>` : ""}
         </div>
       `;
 
       const actions = card.querySelector(".job-actions");
-
-      if (showEditButton) {
-        actions.appendChild(createEditButton(job));
-      }
-
+      if (showEditButton) actions.appendChild(createEditButton(job));
       actions.appendChild(createRushToggleButton(job));
 
-      card.querySelector(".maps-btn").addEventListener("click", () => {
-        window.open(mapsLink, "_blank");
-      });
+      card.querySelector(".maps-btn").addEventListener("click", () => window.open(mapsLink, "_blank"));
 
       if (showDeliverButton) {
         card.querySelector(".deliver-btn").addEventListener("click", async () => {
@@ -1946,19 +2167,9 @@
         card.draggable = false;
       }
 
-      if (showNextDayButton) {
+      if (showMoveButton) {
         card.querySelector(".nextday-btn").addEventListener("click", async () => {
-          try {
-            await updateDoc(doc(db, "deliveryJobs", job.id), {
-              status: "nextDay"
-            });
-            statusMessage.textContent = "Moved to next day shipments.";
-            setNotification(`${job.customerName} moved to Next Day Shipments.`, "warning");
-          } catch (error) {
-            console.error(error);
-            statusMessage.textContent = "Could not move to next day.";
-            setNotification("Could not move to Next Day Shipments.", "danger");
-          }
+          await moveJobToNextDay(job);
         });
       }
 
@@ -1974,53 +2185,10 @@
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
-        <div class="muted">${escapeHtml(job.route)}</div>
+        <div class="muted">${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
         ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
           <button class="small-btn restore-btn" type="button">Restore</button>
-        </div>
-      `;
-
-      const actions = card.querySelector(".job-actions");
-      actions.appendChild(createRushToggleButton(job));
-
-      card.querySelector(".restore-btn").addEventListener("click", async () => {
-        try {
-          let nextOrder = 0;
-          if (!isOutsideRoute(job.route)) {
-            nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" });
-          }
-
-          await updateDoc(doc(db, "deliveryJobs", job.id), {
-            status: "active",
-            deliveredAt: null,
-            order: nextOrder
-          });
-          statusMessage.textContent = "Delivery restored.";
-          setNotification(`${job.customerName} restored to ${job.route}.`, "warning");
-        } catch (error) {
-          console.error(error);
-          statusMessage.textContent = "Could not restore delivery.";
-          setNotification("Could not restore delivery.", "danger");
-        }
-      });
-
-      return card;
-    }
-
-    function createNextDayCard(job) {
-      const card = document.createElement("div");
-      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
-      card.innerHTML = `
-        ${getRouteBadge(job.route)}
-        ${job.isRush ? getRushBadge() : ""}
-        <strong>${escapeHtml(job.customerName)}</strong>
-        ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
-        <div>${escapeHtml(job.address)}</div>
-        <div class="muted">${escapeHtml(job.route)}</div>
-        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
-        <div class="job-actions">
-          <button class="small-btn restore-btn" type="button">Move Back to Today</button>
         </div>
       `;
 
@@ -2030,21 +2198,17 @@
 
       card.querySelector(".restore-btn").addEventListener("click", async () => {
         try {
-          let nextOrder = 0;
-          if (!isOutsideRoute(job.route)) {
-            nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" });
-          }
-
           await updateDoc(doc(db, "deliveryJobs", job.id), {
             status: "active",
-            order: nextOrder
+            deliveredAt: null,
+            order: job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" })
           });
-          statusMessage.textContent = "Moved back to today's schedule.";
-          setNotification(`${job.customerName} moved back to today’s schedule.`, "warning");
+          statusMessage.textContent = "Delivery restored.";
+          setNotification(`${job.customerName} restored to ${job.route}.`, "warning");
         } catch (error) {
           console.error(error);
-          statusMessage.textContent = "Could not move back to today's schedule.";
-          setNotification("Could not move job back to today.", "danger");
+          statusMessage.textContent = "Could not restore delivery.";
+          setNotification("Could not restore delivery.", "danger");
         }
       });
 
@@ -2060,10 +2224,11 @@
         <strong>${escapeHtml(job.customerName)}</strong>
         ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div>${escapeHtml(job.address)}</div>
-        <div class="muted">${escapeHtml(job.route)}</div>
+        <div class="muted">${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
         ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
           <button class="small-btn maps-btn" type="button">Open in Maps</button>
+          <button class="small-btn nextday-btn" type="button">Move +1 Day</button>
         </div>
       `;
 
@@ -2072,25 +2237,36 @@
       actions.appendChild(createRushToggleButton(job));
 
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
-      card.querySelector(".maps-btn").addEventListener("click", () => {
-        window.open(mapsLink, "_blank");
+      card.querySelector(".maps-btn").addEventListener("click", () => window.open(mapsLink, "_blank"));
+      card.querySelector(".nextday-btn").addEventListener("click", async () => {
+        await moveJobToNextDay(job);
       });
 
       return card;
     }
 
+    function createHistoryCard(job) {
+      const card = document.createElement("div");
+      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
+      card.innerHTML = `
+        ${getRouteBadge(job.route)}
+        ${job.isRush ? getRushBadge() : ""}
+        <strong>${escapeHtml(job.customerName)}</strong>
+        ${job.jobNumber ? `<div>Job #: ${escapeHtml(job.jobNumber)}</div>` : ""}
+        <div>${escapeHtml(job.address)}</div>
+        <div class="muted">${job.status === "delivered" ? "Delivered" : "Active"} • ${escapeHtml(job.route)}</div>
+        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
+      `;
+      return card;
+    }
+
     function createScheduleCard(job, accentClass) {
       const statusClass = job.status === "delivered" ? "delivered-card" : "";
-      const deliveredMeta = job.status === "delivered"
-        ? `<div class="meta"><strong>Status:</strong> Delivered</div>`
-        : "";
-      const actionHtml = job.status !== "delivered"
-        ? `<div class="schedule-actions"><button class="schedule-deliver-btn" type="button">Delivered</button></div>`
-        : "";
+      const deliveredMeta = job.status === "delivered" ? `<div class="meta"><strong>Status:</strong> Delivered</div>` : "";
+      const actionHtml = job.status !== "delivered" ? `<div class="schedule-actions"><button class="schedule-deliver-btn" type="button">Delivered</button></div>` : "";
 
       const card = document.createElement("div");
       card.className = `schedule-card ${accentClass} ${statusClass} ${job.isRush ? "rush-card" : ""}`;
-
       card.innerHTML = `
         ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
@@ -2108,19 +2284,19 @@
           await markJobDelivered(job);
         });
       }
-
       return card;
     }
 
     function renderJobs() {
+      syncDateInputs();
       jobList.innerHTML = "";
       routeTitle.textContent = currentRoute;
       singleRouteDropZone.dataset.route = currentRoute;
+      managerDateLabel.textContent = `Showing active ${currentRoute} jobs for ${formatDateLabel(managerViewDate)}.`;
 
-      const filteredJobs = getJobsForRoute(currentRoute);
-
+      const filteredJobs = getManagerJobsForRoute(currentRoute);
       if (filteredJobs.length === 0) {
-        jobList.innerHTML = `<div class="empty-state">No active jobs for ${currentRoute} yet.</div>`;
+        jobList.innerHTML = `<div class="empty-state">No active jobs for ${currentRoute} on ${formatDateLabel(managerViewDate)} yet.</div>`;
         return;
       }
 
@@ -2137,49 +2313,96 @@
 
     function renderCompleted() {
       completedList.innerHTML = "";
-      const deliveredJobs = sortJobsList(getDeliveredJobs());
-
+      completedDateLabel.textContent = `Completed jobs for ${formatDateLabel(managerViewDate)}.`;
+      const deliveredJobs = sortJobsList(getDeliveredJobsForDate(managerViewDate));
       if (deliveredJobs.length === 0) {
-        completedList.innerHTML = `<div class="empty-state">No completed deliveries yet.</div>`;
+        completedList.innerHTML = `<div class="empty-state">No completed deliveries for ${formatDateLabel(managerViewDate)} yet.</div>`;
         return;
       }
-
-      deliveredJobs.forEach(job => {
-        completedList.appendChild(createCompletedCard(job));
-      });
-    }
-
-    function renderNextDay() {
-      nextDayList.innerHTML = "";
-      const nextDayJobs = sortJobsList(getNextDayJobs());
-
-      if (nextDayJobs.length === 0) {
-        nextDayList.innerHTML = `<div class="empty-state">No next day shipments right now.</div>`;
-        return;
-      }
-
-      nextDayJobs.forEach(job => {
-        nextDayList.appendChild(createNextDayCard(job));
-      });
+      deliveredJobs.forEach(job => completedList.appendChild(createCompletedCard(job)));
     }
 
     function renderOutside() {
       outsideList.innerHTML = "";
-      const outsideJobs = sortJobsList(getOutsideJobs());
-
+      outsideDateChip.textContent = formatDateLabel(managerViewDate);
+      const outsideJobs = getOutsideJobsForDate(managerViewDate);
       if (outsideJobs.length === 0) {
-        outsideList.innerHTML = `<div class="empty-state">No outside shipments right now.</div>`;
+        outsideList.innerHTML = `<div class="empty-state">No outside shipments for ${formatDateLabel(managerViewDate)}.</div>`;
+        return;
+      }
+      outsideJobs.forEach(job => outsideList.appendChild(createOutsideCard(job)));
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = "";
+      const historyJobs = jobs
+        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .sort((a, b) => {
+          if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
+          const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
+          if (routeOrder !== 0) return routeOrder;
+          const deliveredA = a.status === "delivered" ? 1 : 0;
+          const deliveredB = b.status === "delivered" ? 1 : 0;
+          if (deliveredA !== deliveredB) return deliveredA - deliveredB;
+          const rushA = a.isRush ? 1 : 0;
+          const rushB = b.isRush ? 1 : 0;
+          if (rushA !== rushB) return rushB - rushA;
+          return (a.order ?? 0) - (b.order ?? 0);
+        });
+
+      historySummaryChip.textContent = `${historyJobs.length} job${historyJobs.length === 1 ? "" : "s"} in the last 30 days`;
+
+      if (!historyJobs.length) {
+        historyList.innerHTML = `<div class="empty-state">No shipment history in the last 30 days yet.</div>`;
         return;
       }
 
-      outsideJobs.forEach(job => {
-        outsideList.appendChild(createOutsideCard(job));
-      });
+      const grouped = historyJobs.reduce((acc, job) => {
+        (acc[job.deliveryDate] ||= []).push(job);
+        return acc;
+      }, {});
+
+      Object.keys(grouped)
+        .sort((a, b) => a < b ? 1 : -1)
+        .forEach(dateKey => {
+          const dayJobs = grouped[dateKey];
+          const delivered = dayJobs.filter(job => job.status === "delivered").length;
+          const group = document.createElement("div");
+          group.className = "history-day-group";
+          group.innerHTML = `
+            <div class="history-day-header">
+              <div>
+                <h3 class="history-day-title">${escapeHtml(formatDateLabel(dateKey))}</h3>
+                <div class="history-day-subtitle">${dayJobs.length} job${dayJobs.length === 1 ? "" : "s"} • ${delivered} delivered</div>
+              </div>
+            </div>
+          `;
+
+          const routeGroups = dayJobs.reduce((acc, job) => {
+            (acc[job.route] ||= []).push(job);
+            return acc;
+          }, {});
+
+          ["South Run", "North / West Run", "Local Delivery", "UPS", "FedEx"]
+            .filter(route => routeGroups[route]?.length)
+            .forEach(route => {
+              const section = document.createElement("div");
+              section.style.marginTop = "12px";
+              section.innerHTML = `
+                <div style="font-weight:bold; margin:0 0 8px; color:#334155;">${escapeHtml(route)}</div>
+                <div class="history-grid"></div>
+              `;
+              const grid = section.querySelector(".history-grid");
+              sortScheduleJobsList(routeGroups[route]).forEach(job => grid.appendChild(createHistoryCard(job)));
+              group.appendChild(section);
+            });
+
+          historyList.appendChild(group);
+        });
     }
 
     function renderFullSchedule() {
       applyDispatchDensity();
-
       southList.innerHTML = "";
       northList.innerHTML = "";
       localList.innerHTML = "";
@@ -2189,44 +2412,31 @@
       const localJobs = getScheduleJobsForRoute("Local Delivery");
 
       applyScheduleLayout(southJobs, northJobs, localJobs);
-
       renderScheduleColumn(southJobs, southList, "south-accent");
       renderScheduleColumn(northJobs, northList, "north-accent");
       renderScheduleColumn(localJobs, localList, "local-accent");
 
-      requestAnimationFrame(() => {
-        applyFullscreenFit();
-      });
+      requestAnimationFrame(() => applyFullscreenFit());
     }
 
     function renderScheduleColumn(routeJobs, container, accentClass) {
       container.classList.remove("double-stack");
-
       if (routeJobs.length === 0) {
         container.innerHTML = `<div class="empty-state">No deliveries yet.</div>`;
         return;
       }
-
-      if (shouldDoubleStack(routeJobs)) {
-        container.classList.add("double-stack");
-      }
-
-      routeJobs.forEach(job => {
-        container.appendChild(createScheduleCard(job, accentClass));
-      });
+      if (shouldDoubleStack(routeJobs)) container.classList.add("double-stack");
+      routeJobs.forEach(job => container.appendChild(createScheduleCard(job, accentClass)));
     }
 
     function setRoute(route) {
       currentRoute = route;
-
       southTab.classList.remove("active");
       northTab.classList.remove("active");
       localTab.classList.remove("active");
-
       if (route === "South Run") southTab.classList.add("active");
       if (route === "North / West Run") northTab.classList.add("active");
       if (route === "Local Delivery") localTab.classList.add("active");
-
       renderJobs();
     }
 
@@ -2247,7 +2457,7 @@
     function resetTopTabs() {
       mainPageBtn.classList.remove("active");
       fullPageBtn.classList.remove("active");
-      nextDayPageBtn.classList.remove("active");
+      historyPageBtn.classList.remove("active");
       outsidePageBtn.classList.remove("active");
     }
 
@@ -2255,47 +2465,45 @@
       currentPageView = "main";
       mainPage.style.display = "block";
       fullPage.style.display = "none";
-      nextDayPage.style.display = "none";
+      historyPage.style.display = "none";
       outsidePage.style.display = "none";
       resetTopTabs();
       mainPageBtn.classList.add("active");
       updateMobileNavTitle("Delivery Manager");
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
-      appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
-      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
       updateQuickTotalsVisibility();
+      renderJobs();
+      renderCompleted();
     }
 
     function showFullPage() {
       currentPageView = "full";
       mainPage.style.display = "none";
       fullPage.style.display = "block";
-      nextDayPage.style.display = "none";
+      historyPage.style.display = "none";
       outsidePage.style.display = "none";
       resetTopTabs();
       fullPageBtn.classList.add("active");
-      updateMobileNavTitle("Full Schedule");
+      updateMobileNavTitle("Today's Schedule");
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
       renderFullSchedule();
       updateQuickTotalsVisibility();
     }
 
-    function showNextDayPage() {
-      currentPageView = "nextDay";
+    function showHistoryPage() {
+      currentPageView = "history";
       mainPage.style.display = "none";
       fullPage.style.display = "none";
-      nextDayPage.style.display = "block";
+      historyPage.style.display = "block";
       outsidePage.style.display = "none";
       resetTopTabs();
-      nextDayPageBtn.classList.add("active");
-      updateMobileNavTitle("Next Day Shipments");
+      historyPageBtn.classList.add("active");
+      updateMobileNavTitle("History");
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
-      appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
-      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
-      renderNextDay();
+      renderHistory();
       updateQuickTotalsVisibility();
     }
 
@@ -2303,49 +2511,40 @@
       currentPageView = "outside";
       mainPage.style.display = "none";
       fullPage.style.display = "none";
-      nextDayPage.style.display = "none";
+      historyPage.style.display = "none";
       outsidePage.style.display = "block";
       resetTopTabs();
       outsidePageBtn.classList.add("active");
       updateMobileNavTitle("Outside Shipments");
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
-      appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
-      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
       renderOutside();
       updateQuickTotalsVisibility();
     }
 
     async function moveDraggedJobToRoute(targetRoute, targetIndex = null) {
       if (!draggedJobId) return;
-
       const draggedJob = jobs.find(job => job.id === draggedJobId);
-      if (!draggedJob) return;
+      if (!draggedJob || isOutsideRoute(targetRoute)) return;
 
-      if (isOutsideRoute(targetRoute)) return;
-
-      const targetRouteJobs = getJobsForRoute(targetRoute).filter(job => job.id !== draggedJobId);
+      const targetRouteJobs = getManagerJobsForRoute(targetRoute).filter(job => job.id !== draggedJobId);
       let newOrderList = [...targetRouteJobs];
 
-      if (targetIndex === null || targetIndex > newOrderList.length) {
-        newOrderList.push(draggedJob);
-      } else {
-        newOrderList.splice(targetIndex, 0, draggedJob);
-      }
+      if (targetIndex === null || targetIndex > newOrderList.length) newOrderList.push(draggedJob);
+      else newOrderList.splice(targetIndex, 0, draggedJob);
 
       try {
         await updateDoc(doc(db, "deliveryJobs", draggedJobId), {
           route: targetRoute,
-          status: "active"
+          status: "active",
+          deliveryDate: managerViewDate
         });
 
-        const updates = newOrderList.map((job, index) => {
-          return updateDoc(doc(db, "deliveryJobs", job.id), {
-            order: index
-          });
-        });
-
+        const updates = newOrderList.map((job, index) =>
+          updateDoc(doc(db, "deliveryJobs", job.id), { order: index })
+        );
         await Promise.all(updates);
+
         statusMessage.textContent = "Route updated.";
         setNotification(`${draggedJob.customerName} moved to ${targetRoute}.`, "warning");
       } catch (error) {
@@ -2368,176 +2567,179 @@
       zone.addEventListener("drop", async (e) => {
         e.preventDefault();
         zone.classList.remove("over");
-
         const targetRoute = zone.dataset.route;
         const targetIndex = getIndexFn ? getIndexFn(e) : null;
         await moveDraggedJobToRoute(targetRoute, targetIndex);
       });
     }
 
-    async function clearEntireSchedule() {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to clear today’s schedule? Active deliveries, outside shipments, and completed jobs will be deleted, and Next Day Shipments will be moved to today."
-      );
+    function buildSummaryText() {
+      const dateKey = getSelectedSummaryDate();
+      const southJobs = sortScheduleJobsList(getJobsByDate(dateKey).filter(job => job.route === "South Run" && !isOutsideRoute(job.route)));
+      const northJobs = sortScheduleJobsList(getJobsByDate(dateKey).filter(job => job.route === "North / West Run" && !isOutsideRoute(job.route)));
+      const localJobs = sortScheduleJobsList(getJobsByDate(dateKey).filter(job => job.route === "Local Delivery" && !isOutsideRoute(job.route)));
+      const completedJobs = sortJobsList(getDeliveredJobsForDate(dateKey));
+      const outsideJobs = getOutsideJobsForDate(dateKey);
 
-      if (!confirmDelete) return;
+      const activeTotal = southJobs.filter(j => j.status === "active").length + northJobs.filter(j => j.status === "active").length + localJobs.filter(j => j.status === "active").length;
+      const completedTotal = completedJobs.length;
+      const outsideTotal = outsideJobs.length;
+      const totalCount = activeTotal + completedTotal + outsideTotal;
 
-      try {
-        statusMessage.textContent = "Clearing schedule...";
+      let text = `Good morning,
 
-        const snapshot = await getDocs(jobsCollection);
-        if (snapshot.empty) {
-          statusMessage.textContent = "There are no jobs to update.";
-          clearScheduleInput.value = "";
-          clearScheduleBtn.disabled = true;
-          return;
+Schedule for ${formatDateLabel(dateKey)} includes ${totalCount} job${totalCount === 1 ? "" : "s"} total.
+`;
+      text += `${activeTotal} active delivery${activeTotal === 1 ? "" : "ies"}, ${completedTotal} completed delivery${completedTotal === 1 ? "" : "ies"}, and ${outsideTotal} outside shipment${outsideTotal === 1 ? "" : "s"}.
+
+`;
+
+      const sections = [
+        ["South Run", southJobs],
+        ["North / West Run", northJobs],
+        ["Local Delivery", localJobs],
+        ["Completed Deliveries", completedJobs],
+        ["Outside Shipments", outsideJobs]
+      ];
+
+      sections.forEach(([title, list]) => {
+        text += `${title} (${list.length}):
+`;
+        if (list.length) {
+          list.forEach(job => {
+            text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}
+`;
+          });
+        } else {
+          text += `- None.
+`;
         }
+        text += `
+`;
+      });
 
-        const batch = writeBatch(db);
-        const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      text += `Please let us know if anything needs to be adjusted.
 
-        const nextDayJobs = allDocs.filter(job => job.status === "nextDay");
-        const groupedRouteCounts = {
-          "South Run": getJobsForRoute("South Run").filter(j => !j.isRush).length,
-          "North / West Run": getJobsForRoute("North / West Run").filter(j => !j.isRush).length,
-          "Local Delivery": getJobsForRoute("Local Delivery").filter(j => !j.isRush).length,
-          "UPS": getOutsideJobs().filter(j => j.route === "UPS" && !j.isRush).length,
-          "FedEx": getOutsideJobs().filter(j => j.route === "FedEx" && !j.isRush).length
-        };
-
-        snapshot.forEach((docItem) => {
-          const data = docItem.data();
-
-          if (data.status === "active" || data.status === "delivered") {
-            batch.delete(doc(db, "deliveryJobs", docItem.id));
-          }
-        });
-
-        nextDayJobs.forEach((job) => {
-          if (job.isRush) {
-            batch.update(doc(db, "deliveryJobs", job.id), {
-              status: "active",
-              order: -1
-            });
-          } else {
-            const nextOrder = groupedRouteCounts[job.route] ?? 0;
-            groupedRouteCounts[job.route] = nextOrder + 1;
-
-            batch.update(doc(db, "deliveryJobs", job.id), {
-              status: "active",
-              order: nextOrder
-            });
-          }
-        });
-
-        await batch.commit();
-
-        statusMessage.textContent = "Today’s schedule cleared. Next day shipments moved to today.";
-        clearScheduleInput.value = "";
-        clearScheduleBtn.disabled = true;
-        summaryOutput.value = "";
-        closeEditDelivery();
-        setNotification("Schedule cleared. Next day shipments moved into today’s schedule.", "danger");
-      } catch (error) {
-        console.error(error);
-        statusMessage.textContent = "Could not clear the schedule.";
-        setNotification("Could not clear the schedule.", "danger");
-      }
+Thank you.`;
+      return text;
     }
 
-    function buildSummaryText() {
-      const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North / West Run");
-      const localJobs = getScheduleJobsForRoute("Local Delivery");
-      const completedJobs = sortJobsList(getDeliveredJobs());
-      const nextDayJobs = sortJobsList(getNextDayJobs());
-      const outsideJobs = sortJobsList(getOutsideJobs());
 
-      const activeTotal = southJobs.length + northJobs.length + localJobs.length;
-      const completedTotal = completedJobs.length;
-      const nextDayTotal = nextDayJobs.length;
-      const outsideTotal = outsideJobs.length;
-      const totalCount = activeTotal + completedTotal + nextDayTotal + outsideTotal;
-
-      let text = `Good morning,\n\nToday's schedule includes ${totalCount} job${totalCount === 1 ? "" : "s"} total.\n`;
-      text += `${activeTotal} active delivery${activeTotal === 1 ? "" : "ies"}, ${completedTotal} completed delivery${completedTotal === 1 ? "" : "ies"}, ${nextDayTotal} next day shipment${nextDayTotal === 1 ? "" : "s"}, and ${outsideTotal} outside shipment${outsideTotal === 1 ? "" : "s"}.\n\n`;
-
-      text += `South Run (${southJobs.length} active):\n`;
-      if (southJobs.length) {
-        southJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
+    function getHistoryJobsForReport() {
+      return jobs
+        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .sort((a, b) => {
+          if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
+          const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
+          if (routeOrder !== 0) return routeOrder;
+          const deliveredA = a.status === "delivered" ? 1 : 0;
+          const deliveredB = b.status === "delivered" ? 1 : 0;
+          if (deliveredA !== deliveredB) return deliveredA - deliveredB;
+          const rushA = a.isRush ? 1 : 0;
+          const rushB = b.isRush ? 1 : 0;
+          if (rushA !== rushB) return rushB - rushA;
+          return (a.order ?? 0) - (b.order ?? 0);
         });
-      } else {
-        text += `- No active South Run deliveries.\n`;
+    }
+
+    function buildHistoryReportHtml() {
+      const historyJobs = getHistoryJobsForReport();
+      const grouped = historyJobs.reduce((acc, job) => {
+        (acc[job.deliveryDate] ||= []).push(job);
+        return acc;
+      }, {});
+
+      const sections = Object.keys(grouped)
+        .sort((a, b) => a < b ? 1 : -1)
+        .map(dateKey => {
+          const dayJobs = grouped[dateKey];
+          const delivered = dayJobs.filter(job => job.status === "delivered").length;
+          const routeGroups = dayJobs.reduce((acc, job) => {
+            (acc[job.route] ||= []).push(job);
+            return acc;
+          }, {});
+
+          const routeSections = ["South Run", "North / West Run", "Local Delivery", "UPS", "FedEx"]
+            .filter(route => routeGroups[route]?.length)
+            .map(route => `
+              <div style="margin-top:14px;">
+                <div style="font-weight:bold; font-size:16px; color:#334155; margin:0 0 8px;">${route}</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
+                  ${sortScheduleJobsList(routeGroups[route]).map(job => `
+                    <div style="border:1px solid #dbe3ee; border-left:5px solid ${job.route === "South Run" ? "#0ea5e9" : job.route === "North / West Run" ? "#8b5cf6" : job.route === "Local Delivery" ? "#f59e0b" : job.route === "UPS" ? "#8b5cf6" : "#ec4899"}; border-radius:10px; padding:10px; background:${job.status === "delivered" ? "#f0fdf4" : "#fff"};">
+                      <div style="font-weight:bold; font-size:15px;">
+                        ${job.customerName}
+                        ${job.isRush ? `<span style="background:#dc2626;color:white;padding:2px 8px;border-radius:999px;font-size:11px;margin-left:8px;">RUSH</span>` : ""}
+                      </div>
+                      ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${job.jobNumber}</div>` : ""}
+                      <div style="margin-top:4px;"><strong>Status:</strong> ${job.status === "delivered" ? "Delivered" : "Active"}</div>
+                      <div style="margin-top:4px;"><strong>Address:</strong> ${job.address}</div>
+                      ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("");
+
+          return `
+            <section style="margin-bottom:24px; page-break-inside:avoid;">
+              <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-end; border-bottom:2px solid #e5e7eb; padding-bottom:8px; margin-bottom:10px;">
+                <div>
+                  <h2 style="margin:0; font-size:22px;">${formatDateLabel(dateKey)}</h2>
+                  <div style="margin-top:4px; color:#6b7280;">${dayJobs.length} job${dayJobs.length === 1 ? "" : "s"} • ${delivered} delivered</div>
+                </div>
+              </div>
+              ${routeSections}
+            </section>
+          `;
+        }).join("");
+
+      return `
+        <html>
+          <head>
+            <title>History Report</title>
+          </head>
+          <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
+            <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
+            <p style="margin:0 0 20px; color:#6b7280;">History Report - Last 30 Days (${getDenverDateTimeLabel()} Denver time)</p>
+
+            <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:24px;">
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">History Jobs</div><div style="font-size:24px; font-weight:bold;">${historyJobs.length}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Delivered</div><div style="font-size:24px; font-weight:bold;">${historyJobs.filter(job => job.status === "delivered").length}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Days Covered</div><div style="font-size:24px; font-weight:bold;">${Object.keys(grouped).length}</div></div>
+            </div>
+
+            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No shipment history in the last 30 days yet.</div>`}
+          </body>
+        </html>
+      `;
+    }
+
+    function printHistoryReport() {
+      const printWindow = window.open("", "_blank", "width=1100,height=850");
+      if (!printWindow) {
+        setNotification("Could not open history report window.", "danger");
+        return;
       }
-
-      text += `\nNorth / West Run (${northJobs.length} active):\n`;
-      if (northJobs.length) {
-        northJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
-        });
-      } else {
-        text += `- No active North / West Run deliveries.\n`;
-      }
-
-      text += `\nLocal Delivery (${localJobs.length} active):\n`;
-      if (localJobs.length) {
-        localJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
-        });
-      } else {
-        text += `- No active Local Delivery jobs.\n`;
-      }
-
-      text += `\nCompleted Deliveries (${completedJobs.length}):\n`;
-      if (completedJobs.length) {
-        completedJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
-        });
-      } else {
-        text += `- No completed deliveries yet.\n`;
-      }
-
-      text += `\nNext Day Shipments (${nextDayJobs.length}):\n`;
-      if (nextDayJobs.length) {
-        nextDayJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
-        });
-      } else {
-        text += `- No next day shipments.\n`;
-      }
-
-      text += `\nOutside Shipments (${outsideJobs.length}):\n`;
-      if (outsideJobs.length) {
-        outsideJobs.forEach(job => {
-          text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address} — ${job.route}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
-        });
-      } else {
-        text += `- No outside shipments.\n`;
-      }
-
-      text += `\nPlease let us know if anything needs to be adjusted.\n\nThank you.`;
-
-      return text;
+      printWindow.document.open();
+      printWindow.document.write(buildHistoryReportHtml());
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
     }
 
     function buildPrintSheetHtml() {
       const southJobs = getScheduleJobsForRoute("South Run");
       const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
-      const outsideJobs = sortJobsList(getOutsideJobs());
-      const nextDayJobs = sortJobsList(getNextDayJobs());
+      const outsideJobs = getOutsideJobsForDate(currentDenverDate);
 
       function renderPrintList(title, list) {
         if (!list.length) {
-          return `
-            <div style="margin-bottom:24px;">
-              <h2 style="margin:0 0 10px; border-bottom:2px solid #ddd; padding-bottom:6px;">${title}</h2>
-              <p style="margin:0; color:#666;">No jobs.</p>
-            </div>
-          `;
+          return `<div style="margin-bottom:24px;"><h2 style="margin:0 0 10px; border-bottom:2px solid #ddd; padding-bottom:6px;">${title}</h2><p style="margin:0; color:#666;">No jobs.</p></div>`;
         }
-
         return `
           <div style="margin-bottom:24px;">
             <h2 style="margin:0 0 10px; border-bottom:2px solid #ddd; padding-bottom:6px;">${title}</h2>
@@ -2550,7 +2752,7 @@
                 ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${job.jobNumber}</div>` : ""}
                 <div style="margin-top:4px;"><strong>Address:</strong> ${job.address}</div>
                 <div style="margin-top:4px;"><strong>Route:</strong> ${job.route}</div>
-                ${job.notes ? `<div style="margin-top:4px;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
+                ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
               </div>
             `).join("")}
           </div>
@@ -2559,41 +2761,23 @@
 
       return `
         <html>
-          <head>
-            <title>Dispatch Sheet</title>
-          </head>
+          <head><title>Dispatch Sheet</title></head>
           <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
             <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
-            <p style="margin:0 0 20px; color:#6b7280;">Dispatch Sheet - ${new Date().toLocaleString()}</p>
+            <p style="margin:0 0 20px; color:#6b7280;">Dispatch Sheet - ${formatDateLabel(currentDenverDate)} (${getDenverDateTimeLabel()} Denver time)</p>
 
             <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:24px;">
-              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
-                <div style="font-size:12px; color:#666;">Active Today</div>
-                <div style="font-size:24px; font-weight:bold;">${southJobs.length + northJobs.length + localJobs.length}</div>
-              </div>
-              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
-                <div style="font-size:12px; color:#666;">Rush Jobs</div>
-                <div style="font-size:24px; font-weight:bold;">${getRushJobsCount()}</div>
-              </div>
-              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
-                <div style="font-size:12px; color:#666;">Next Day</div>
-                <div style="font-size:24px; font-weight:bold;">${nextDayJobs.length}</div>
-              </div>
-              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
-                <div style="font-size:12px; color:#666;">Outside</div>
-                <div style="font-size:24px; font-weight:bold;">${outsideJobs.length}</div>
-              </div>
-              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;">
-                <div style="font-size:12px; color:#666;">Completed</div>
-                <div style="font-size:24px; font-weight:bold;">${getDeliveredJobs().length}</div>
-              </div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Today</div><div style="font-size:24px; font-weight:bold;">${southJobs.filter(j => j.status === "active").length + northJobs.filter(j => j.status === "active").length + localJobs.filter(j => j.status === "active").length}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Rush</div><div style="font-size:24px; font-weight:bold;">${getRushJobsCountForDate(currentDenverDate)}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Outside</div><div style="font-size:24px; font-weight:bold;">${outsideJobs.length}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Completed</div><div style="font-size:24px; font-weight:bold;">${getDeliveredJobsForDate(currentDenverDate).length}</div></div>
+              <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">History 30d</div><div style="font-size:24px; font-weight:bold;">${getHistoryCount()}</div></div>
             </div>
 
             ${renderPrintList("South Run", southJobs)}
             ${renderPrintList("North / West Run", northJobs)}
             ${renderPrintList("Local Delivery", localJobs)}
             ${renderPrintList("Outside Shipments", outsideJobs)}
-            ${renderPrintList("Next Day Shipments", nextDayJobs)}
           </body>
         </html>
       `;
@@ -2605,11 +2789,9 @@
         setNotification("Could not open print window.", "danger");
         return;
       }
-
       printWindow.document.open();
       printWindow.document.write(buildPrintSheetHtml());
       printWindow.document.close();
-
       printWindow.onload = () => {
         printWindow.focus();
         printWindow.print();
@@ -2635,7 +2817,6 @@
 
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
-
       fullscreenBtn.textContent = isFullscreen ? "Exit Full Screen" : "Full Screen";
 
       if (isFullscreen) {
@@ -2643,67 +2824,47 @@
         document.body.classList.add("no-scroll");
       } else {
         appRoot.classList.remove("is-fullscreen");
-        appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
         document.body.classList.remove("no-scroll");
       }
 
       updateQuickTotalsVisibility();
-
-      requestAnimationFrame(() => {
-        applyFullscreenFit();
-      });
+      requestAnimationFrame(() => applyFullscreenFit());
     });
 
     jobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       statusMessage.textContent = "Adding delivery...";
 
-      const shipmentStatus = shipWhenInput.checked ? "nextDay" : "active";
+      const routeValue = routeInput.value;
+      const deliveryDate = deliveryDateInput.value || currentDenverDate;
       const isRush = rushDeliveryInput.checked;
-
-      let nextOrder = 0;
-      if (shipmentStatus === "active" && !isOutsideRoute(routeInput.value)) {
-        if (isRush) {
-          nextOrder = -1;
-        } else {
-          const routeJobs = getJobsForRoute(routeInput.value).filter(job => !job.isRush);
-          nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
-        }
-      } else if (shipmentStatus === "active" && isOutsideRoute(routeInput.value)) {
-        if (isRush) {
-          nextOrder = -1;
-        } else {
-          const outsideRouteJobs = getOutsideJobs().filter(job => job.route === routeInput.value && !job.isRush);
-          nextOrder = outsideRouteJobs.length ? Math.max(...outsideRouteJobs.map(job => job.order ?? 0)) + 1 : 0;
-        }
-      }
+      let nextOrder = isRush ? -1 : getNextNonRushOrder({ id: "new", route: routeValue, deliveryDate, status: "active" }, routeValue, deliveryDate);
 
       const newJob = {
         customerName: customerNameInput.value.trim(),
         jobNumber: jobNumberInput.value.trim(),
         address: addressInput.value.trim(),
         notes: deliveryNotesInput.value.trim(),
-        route: routeInput.value,
-        status: shipmentStatus,
+        route: routeValue,
+        deliveryDate,
+        status: "active",
         isRush,
         order: nextOrder,
         createdAt: serverTimestamp()
       };
 
-      if (!newJob.customerName || !newJob.address || !newJob.route) {
-        statusMessage.textContent = "Please fill in customer name, address, and route.";
+      if (!newJob.customerName || !newJob.address || !newJob.route || !newJob.deliveryDate) {
+        statusMessage.textContent = "Please fill in customer name, address, route, and delivery date.";
         return;
       }
 
       try {
         await addDoc(jobsCollection, newJob);
         jobForm.reset();
-        shipWhenInput.checked = false;
+        deliveryDateInput.value = managerViewDate;
         rushDeliveryInput.checked = false;
         statusMessage.textContent = "Delivery added.";
-        const timingLabel = newJob.status === "nextDay" ? "next day" : "today";
-        const rushLabel = newJob.isRush ? "rush " : "";
-        setNotification(`${ACTOR_NAME} added a new ${timingLabel} ${rushLabel}${newJob.route} delivery.`, "success");
+        setNotification(`${ACTOR_NAME} added a ${newJob.isRush ? "rush " : ""}${newJob.route} delivery for ${formatDateLabel(newJob.deliveryDate)}.`, "success");
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not add delivery.";
@@ -2713,10 +2874,8 @@
 
     async function deleteEditingJob() {
       if (!editingJobId) return;
-
       const jobToDelete = jobs.find(job => job.id === editingJobId);
       const customerLabel = jobToDelete?.customerName || "This delivery";
-
       const confirmDelete = window.confirm(`Delete ${customerLabel}? This cannot be undone.`);
       if (!confirmDelete) return;
 
@@ -2734,32 +2893,13 @@
 
     editJobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       if (!editingJobId) return;
 
       try {
-        const shipmentStatus = editShipWhenInput.checked ? "nextDay" : "active";
-        const isRush = editRushDeliveryInput.checked;
         const selectedRoute = editRouteInput.value;
-
-        let nextOrder = 0;
-        if (shipmentStatus === "active" && !isOutsideRoute(selectedRoute)) {
-          if (isRush) {
-            nextOrder = -1;
-          } else {
-            const routeJobs = getJobsForRoute(selectedRoute)
-              .filter(job => job.id !== editingJobId && !job.isRush);
-            nextOrder = routeJobs.length ? Math.max(...routeJobs.map(job => job.order ?? 0)) + 1 : 0;
-          }
-        } else if (shipmentStatus === "active" && isOutsideRoute(selectedRoute)) {
-          if (isRush) {
-            nextOrder = -1;
-          } else {
-            const outsideRouteJobs = getOutsideJobs()
-              .filter(job => job.id !== editingJobId && job.route === selectedRoute && !job.isRush);
-            nextOrder = outsideRouteJobs.length ? Math.max(...outsideRouteJobs.map(job => job.order ?? 0)) + 1 : 0;
-          }
-        }
+        const selectedDate = editDeliveryDateInput.value || currentDenverDate;
+        const isRush = editRushDeliveryInput.checked;
+        const nextOrder = isRush ? -1 : getNextNonRushOrder({ id: editingJobId, route: selectedRoute, deliveryDate: selectedDate, status: "active" }, selectedRoute, selectedDate);
 
         await updateDoc(doc(db, "deliveryJobs", editingJobId), {
           customerName: editCustomerNameInput.value.trim(),
@@ -2767,7 +2907,7 @@
           address: editAddressInput.value.trim(),
           notes: editDeliveryNotesInput.value.trim(),
           route: selectedRoute,
-          status: shipmentStatus,
+          deliveryDate: selectedDate,
           isRush,
           order: nextOrder
         });
@@ -2787,88 +2927,48 @@
     modalCloseBtn.addEventListener("click", closeEditDelivery);
 
     editModalOverlay.addEventListener("click", (e) => {
-      if (e.target === editModalOverlay) {
-        closeEditDelivery();
-      }
+      if (e.target === editModalOverlay) closeEditDelivery();
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && editModalOverlay.classList.contains("show")) {
-        closeEditDelivery();
-      }
+      if (e.key === "Escape" && editModalOverlay.classList.contains("show")) closeEditDelivery();
     });
 
     menuToggleBtn.addEventListener("click", toggleMobileMenu);
 
     mainPageBtn.addEventListener("click", showMainPage);
     fullPageBtn.addEventListener("click", showFullPage);
-    nextDayPageBtn.addEventListener("click", showNextDayPage);
+    historyPageBtn.addEventListener("click", showHistoryPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
     fullscreenBtn.addEventListener("click", toggleFullScreen);
     printSheetBtn.addEventListener("click", printDispatchSheet);
+    if (printHistoryBtn) printHistoryBtn.addEventListener("click", printHistoryReport);
 
     southTab.addEventListener("click", () => setRoute("South Run"));
     northTab.addEventListener("click", () => setRoute("North / West Run"));
     localTab.addEventListener("click", () => setRoute("Local Delivery"));
 
-    clearScheduleInput.addEventListener("input", () => {
-      clearScheduleBtn.disabled = clearScheduleInput.value.trim() !== "CLEAR";
+    managerDateInput.addEventListener("change", () => {
+      managerViewDate = managerDateInput.value || currentDenverDate;
+      deliveryDateInput.value = managerViewDate;
+      renderAll();
     });
 
-    clearScheduleBtn.addEventListener("click", clearEntireSchedule);
+    if (summaryDateInput) {
+      summaryDateInput.addEventListener("change", () => {
+        if (summaryDateLabel) {
+          summaryDateLabel.textContent = `Summary will include only ${formatDateLabel(getSelectedSummaryDate())}.`;
+        }
+      });
+    }
 
-summarizeBtn.addEventListener("click", () => {
-  let summary = "";
-
-  const south = getScheduleJobsForRoute("South Run");
-  const north = getScheduleJobsForRoute("North / West Run");
-  const local = getScheduleJobsForRoute("Local Delivery");
-  const completed = getDeliveredJobs();
-  const nextDay = getNextDayJobs();
-  const outside = getOutsideJobs();
-
-  function buildSection(title, jobs) {
-    if (!jobs.length) return "";
-
-    let section = `${title}:\n`;
-
-    jobs.forEach(job => {
-      section += `- ${job.customerName} (${job.route})`;
-
-      if (job.jobNumber) {
-        section += ` | Job #: ${job.jobNumber}`;
-      }
-
-      if (job.notes) {
-        section += ` | Notes: ${job.notes}`;
-      }
-
-      if (job.isRush) {
-        section += ` 🚨 RUSH`;
-      }
-
-      section += `\n`;
+    summarizeBtn.addEventListener("click", () => {
+      summaryOutput.value = buildSummaryText();
     });
-
-    return section + `\n`;
-  }
-
-  summary += buildSection("South Run", south);
-  summary += buildSection("North / West Run", north);
-  summary += buildSection("Local Delivery", local);
-  summary += buildSection("Completed", completed);
-  summary += buildSection("Next Day", nextDay);
-  summary += buildSection("Outside Shipments", outside);
-
-  summaryOutput.value = summary.trim();
-});
 
     copySummaryBtn.addEventListener("click", async () => {
       try {
-        if (!summaryOutput.value.trim()) {
-          summaryOutput.value = buildSummaryText();
-        }
-
+        if (!summaryOutput.value.trim()) summaryOutput.value = buildSummaryText();
         await navigator.clipboard.writeText(summaryOutput.value);
         statusMessage.textContent = "Summary copied.";
         setNotification("Shipping summary copied.", "success");
@@ -2881,27 +2981,42 @@ summarizeBtn.addEventListener("click", () => {
 
     setupDropZone(singleRouteDropZone, () => dragTargetIndex);
 
+    function renderAll() {
+      syncDateInputs();
+      renderJobs();
+      renderCompleted();
+      renderOutside();
+      renderHistory();
+      renderFullSchedule();
+      updateQuickTotals();
+      updateQuickTotalsVisibility();
+      requestAnimationFrame(() => applyFullscreenFit());
+    }
+
+    function checkForDateChange() {
+      const latestDenverDate = getDenverTodayString();
+      if (latestDenverDate === currentDenverDate) return;
+
+      const oldDate = currentDenverDate;
+      currentDenverDate = latestDenverDate;
+
+      if (managerViewDate === oldDate) {
+        managerViewDate = latestDenverDate;
+        managerDateInput.value = latestDenverDate;
+        deliveryDateInput.value = latestDenverDate;
+      }
+
+      renderAll();
+      setNotification(`Today's Schedule switched automatically to ${formatDateLabel(latestDenverDate)} using Denver time.`, "warning");
+    }
+
     const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
 
     onSnapshot(
       jobsQuery,
       (snapshot) => {
-        jobs = snapshot.docs.map(docItem => ({
-          id: docItem.id,
-          ...docItem.data()
-        }));
-
-        renderJobs();
-        renderCompleted();
-        renderNextDay();
-        renderOutside();
-        renderFullSchedule();
-        updateQuickTotals();
-        updateQuickTotalsVisibility();
-
-        requestAnimationFrame(() => {
-          applyFullscreenFit();
-        });
+        jobs = snapshot.docs.map(docItem => normalizeJob(docItem.id, docItem.data()));
+        renderAll();
       },
       (error) => {
         console.error(error);
@@ -2911,22 +3026,17 @@ summarizeBtn.addEventListener("click", () => {
     );
 
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 700) {
-        closeMobileMenu();
-      }
-
-      requestAnimationFrame(() => {
-        applyFullscreenFit();
-      });
+      if (window.innerWidth > 700) closeMobileMenu();
+      requestAnimationFrame(() => applyFullscreenFit());
     });
 
-    renderJobs();
-    renderCompleted();
-    renderNextDay();
-    renderOutside();
-    renderFullSchedule();
-    updateQuickTotals();
+    setInterval(checkForDateChange, 30000);
+
+    deliveryDateInput.value = currentDenverDate;
+    managerDateInput.value = managerViewDate;
+    renderAll();
     showMainPage();
   </script>
+
 </body>
 </html>
