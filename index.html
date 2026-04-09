@@ -6,6 +6,19 @@
   <title>Pioneer Delivery Tracker</title>
 
   <style>
+    :root {
+      --fs-column-title: 1.25rem;
+      --fs-card-title: 1.2rem;
+      --fs-meta: 0.98rem;
+      --fs-address: 1.08rem;
+      --fs-notes: 0.9rem;
+      --fs-badge: 0.78rem;
+      --fs-card-padding-y: 10px;
+      --fs-card-padding-x: 12px;
+      --fs-column-padding: 10px;
+      --fs-grid-gap: 8px;
+    }
+
     * { box-sizing: border-box; }
 
     html, body {
@@ -392,6 +405,8 @@
       color: #334155;
       font-size: 0.92rem;
       border: 1px solid #c7d2fe;
+      white-space: pre-line;
+      word-break: break-word;
     }
 
     .job-actions {
@@ -604,20 +619,45 @@
     }
 
     .schedule-card .address {
-      font-size: 0.9rem;
-      line-height: 1.25;
+      font-size: var(--fs-address, 1rem);
+      line-height: 1.2;
       color: #111827;
-      white-space: normal;
+      white-space: pre-line;
       word-break: break-word;
     }
 
     .schedule-card .notes-mini {
-      font-size: 0.8rem;
-      line-height: 1.2;
+      font-size: var(--fs-notes, 0.9rem);
+      line-height: 1.15;
       color: #475569;
-      margin-top: 5px;
-      padding-top: 5px;
+      margin-top: 6px;
+      padding-top: 6px;
       border-top: 1px dashed #dbe3ee;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+
+    .schedule-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-deliver-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      width: auto;
+      min-width: 0;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+    }
+
+    .schedule-deliver-btn:hover {
+      background: #1d4ed8;
     }
 
     .south-accent {
@@ -755,51 +795,6 @@
     .dispatch-fit-3 .schedule-card .address { font-size: 0.62rem; line-height: 1; }
     .dispatch-fit-3 .schedule-card .notes-mini { font-size: 0.58rem; }
 
-    .fullscreen-fit-1 .full-page-card { padding: 10px; }
-    .fullscreen-fit-1 .full-grid { gap: 6px; }
-    .fullscreen-fit-1 .full-column { padding: 6px; }
-    .fullscreen-fit-1 .column-header { margin-bottom: 4px; padding-bottom: 4px; }
-    .fullscreen-fit-1 .column-header h3 { font-size: 0.84rem; }
-    .fullscreen-fit-1 .schedule-note { font-size: 0.74rem; margin-bottom: 6px; }
-    .fullscreen-fit-1 .schedule-card { padding: 6px 8px; }
-    .fullscreen-fit-1 .schedule-card h4 { font-size: 0.86rem; }
-    .fullscreen-fit-1 .schedule-card .meta { font-size: 0.74rem; }
-    .fullscreen-fit-1 .schedule-card .address { font-size: 0.8rem; line-height: 1.15; }
-    .fullscreen-fit-1 .schedule-card .notes-mini { font-size: 0.7rem; line-height: 1.1; }
-    .fullscreen-fit-1 .route-badge,
-    .fullscreen-fit-1 .rush-badge { font-size: 0.7rem; padding: 3px 6px; margin-bottom: 4px; }
-
-    .fullscreen-fit-2 .full-page-card { padding: 8px; }
-    .fullscreen-fit-2 .full-grid { gap: 4px; }
-    .fullscreen-fit-2 .full-column { padding: 4px; border-radius: 10px; }
-    .fullscreen-fit-2 .column-header { margin-bottom: 2px; padding-bottom: 2px; }
-    .fullscreen-fit-2 .column-header h3 { font-size: 0.76rem; }
-    .fullscreen-fit-2 .schedule-note { font-size: 0.68rem; margin-bottom: 4px; }
-    .fullscreen-fit-2 .schedule-list { gap: 2px; }
-    .fullscreen-fit-2 .schedule-list.double-stack { column-gap: 2px; row-gap: 2px; }
-    .fullscreen-fit-2 .schedule-card { padding: 5px 6px; border-radius: 7px; }
-    .fullscreen-fit-2 .schedule-card h4 { font-size: 0.76rem; margin-bottom: 2px; }
-    .fullscreen-fit-2 .schedule-card .meta { font-size: 0.66rem; margin-bottom: 2px; }
-    .fullscreen-fit-2 .schedule-card .address { font-size: 0.7rem; line-height: 1.08; }
-    .fullscreen-fit-2 .schedule-card .notes-mini { font-size: 0.62rem; line-height: 1.02; margin-top: 3px; padding-top: 3px; }
-    .fullscreen-fit-2 .route-badge,
-    .fullscreen-fit-2 .rush-badge { font-size: 0.64rem; padding: 2px 5px; margin-bottom: 3px; }
-
-    .fullscreen-fit-3 .full-page-card { padding: 6px; }
-    .fullscreen-fit-3 .full-grid { gap: 3px; }
-    .fullscreen-fit-3 .full-column { padding: 3px; border-radius: 8px; }
-    .fullscreen-fit-3 .column-header { margin-bottom: 2px; padding-bottom: 2px; }
-    .fullscreen-fit-3 .column-header h3 { font-size: 0.68rem; }
-    .fullscreen-fit-3 .schedule-note { font-size: 0.62rem; margin-bottom: 3px; }
-    .fullscreen-fit-3 .schedule-list { gap: 2px; }
-    .fullscreen-fit-3 .schedule-list.double-stack { column-gap: 2px; row-gap: 2px; }
-    .fullscreen-fit-3 .schedule-card { padding: 4px 5px; border-radius: 6px; }
-    .fullscreen-fit-3 .schedule-card h4 { font-size: 0.68rem; margin-bottom: 1px; }
-    .fullscreen-fit-3 .schedule-card .meta { font-size: 0.58rem; margin-bottom: 1px; }
-    .fullscreen-fit-3 .schedule-card .address { font-size: 0.62rem; line-height: 1; }
-    .fullscreen-fit-3 .schedule-card .notes-mini { font-size: 0.54rem; line-height: 0.96; margin-top: 2px; padding-top: 2px; }
-    .fullscreen-fit-3 .route-badge,
-    .fullscreen-fit-3 .rush-badge { font-size: 0.56rem; padding: 2px 4px; margin-bottom: 2px; }
 
     
     .is-fullscreen .app {
@@ -848,7 +843,7 @@
     }
 
     .is-fullscreen .full-column {
-      padding: 10px;
+      padding: var(--fs-column-padding);
     }
 
     .is-fullscreen .column-header {
@@ -857,7 +852,46 @@
     }
 
     .is-fullscreen .column-header h3 {
-      font-size: 1.1rem;
+      font-size: var(--fs-column-title);
+      line-height: 1.1;
+    }
+
+    .is-fullscreen .full-grid {
+      gap: var(--fs-grid-gap);
+    }
+
+    .is-fullscreen .schedule-card {
+      padding: var(--fs-card-padding-y) var(--fs-card-padding-x);
+    }
+
+    .is-fullscreen .schedule-card h4 {
+      font-size: var(--fs-card-title);
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+
+    .is-fullscreen .schedule-card .meta {
+      font-size: var(--fs-meta);
+      line-height: 1.12;
+      margin-bottom: 4px;
+    }
+
+    .is-fullscreen .schedule-card .address {
+      font-size: var(--fs-address);
+      line-height: 1.18;
+    }
+
+    .is-fullscreen .route-badge,
+    .is-fullscreen .rush-badge {
+      font-size: var(--fs-badge);
+      padding: 4px 8px;
+      margin-bottom: 5px;
+    }
+
+    .is-fullscreen .schedule-card .job-meta-optional,
+    .is-fullscreen .schedule-card .notes-mini,
+    .is-fullscreen .schedule-card .schedule-actions {
+      display: none !important;
     }
 
 .is-fullscreen #quickTotalsCard {
@@ -1546,6 +1580,21 @@
       completedCount.textContent = getDeliveredJobs().length;
     }
 
+    async function markJobDelivered(job) {
+      try {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
+          status: "delivered",
+          deliveredAt: serverTimestamp()
+        });
+        statusMessage.textContent = "Delivery marked complete.";
+        setNotification(`${job.customerName} marked completed.`, "success");
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not mark delivery complete.";
+        setNotification("Could not mark delivery complete.", "danger");
+      }
+    }
+
     async function toggleRushStatus(job) {
       try {
         const nextRushState = !job.isRush;
@@ -1645,25 +1694,134 @@
 
       if (!document.fullscreenElement || currentPageView !== "full") return;
 
-      const fitClasses = ["fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3"];
+      const southJobs = getScheduleJobsForRoute("South Run");
+      const northJobs = getScheduleJobsForRoute("North Run");
+      const localJobs = getScheduleJobsForRoute("Local Delivery");
 
-      let applied = false;
-      for (const fitClass of fitClasses) {
-        appRoot.classList.add(fitClass);
+      const visibleRoutes = [southJobs, northJobs, localJobs].filter(list => list.length > 0);
+      const totalJobs = visibleRoutes.reduce((sum, list) => sum + list.length, 0);
+      const maxColumnJobs = visibleRoutes.length ? Math.max(...visibleRoutes.map(list => list.length)) : 0;
+      const columnCount = Math.max(1, visibleRoutes.length);
 
+      let titleSize = 1.55;
+      let cardTitleSize = 1.35;
+      let metaSize = 1.08;
+      let addressSize = 1.22;
+      let notesSize = 0.95;
+      let badgeSize = 0.82;
+      let padY = 12;
+      let padX = 14;
+      let columnPad = 12;
+      let gap = 10;
+
+      if (columnCount === 3) {
+        titleSize -= 0.12;
+        cardTitleSize -= 0.10;
+        metaSize -= 0.06;
+        addressSize -= 0.08;
+      } else if (columnCount === 2) {
+        titleSize += 0.04;
+        cardTitleSize += 0.04;
+        addressSize += 0.04;
+      }
+
+      if (maxColumnJobs >= 7) {
+        titleSize -= 0.10;
+        cardTitleSize -= 0.10;
+        metaSize -= 0.08;
+        addressSize -= 0.10;
+        padY -= 1;
+        padX -= 1;
+        gap -= 1;
+      }
+
+      if (maxColumnJobs >= 10) {
+        titleSize -= 0.14;
+        cardTitleSize -= 0.14;
+        metaSize -= 0.10;
+        addressSize -= 0.14;
+        notesSize -= 0.06;
+        padY -= 1;
+        padX -= 1;
+        columnPad -= 1;
+        gap -= 1;
+      }
+
+      if (maxColumnJobs >= 13) {
+        titleSize -= 0.16;
+        cardTitleSize -= 0.16;
+        metaSize -= 0.12;
+        addressSize -= 0.16;
+        notesSize -= 0.08;
+        badgeSize -= 0.06;
+        padY -= 1;
+        padX -= 1;
+        columnPad -= 1;
+        gap -= 1;
+      }
+
+      if (maxColumnJobs >= 16) {
+        titleSize -= 0.18;
+        cardTitleSize -= 0.16;
+        metaSize -= 0.12;
+        addressSize -= 0.16;
+        notesSize -= 0.08;
+        badgeSize -= 0.06;
+        padY -= 1;
+        padX -= 1;
+        columnPad -= 1;
+        gap -= 1;
+      }
+
+      if (totalJobs >= 24) {
+        titleSize -= 0.08;
+        cardTitleSize -= 0.08;
+        metaSize -= 0.06;
+        addressSize -= 0.08;
+        notesSize -= 0.04;
+        badgeSize -= 0.04;
+      }
+
+      titleSize = Math.max(titleSize, 0.95);
+      cardTitleSize = Math.max(cardTitleSize, 0.95);
+      metaSize = Math.max(metaSize, 0.8);
+      addressSize = Math.max(addressSize, 0.9);
+      notesSize = Math.max(notesSize, 0.72);
+      badgeSize = Math.max(badgeSize, 0.64);
+      padY = Math.max(padY, 6);
+      padX = Math.max(padX, 8);
+      columnPad = Math.max(columnPad, 6);
+      gap = Math.max(gap, 4);
+
+      appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
+      appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
+      appRoot.style.setProperty("--fs-meta", `${metaSize}rem`);
+      appRoot.style.setProperty("--fs-address", `${addressSize}rem`);
+      appRoot.style.setProperty("--fs-notes", `${notesSize}rem`);
+      appRoot.style.setProperty("--fs-badge", `${badgeSize}rem`);
+      appRoot.style.setProperty("--fs-card-padding-y", `${padY}px`);
+      appRoot.style.setProperty("--fs-card-padding-x", `${padX}px`);
+      appRoot.style.setProperty("--fs-column-padding", `${columnPad}px`);
+      appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
+
+      requestAnimationFrame(() => {
         const needsScroll =
           fullGrid.scrollHeight > fullGrid.clientHeight + 2 ||
           fullGrid.scrollWidth > fullGrid.clientWidth + 2;
 
-        if (!needsScroll) {
-          applied = true;
-          break;
+        if (needsScroll) {
+          appRoot.style.setProperty("--fs-column-title", `${Math.max(titleSize - 0.1, 0.9)}rem`);
+          appRoot.style.setProperty("--fs-card-title", `${Math.max(cardTitleSize - 0.12, 0.88)}rem`);
+          appRoot.style.setProperty("--fs-meta", `${Math.max(metaSize - 0.08, 0.76)}rem`);
+          appRoot.style.setProperty("--fs-address", `${Math.max(addressSize - 0.12, 0.86)}rem`);
+          appRoot.style.setProperty("--fs-notes", `${Math.max(notesSize - 0.06, 0.68)}rem`);
+          appRoot.style.setProperty("--fs-badge", `${Math.max(badgeSize - 0.05, 0.6)}rem`);
+          appRoot.style.setProperty("--fs-card-padding-y", `${Math.max(padY - 1, 5)}px`);
+          appRoot.style.setProperty("--fs-card-padding-x", `${Math.max(padX - 1, 7)}px`);
+          appRoot.style.setProperty("--fs-column-padding", `${Math.max(columnPad - 1, 5)}px`);
+          appRoot.style.setProperty("--fs-grid-gap", `${Math.max(gap - 1, 3)}px`);
         }
-      }
-
-      if (!applied) {
-        appRoot.classList.add("fullscreen-fit-3");
-      }
+      });
     }
 
     function getRushBadge() {
@@ -1734,18 +1892,7 @@
 
       if (showDeliverButton) {
         card.querySelector(".deliver-btn").addEventListener("click", async () => {
-          try {
-            await updateDoc(doc(db, "deliveryJobs", job.id), {
-              status: "delivered",
-              deliveredAt: serverTimestamp()
-            });
-            statusMessage.textContent = "Delivery marked complete.";
-            setNotification(`${job.customerName} marked completed.`, "success");
-          } catch (error) {
-            console.error(error);
-            statusMessage.textContent = "Could not mark delivery complete.";
-            setNotification("Could not mark delivery complete.", "danger");
-          }
+          await markJobDelivered(job);
         });
 
         card.addEventListener("dragstart", () => {
@@ -1901,6 +2048,9 @@
       const deliveredMeta = job.status === "delivered"
         ? `<div class="meta"><strong>Status:</strong> Delivered</div>`
         : "";
+      const actionHtml = job.status !== "delivered"
+        ? `<div class="schedule-actions"><button class="schedule-deliver-btn" type="button">Delivered</button></div>`
+        : "";
 
       const card = document.createElement("div");
       card.className = `schedule-card ${accentClass} ${statusClass} ${job.isRush ? "rush-card" : ""}`;
@@ -1910,10 +2060,18 @@
         ${job.isRush ? getRushBadge() : ""}
         <h4>${escapeHtml(job.customerName)}</h4>
         ${deliveredMeta}
-        ${job.jobNumber ? `<div class="meta"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
+        ${job.jobNumber ? `<div class="meta job-meta-optional"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
         <div class="address">${escapeHtml(job.address)}</div>
         ${getMiniNotesHtml(job.notes)}
+        ${actionHtml}
       `;
+
+      const deliverBtn = card.querySelector(".schedule-deliver-btn");
+      if (deliverBtn) {
+        deliverBtn.addEventListener("click", async () => {
+          await markJobDelivered(job);
+        });
+      }
 
       return card;
     }
@@ -2623,11 +2781,51 @@
 
     clearScheduleBtn.addEventListener("click", clearEntireSchedule);
 
-    summarizeBtn.addEventListener("click", () => {
-      summaryOutput.value = buildSummaryText();
-      statusMessage.textContent = "Summary generated.";
-      setNotification("Shipping summary generated.", "success");
+summarizeBtn.addEventListener("click", () => {
+  let summary = "";
+
+  const south = getScheduleJobsForRoute("South Run");
+  const north = getScheduleJobsForRoute("North Run");
+  const local = getScheduleJobsForRoute("Local Delivery");
+  const completed = getDeliveredJobs();
+  const nextDay = getNextDayJobs();
+  const outside = getOutsideJobs();
+
+  function buildSection(title, jobs) {
+    if (!jobs.length) return "";
+
+    let section = `${title}:\n`;
+
+    jobs.forEach(job => {
+      section += `- ${job.customerName} (${job.route})`;
+
+      if (job.jobNumber) {
+        section += ` | Job #: ${job.jobNumber}`;
+      }
+
+      if (job.notes) {
+        section += ` | Notes: ${job.notes}`;
+      }
+
+      if (job.isRush) {
+        section += ` 🚨 RUSH`;
+      }
+
+      section += `\n`;
     });
+
+    return section + `\n`;
+  }
+
+  summary += buildSection("South Run", south);
+  summary += buildSection("North Run", north);
+  summary += buildSection("Local Delivery", local);
+  summary += buildSection("Completed", completed);
+  summary += buildSection("Next Day", nextDay);
+  summary += buildSection("Outside Shipments", outside);
+
+  summaryOutput.value = summary.trim();
+});
 
     copySummaryBtn.addEventListener("click", async () => {
       try {
