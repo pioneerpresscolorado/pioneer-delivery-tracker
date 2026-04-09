@@ -145,6 +145,24 @@
       gap: 12px;
     }
 
+    .manager-layout {
+      display: grid;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .manager-top-grid {
+      display: grid;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .manager-main,
+    .manager-side,
+    .manager-full {
+      min-width: 0;
+    }
+
     .form-row {
       display: grid;
       gap: 12px;
@@ -1096,6 +1114,14 @@
         grid-template-columns: 1fr 1fr;
       }
 
+      .manager-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .manager-top-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
       .checkbox-row-wrap {
         grid-template-columns: 1fr 1fr;
       }
@@ -1128,6 +1154,14 @@
     @media (min-width: 950px) {
       .full-grid {
         grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .manager-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .manager-top-grid {
+        grid-template-columns: 1.15fr 0.85fr;
       }
     }
 
@@ -1338,116 +1372,128 @@
 
     
     <div id="mainPage">
-      <div class="card">
-        <h2>Add Delivery</h2>
+      <div class="manager-layout">
+        <div class="manager-top-grid">
+          <div class="manager-main">
+            <div class="card">
+              <h2>Add Delivery</h2>
 
-        <form id="jobForm" class="form-grid">
-          <div class="form-row">
-            <div>
-              <label for="customerName">Customer Name</label>
-              <input id="customerName" type="text" placeholder="Enter customer name" required />
+              <form id="jobForm" class="form-grid">
+                <div class="form-row">
+                  <div>
+                    <label for="customerName">Customer Name</label>
+                    <input id="customerName" type="text" placeholder="Enter customer name" required />
+                  </div>
+
+                  <div>
+                    <label for="jobNumber">Job Number (optional)</label>
+                    <input id="jobNumber" type="text" placeholder="Enter job number if needed" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div>
+                    <label for="route">Route</label>
+                    <select id="route" required>
+                      <option value="">Select Route</option>
+                      <option value="South Run">South Run</option>
+                      <option value="North / West Run">North / West Run</option>
+                      <option value="Local Delivery">Local Delivery</option>
+                      <option value="UPS">UPS</option>
+                      <option value="FedEx">FedEx</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="deliveryDate">Delivery Date</label>
+                    <input id="deliveryDate" type="date" required />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="address">Delivery Address</label>
+                  <textarea id="address" placeholder="Enter full delivery address" required></textarea>
+                </div>
+
+                <div>
+                  <label for="deliveryNotes">Notes (optional)</label>
+                  <textarea id="deliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
+                </div>
+
+                <div class="checkbox-row-wrap">
+                  <label class="checkbox-row">
+                    <input id="rushDelivery" type="checkbox" />
+                    <span>Mark as Rush</span>
+                  </label>
+                </div>
+
+                <button class="primary-btn" type="submit">Add Delivery</button>
+                <div id="statusMessage" class="status-message"></div>
+              </form>
+            </div>
+          </div>
+
+          <div class="manager-side">
+            <div class="card">
+              <h2>Summarize Schedule</h2>
+              <p class="muted">Choose which delivery date to summarize. The summary will only include shipments for that selected date.</p>
+
+              <div class="date-toolbar" style="margin-bottom:12px;">
+                <div>
+                  <label for="summaryDate" style="margin:0;">Summary Date</label>
+                  <div class="muted" id="summaryDateLabel" style="margin-top:4px;">Select a date to summarize.</div>
+                </div>
+                <div class="date-picker-wrap">
+                  <input id="summaryDate" type="date" />
+                </div>
+              </div>
+
+              <div class="summary-actions">
+                <button id="summarizeBtn" class="secondary-btn" type="button">Generate Summary</button>
+                <button id="copySummaryBtn" class="copy-btn" type="button">Copy Summary</button>
+              </div>
+
+              <div style="margin-top: 12px;">
+                <label for="summaryOutput">Shipping Summary</label>
+                <textarea id="summaryOutput" class="summary-box" placeholder="Your summary will appear here..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="manager-full">
+          <div class="card">
+            <div class="date-toolbar">
+              <div>
+                <h2 style="margin:0 0 6px;">Delivery Manager</h2>
+                <p class="muted" style="margin:0;">Manage one delivery day at a time. Today's Schedule always follows the current Denver day automatically.</p>
+              </div>
+              <div class="date-picker-wrap">
+                <label for="managerDate" style="margin:0;">Viewing Delivery Date</label>
+                <input id="managerDate" type="date" />
+              </div>
             </div>
 
-            <div>
-              <label for="jobNumber">Job Number (optional)</label>
-              <input id="jobNumber" type="text" placeholder="Enter job number if needed" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div>
-              <label for="route">Route</label>
-              <select id="route" required>
-                <option value="">Select Route</option>
-                <option value="South Run">South Run</option>
-                <option value="North / West Run">North / West Run</option>
-                <option value="Local Delivery">Local Delivery</option>
-                <option value="UPS">UPS</option>
-                <option value="FedEx">FedEx</option>
-              </select>
+            <div class="route-tabs">
+              <button class="tab-btn active" id="southTab" type="button">South</button>
+              <button class="tab-btn" id="northTab" type="button">North / West</button>
+              <button class="tab-btn" id="localTab" type="button">Local</button>
             </div>
 
-            <div>
-              <label for="deliveryDate">Delivery Date</label>
-              <input id="deliveryDate" type="date" required />
+            <h2 class="route-title" id="routeTitle">South Run</h2>
+            <div class="muted" id="managerDateLabel" style="margin-top:-8px; margin-bottom:12px;"></div>
+            <div class="drop-zone" id="singleRouteDropZone" data-route="South Run">
+              <div class="job-list" id="jobList"></div>
             </div>
           </div>
-
-          <div>
-            <label for="address">Delivery Address</label>
-            <textarea id="address" placeholder="Enter full delivery address" required></textarea>
-          </div>
-
-          <div>
-            <label for="deliveryNotes">Notes (optional)</label>
-            <textarea id="deliveryNotes" placeholder="Add any delivery notes if needed"></textarea>
-          </div>
-
-          <div class="checkbox-row-wrap">
-            <label class="checkbox-row">
-              <input id="rushDelivery" type="checkbox" />
-              <span>Mark as Rush</span>
-            </label>
-          </div>
-
-          <button class="primary-btn" type="submit">Add Delivery</button>
-          <div id="statusMessage" class="status-message"></div>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="date-toolbar">
-          <div>
-            <h2 style="margin:0 0 6px;">Delivery Manager</h2>
-            <p class="muted" style="margin:0;">Manage one delivery day at a time. Today's Schedule always follows the current Denver day automatically.</p>
-          </div>
-          <div class="date-picker-wrap">
-            <label for="managerDate" style="margin:0;">Viewing Delivery Date</label>
-            <input id="managerDate" type="date" />
-          </div>
         </div>
 
-        <div class="route-tabs">
-          <button class="tab-btn active" id="southTab" type="button">South</button>
-          <button class="tab-btn" id="northTab" type="button">North / West</button>
-          <button class="tab-btn" id="localTab" type="button">Local</button>
-        </div>
-
-        <h2 class="route-title" id="routeTitle">South Run</h2>
-        <div class="muted" id="managerDateLabel" style="margin-top:-8px; margin-bottom:12px;"></div>
-        <div class="drop-zone" id="singleRouteDropZone" data-route="South Run">
-          <div class="job-list" id="jobList"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Completed Deliveries</h2>
-        <p class="muted" id="completedDateLabel">Completed jobs for the selected delivery date.</p>
-        <div class="completed-list" id="completedList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Summarize Schedule</h2>
-        <p class="muted">Choose which delivery date to summarize. The summary will only include shipments for that selected date.</p>
-
-        <div class="date-toolbar" style="margin-bottom:12px;">
-          <div>
-            <label for="summaryDate" style="margin:0;">Summary Date</label>
-            <div class="muted" id="summaryDateLabel" style="margin-top:4px;">Select a date to summarize.</div>
+        <div class="manager-full">
+          <div class="card">
+            <h2>Completed Deliveries</h2>
+            <p class="muted" id="completedDateLabel">Completed jobs for the selected delivery date.</p>
+            <div class="completed-list" id="completedList"></div>
           </div>
-          <div class="date-picker-wrap">
-            <input id="summaryDate" type="date" />
-          </div>
-        </div>
-
-        <div class="summary-actions">
-          <button id="summarizeBtn" class="secondary-btn" type="button">Generate Summary</button>
-          <button id="copySummaryBtn" class="copy-btn" type="button">Copy Summary</button>
-        </div>
-
-        <div style="margin-top: 12px;">
-          <label for="summaryOutput">Shipping Summary</label>
-          <textarea id="summaryOutput" class="summary-box" placeholder="Your summary will appear here..."></textarea>
         </div>
       </div>
     </div>
