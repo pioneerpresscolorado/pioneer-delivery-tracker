@@ -1162,8 +1162,40 @@
       border: 1px solid #e5e7eb;
       border-radius: 16px;
       background: #f8fafc;
-      padding: 14px;
       margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .history-day-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      border-bottom: 1px solid transparent;
+    }
+
+    .history-day-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .history-day-group[open] .history-day-toggle {
+      border-bottom-color: #dbe3ee;
+    }
+
+    .history-day-toggle::after {
+      content: "▾";
+      font-size: 1rem;
+      font-weight: bold;
+      color: #475569;
+      margin-left: auto;
+    }
+
+    .history-day-group[open] .history-day-toggle::after {
+      content: "▴";
     }
 
     .history-day-header {
@@ -1172,9 +1204,11 @@
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #dbe3ee;
+      width: 100%;
+    }
+
+    .history-day-body {
+      padding: 14px;
     }
 
     .history-day-title {
@@ -2367,17 +2401,21 @@
         .forEach(dateKey => {
           const dayJobs = grouped[dateKey];
           const delivered = dayJobs.filter(job => job.status === "delivered").length;
-          const group = document.createElement("div");
+          const group = document.createElement("details");
           group.className = "history-day-group";
           group.innerHTML = `
-            <div class="history-day-header">
-              <div>
-                <h3 class="history-day-title">${escapeHtml(formatDateLabel(dateKey))}</h3>
-                <div class="history-day-subtitle">${dayJobs.length} job${dayJobs.length === 1 ? "" : "s"} • ${delivered} delivered</div>
+            <summary class="history-day-toggle">
+              <div class="history-day-header">
+                <div>
+                  <h3 class="history-day-title">${escapeHtml(formatDateLabel(dateKey))}</h3>
+                  <div class="history-day-subtitle">${dayJobs.length} job${dayJobs.length === 1 ? "" : "s"} • ${delivered} delivered</div>
+                </div>
               </div>
-            </div>
+            </summary>
+            <div class="history-day-body"></div>
           `;
 
+          const body = group.querySelector(".history-day-body");
           const routeGroups = dayJobs.reduce((acc, job) => {
             (acc[job.route] ||= []).push(job);
             return acc;
@@ -2394,7 +2432,7 @@
               `;
               const grid = section.querySelector(".history-grid");
               sortScheduleJobsList(routeGroups[route]).forEach(job => grid.appendChild(createHistoryCard(job)));
-              group.appendChild(section);
+              body.appendChild(section);
             });
 
           historyList.appendChild(group);
