@@ -993,6 +993,21 @@
       .schedule-toolbar {
         flex-direction: column;
       }
+
+      .full-grid,
+      .full-grid.columns-1,
+      .full-grid.columns-2,
+      .full-grid.columns-3 {
+        grid-template-columns: 1fr !important;
+      }
+
+      .full-column {
+        width: 100%;
+      }
+
+      .schedule-list.double-stack {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (min-width: 700px) {
