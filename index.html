@@ -1000,17 +1000,30 @@
       background: #d1d5db;
     }
 
-    @media (max-width: 700px) {
-      .mobile-nav-bar {
-        display: flex;
+    @media (max-width: 949px) {
+      .full-grid,
+      .full-grid.columns-1,
+      .full-grid.columns-2,
+      .full-grid.columns-3 {
+        grid-template-columns: 1fr !important;
       }
 
-      .full-grid {
-        grid-template-columns: 1fr !important;
+      .full-column {
+        width: 100%;
       }
 
       .schedule-list.double-stack {
         grid-template-columns: 1fr !important;
+      }
+
+      .fullscreen-btn {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .mobile-nav-bar {
+        display: flex;
       }
 
       .top-nav {
@@ -1411,7 +1424,7 @@
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
 
-    const ACTOR_NAME = "Cristina";
+    const ACTOR_NAME = "Shipping Manager";
 
     let jobs = [];
     let currentRoute = "South Run";
