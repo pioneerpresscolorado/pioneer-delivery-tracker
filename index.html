@@ -392,7 +392,7 @@
     }
 
     .badge-south { background: #0ea5e9; }
-    .badge-north { background: #22c55e; }
+    .badge-north { background: #7c3aed; }
     .badge-local { background: #f59e0b; }
     .badge-ups { background: #8b5cf6; }
     .badge-fedex { background: #ec4899; }
@@ -665,7 +665,7 @@
     }
 
     .north-accent {
-      border-left-color: #22c55e;
+      border-left-color: #7c3aed;
     }
 
     .local-accent {
@@ -898,6 +898,46 @@
       display: none !important;
     }
 
+    .is-fullscreen #notificationBox {
+      display: none !important;
+    }
+
+    .fullscreen-totals {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .fullscreen-total-chip {
+      background: #f8fafc;
+      border: 1px solid #dbe3ee;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    .fullscreen-total-chip strong {
+      color: #111827;
+      font-size: 0.95rem;
+      margin-left: 4px;
+    }
+
+    .is-fullscreen .fullscreen-totals {
+      display: flex;
+    }
+
+    .is-fullscreen .schedule-toolbar {
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+
     .is-fullscreen .full-page-card {
       flex: 1;
       overflow: hidden;
@@ -965,6 +1005,14 @@
         display: flex;
       }
 
+      .full-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .schedule-list.double-stack {
+        grid-template-columns: 1fr !important;
+      }
+
       .top-nav {
         display: none;
         grid-template-columns: 1fr;
@@ -992,21 +1040,6 @@
 
       .schedule-toolbar {
         flex-direction: column;
-      }
-
-      .full-grid,
-      .full-grid.columns-1,
-      .full-grid.columns-2,
-      .full-grid.columns-3 {
-        grid-template-columns: 1fr !important;
-      }
-
-      .full-column {
-        width: 100%;
-      }
-
-      .schedule-list.double-stack {
-        grid-template-columns: 1fr;
       }
     }
 
@@ -1114,6 +1147,13 @@
             <div class="schedule-toolbar">
               <button id="printSheetBtn" class="print-btn" type="button">Print Dispatch Sheet</button>
               <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
+              <div class="fullscreen-totals" id="fullscreenTotals">
+                <div class="fullscreen-total-chip">Today <strong id="fsActiveTodayCount">0</strong></div>
+                <div class="fullscreen-total-chip">Rush <strong id="fsRushCount">0</strong></div>
+                <div class="fullscreen-total-chip">Next Day <strong id="fsNextDayCount">0</strong></div>
+                <div class="fullscreen-total-chip">Outside <strong id="fsOutsideCount">0</strong></div>
+                <div class="fullscreen-total-chip">Done <strong id="fsCompletedCount">0</strong></div>
+              </div>
             </div>
 
             <h2>Full Schedule</h2>
@@ -1129,7 +1169,7 @@
 
               <div class="full-column">
                 <div class="column-header">
-                  <h3>North Run</h3>
+                  <h3>North / West Run</h3>
                 </div>
                 <div class="schedule-list" id="northList"></div>
               </div>
@@ -1178,7 +1218,7 @@
             <select id="route" required>
               <option value="">Select Route</option>
               <option value="South Run">South Run</option>
-              <option value="North Run">North Run</option>
+              <option value="North / West Run">North / West Run</option>
               <option value="Local Delivery">Local Delivery</option>
               <option value="UPS">UPS</option>
               <option value="FedEx">FedEx</option>
@@ -1205,7 +1245,7 @@
       <div class="card">
         <div class="route-tabs">
           <button class="tab-btn active" id="southTab" type="button">South</button>
-          <button class="tab-btn" id="northTab" type="button">North</button>
+          <button class="tab-btn" id="northTab" type="button">North / West</button>
           <button class="tab-btn" id="localTab" type="button">Local</button>
         </div>
 
@@ -1312,7 +1352,7 @@
           <select id="editRoute" required>
             <option value="">Select Route</option>
             <option value="South Run">South Run</option>
-            <option value="North Run">North Run</option>
+            <option value="North / West Run">North / West Run</option>
             <option value="Local Delivery">Local Delivery</option>
             <option value="UPS">UPS</option>
             <option value="FedEx">FedEx</option>
@@ -1454,6 +1494,11 @@
     const nextDayCount = document.getElementById("nextDayCount");
     const outsideCount = document.getElementById("outsideCount");
     const completedCount = document.getElementById("completedCount");
+    const fsActiveTodayCount = document.getElementById("fsActiveTodayCount");
+    const fsRushCount = document.getElementById("fsRushCount");
+    const fsNextDayCount = document.getElementById("fsNextDayCount");
+    const fsOutsideCount = document.getElementById("fsOutsideCount");
+    const fsCompletedCount = document.getElementById("fsCompletedCount");
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -1489,7 +1534,7 @@
     }
 
     function isLocalRoute(route) {
-      return route === "South Run" || route === "North Run" || route === "Local Delivery";
+      return route === "South Run" || route === "North / West Run" || route === "Local Delivery";
     }
 
     function getActiveJobs() {
@@ -1521,6 +1566,20 @@
       });
     }
 
+    function sortScheduleJobsList(list) {
+      return [...list].sort((a, b) => {
+        const statusA = a.status === "delivered" ? 1 : 0;
+        const statusB = b.status === "delivered" ? 1 : 0;
+        if (statusA !== statusB) return statusA - statusB;
+
+        const rushA = a.isRush ? 1 : 0;
+        const rushB = b.isRush ? 1 : 0;
+        if (rushA !== rushB) return rushB - rushA;
+
+        return (a.order ?? 0) - (b.order ?? 0);
+      });
+    }
+
     function getJobsForRoute(routeName) {
       return sortJobsList(
         getActiveJobs().filter(job =>
@@ -1531,7 +1590,7 @@
     }
 
     function getScheduleJobsForRoute(routeName) {
-      return sortJobsList(
+      return sortScheduleJobsList(
         jobs.filter(job =>
           (job.status === "active" || job.status === "delivered") &&
           job.route === routeName &&
@@ -1576,7 +1635,7 @@
 
     function getRouteBadgeClass(route) {
       if (route === "South Run") return "badge-south";
-      if (route === "North Run") return "badge-north";
+      if (route === "North / West Run") return "badge-north";
       if (route === "Local Delivery") return "badge-local";
       if (route === "UPS") return "badge-ups";
       if (route === "FedEx") return "badge-fedex";
@@ -1588,11 +1647,23 @@
     }
 
     function updateQuickTotals() {
-      activeTodayCount.textContent = getJobsForRoute("South Run").length + getJobsForRoute("North Run").length + getJobsForRoute("Local Delivery").length;
-      rushCount.textContent = getRushJobsCount();
-      nextDayCount.textContent = getNextDayJobs().length;
-      outsideCount.textContent = getOutsideJobs().length;
-      completedCount.textContent = getDeliveredJobs().length;
+      const activeToday = getJobsForRoute("South Run").length + getJobsForRoute("North / West Run").length + getJobsForRoute("Local Delivery").length;
+      const rushTotal = getRushJobsCount();
+      const nextDayTotal = getNextDayJobs().length;
+      const outsideTotal = getOutsideJobs().length;
+      const completedTotal = getDeliveredJobs().length;
+
+      activeTodayCount.textContent = activeToday;
+      rushCount.textContent = rushTotal;
+      nextDayCount.textContent = nextDayTotal;
+      outsideCount.textContent = outsideTotal;
+      completedCount.textContent = completedTotal;
+
+      fsActiveTodayCount.textContent = activeToday;
+      fsRushCount.textContent = rushTotal;
+      fsNextDayCount.textContent = nextDayTotal;
+      fsOutsideCount.textContent = outsideTotal;
+      fsCompletedCount.textContent = completedTotal;
     }
 
     async function markJobDelivered(job) {
@@ -1664,7 +1735,9 @@
     }
 
     function shouldDoubleStack(routeJobs) {
-      return routeJobs.length >= 12;
+      const isFullscreenSchedule = !!document.fullscreenElement && currentPageView === "full";
+      const threshold = isFullscreenSchedule ? 7 : 12;
+      return routeJobs.length > threshold;
     }
 
     function setFullGridColumns(count) {
@@ -1699,141 +1772,76 @@
 
     function applyDispatchDensity() {
       appRoot.classList.remove("dispatch-fit-1", "dispatch-fit-2", "dispatch-fit-3");
-      const totalJobs = getJobsForRoute("South Run").length + getJobsForRoute("North Run").length + getJobsForRoute("Local Delivery").length;
+      const totalJobs = getJobsForRoute("South Run").length + getJobsForRoute("North / West Run").length + getJobsForRoute("Local Delivery").length;
       const fitClass = getDispatchFitClass(totalJobs);
       if (fitClass) appRoot.classList.add(fitClass);
     }
 
     function applyFullscreenFit() {
-      appRoot.classList.remove("fullscreen-fit-1", "fullscreen-fit-2", "fullscreen-fit-3");
-
-      if (!document.fullscreenElement || currentPageView !== "full") return;
+      if (!document.fullscreenElement || currentPageView !== "full") {
+        appRoot.style.removeProperty("--fs-column-title");
+        appRoot.style.removeProperty("--fs-card-title");
+        appRoot.style.removeProperty("--fs-meta");
+        appRoot.style.removeProperty("--fs-address");
+        appRoot.style.removeProperty("--fs-notes");
+        appRoot.style.removeProperty("--fs-badge");
+        appRoot.style.removeProperty("--fs-card-padding-y");
+        appRoot.style.removeProperty("--fs-card-padding-x");
+        appRoot.style.removeProperty("--fs-column-padding");
+        appRoot.style.removeProperty("--fs-grid-gap");
+        return;
+      }
 
       const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North Run");
+      const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
-
       const visibleRoutes = [southJobs, northJobs, localJobs].filter(list => list.length > 0);
       const totalJobs = visibleRoutes.reduce((sum, list) => sum + list.length, 0);
       const maxColumnJobs = visibleRoutes.length ? Math.max(...visibleRoutes.map(list => list.length)) : 0;
-      const columnCount = Math.max(1, visibleRoutes.length);
+      const isDense = maxColumnJobs >= 7;
 
-      let titleSize = 1.55;
-      let cardTitleSize = 1.35;
-      let metaSize = 1.08;
-      let addressSize = 1.22;
-      let notesSize = 0.95;
-      let badgeSize = 0.82;
-      let padY = 12;
-      let padX = 14;
-      let columnPad = 12;
-      let gap = 10;
-
-      if (columnCount === 3) {
-        titleSize -= 0.12;
-        cardTitleSize -= 0.10;
-        metaSize -= 0.06;
-        addressSize -= 0.08;
-      } else if (columnCount === 2) {
-        titleSize += 0.04;
-        cardTitleSize += 0.04;
-        addressSize += 0.04;
-      }
-
-      if (maxColumnJobs >= 7) {
-        titleSize -= 0.10;
-        cardTitleSize -= 0.10;
-        metaSize -= 0.08;
-        addressSize -= 0.10;
-        padY -= 1;
-        padX -= 1;
-        gap -= 1;
-      }
-
-      if (maxColumnJobs >= 10) {
-        titleSize -= 0.14;
-        cardTitleSize -= 0.14;
-        metaSize -= 0.10;
-        addressSize -= 0.14;
-        notesSize -= 0.06;
-        padY -= 1;
-        padX -= 1;
-        columnPad -= 1;
-        gap -= 1;
-      }
-
-      if (maxColumnJobs >= 13) {
-        titleSize -= 0.16;
-        cardTitleSize -= 0.16;
-        metaSize -= 0.12;
-        addressSize -= 0.16;
-        notesSize -= 0.08;
-        badgeSize -= 0.06;
-        padY -= 1;
-        padX -= 1;
-        columnPad -= 1;
-        gap -= 1;
-      }
-
-      if (maxColumnJobs >= 16) {
-        titleSize -= 0.18;
-        cardTitleSize -= 0.16;
-        metaSize -= 0.12;
-        addressSize -= 0.16;
-        notesSize -= 0.08;
-        badgeSize -= 0.06;
-        padY -= 1;
-        padX -= 1;
-        columnPad -= 1;
-        gap -= 1;
-      }
-
-      if (totalJobs >= 24) {
-        titleSize -= 0.08;
-        cardTitleSize -= 0.08;
-        metaSize -= 0.06;
-        addressSize -= 0.08;
-        notesSize -= 0.04;
-        badgeSize -= 0.04;
-      }
-
-      titleSize = Math.max(titleSize, 0.95);
-      cardTitleSize = Math.max(cardTitleSize, 0.95);
-      metaSize = Math.max(metaSize, 0.8);
-      addressSize = Math.max(addressSize, 0.9);
-      notesSize = Math.max(notesSize, 0.72);
-      badgeSize = Math.max(badgeSize, 0.64);
-      padY = Math.max(padY, 6);
-      padX = Math.max(padX, 8);
-      columnPad = Math.max(columnPad, 6);
-      gap = Math.max(gap, 4);
+      const titleSize = maxColumnJobs >= 12 ? 1.02 : maxColumnJobs >= 9 ? 1.08 : 1.14;
+      const cardTitleSize = maxColumnJobs >= 12 ? 0.96 : maxColumnJobs >= 9 ? 1.02 : 1.08;
+      const metaSize = maxColumnJobs >= 12 ? 0.78 : maxColumnJobs >= 9 ? 0.84 : 0.9;
+      const addressSize = maxColumnJobs >= 12 ? 0.86 : maxColumnJobs >= 9 ? 0.92 : 1.0;
+      const badgeSize = maxColumnJobs >= 12 ? 0.6 : maxColumnJobs >= 9 ? 0.66 : 0.72;
+      const padY = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
+      const padX = maxColumnJobs >= 12 ? 6 : maxColumnJobs >= 9 ? 7 : 9;
+      const columnPad = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
+      const gap = isDense ? 4 : 6;
 
       appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
       appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
       appRoot.style.setProperty("--fs-meta", `${metaSize}rem`);
       appRoot.style.setProperty("--fs-address", `${addressSize}rem`);
-      appRoot.style.setProperty("--fs-notes", `${notesSize}rem`);
+      appRoot.style.setProperty("--fs-notes", `0.72rem`);
       appRoot.style.setProperty("--fs-badge", `${badgeSize}rem`);
       appRoot.style.setProperty("--fs-card-padding-y", `${padY}px`);
       appRoot.style.setProperty("--fs-card-padding-x", `${padX}px`);
       appRoot.style.setProperty("--fs-column-padding", `${columnPad}px`);
       appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
 
-      requestAnimationFrame(() => {
-        const needsScroll =
-          fullGrid.scrollHeight > fullGrid.clientHeight + 2 ||
-          fullGrid.scrollWidth > fullGrid.clientWidth + 2;
+      [southList, northList, localList].forEach(list => {
+        list.classList.remove("double-stack");
+      });
 
-        if (needsScroll) {
-          appRoot.style.setProperty("--fs-column-title", `${Math.max(titleSize - 0.1, 0.9)}rem`);
-          appRoot.style.setProperty("--fs-card-title", `${Math.max(cardTitleSize - 0.12, 0.88)}rem`);
-          appRoot.style.setProperty("--fs-meta", `${Math.max(metaSize - 0.08, 0.76)}rem`);
-          appRoot.style.setProperty("--fs-address", `${Math.max(addressSize - 0.12, 0.86)}rem`);
-          appRoot.style.setProperty("--fs-notes", `${Math.max(notesSize - 0.06, 0.68)}rem`);
-          appRoot.style.setProperty("--fs-badge", `${Math.max(badgeSize - 0.05, 0.6)}rem`);
-          appRoot.style.setProperty("--fs-card-padding-y", `${Math.max(padY - 1, 5)}px`);
-          appRoot.style.setProperty("--fs-card-padding-x", `${Math.max(padX - 1, 7)}px`);
-          appRoot.style.setProperty("--fs-column-padding", `${Math.max(columnPad - 1, 5)}px`);
+      if (southJobs.length > 7) southList.classList.add("double-stack");
+      if (northJobs.length > 7) northList.classList.add("double-stack");
+      if (localJobs.length > 7) localList.classList.add("double-stack");
+
+      requestAnimationFrame(() => {
+        const lists = [southList, northList, localList].filter(list => list.children.length > 0);
+        const overflow = lists.some(list => list.scrollHeight > list.clientHeight + 2 || list.scrollWidth > list.clientWidth + 2);
+
+        if (overflow || totalJobs >= 24) {
+          appRoot.style.setProperty("--fs-column-title", `${Math.max(titleSize - 0.08, 0.94)}rem`);
+          appRoot.style.setProperty("--fs-card-title", `${Math.max(cardTitleSize - 0.08, 0.9)}rem`);
+          appRoot.style.setProperty("--fs-meta", `${Math.max(metaSize - 0.06, 0.74)}rem`);
+          appRoot.style.setProperty("--fs-address", `${Math.max(addressSize - 0.08, 0.82)}rem`);
+          appRoot.style.setProperty("--fs-badge", `${Math.max(badgeSize - 0.05, 0.56)}rem`);
+          appRoot.style.setProperty("--fs-card-padding-y", `${Math.max(padY - 1, 4)}px`);
+          appRoot.style.setProperty("--fs-card-padding-x", `${Math.max(padX - 1, 5)}px`);
+          appRoot.style.setProperty("--fs-column-padding", `${Math.max(columnPad - 1, 4)}px`);
           appRoot.style.setProperty("--fs-grid-gap", `${Math.max(gap - 1, 3)}px`);
         }
       });
@@ -2164,7 +2172,7 @@
       localList.innerHTML = "";
 
       const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North Run");
+      const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
 
       applyScheduleLayout(southJobs, northJobs, localJobs);
@@ -2203,7 +2211,7 @@
       localTab.classList.remove("active");
 
       if (route === "South Run") southTab.classList.add("active");
-      if (route === "North Run") northTab.classList.add("active");
+      if (route === "North / West Run") northTab.classList.add("active");
       if (route === "Local Delivery") localTab.classList.add("active");
 
       renderJobs();
@@ -2378,7 +2386,7 @@
         const nextDayJobs = allDocs.filter(job => job.status === "nextDay");
         const groupedRouteCounts = {
           "South Run": getJobsForRoute("South Run").filter(j => !j.isRush).length,
-          "North Run": getJobsForRoute("North Run").filter(j => !j.isRush).length,
+          "North / West Run": getJobsForRoute("North / West Run").filter(j => !j.isRush).length,
           "Local Delivery": getJobsForRoute("Local Delivery").filter(j => !j.isRush).length,
           "UPS": getOutsideJobs().filter(j => j.route === "UPS" && !j.isRush).length,
           "FedEx": getOutsideJobs().filter(j => j.route === "FedEx" && !j.isRush).length
@@ -2426,7 +2434,7 @@
 
     function buildSummaryText() {
       const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North Run");
+      const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
       const completedJobs = sortJobsList(getDeliveredJobs());
       const nextDayJobs = sortJobsList(getNextDayJobs());
@@ -2450,13 +2458,13 @@
         text += `- No active South Run deliveries.\n`;
       }
 
-      text += `\nNorth Run (${northJobs.length} active):\n`;
+      text += `\nNorth / West Run (${northJobs.length} active):\n`;
       if (northJobs.length) {
         northJobs.forEach(job => {
           text += `- ${job.isRush ? "[RUSH] " : ""}${job.customerName}${job.jobNumber ? ` — Job #${job.jobNumber}` : ""} — ${job.address}${job.notes ? ` — Notes: ${job.notes}` : ""}\n`;
         });
       } else {
-        text += `- No active North Run deliveries.\n`;
+        text += `- No active North / West Run deliveries.\n`;
       }
 
       text += `\nLocal Delivery (${localJobs.length} active):\n`;
@@ -2502,7 +2510,7 @@
 
     function buildPrintSheetHtml() {
       const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North Run");
+      const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
       const outsideJobs = sortJobsList(getOutsideJobs());
       const nextDayJobs = sortJobsList(getNextDayJobs());
@@ -2569,7 +2577,7 @@
             </div>
 
             ${renderPrintList("South Run", southJobs)}
-            ${renderPrintList("North Run", northJobs)}
+            ${renderPrintList("North / West Run", northJobs)}
             ${renderPrintList("Local Delivery", localJobs)}
             ${renderPrintList("Outside Shipments", outsideJobs)}
             ${renderPrintList("Next Day Shipments", nextDayJobs)}
@@ -2787,7 +2795,7 @@
     printSheetBtn.addEventListener("click", printDispatchSheet);
 
     southTab.addEventListener("click", () => setRoute("South Run"));
-    northTab.addEventListener("click", () => setRoute("North Run"));
+    northTab.addEventListener("click", () => setRoute("North / West Run"));
     localTab.addEventListener("click", () => setRoute("Local Delivery"));
 
     clearScheduleInput.addEventListener("input", () => {
@@ -2800,7 +2808,7 @@ summarizeBtn.addEventListener("click", () => {
   let summary = "";
 
   const south = getScheduleJobsForRoute("South Run");
-  const north = getScheduleJobsForRoute("North Run");
+  const north = getScheduleJobsForRoute("North / West Run");
   const local = getScheduleJobsForRoute("Local Delivery");
   const completed = getDeliveredJobs();
   const nextDay = getNextDayJobs();
@@ -2833,7 +2841,7 @@ summarizeBtn.addEventListener("click", () => {
   }
 
   summary += buildSection("South Run", south);
-  summary += buildSection("North Run", north);
+  summary += buildSection("North / West Run", north);
   summary += buildSection("Local Delivery", local);
   summary += buildSection("Completed", completed);
   summary += buildSection("Next Day", nextDay);
