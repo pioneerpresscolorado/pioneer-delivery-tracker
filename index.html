@@ -61,14 +61,37 @@
       color: #6b7280;
       font-size: 1rem;
     }
-    .last-action-flash {
-      animation: lastActionPulse 1.4s ease;
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    @keyframes lastActionPulse {
-      0% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); background: #eff6ff; transform: scale(1); }
-      20% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.22); background: #dbeafe; transform: scale(1.01); }
-      100% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); background: #eff6ff; transform: scale(1); }
+    .header-copy {
+      min-width: 0;
+    }
+
+    .sound-toggle-btn {
+      width: auto;
+      border: none;
+      background: #111827;
+      color: white;
+      font-weight: bold;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .sound-toggle-btn:hover {
+      background: #000;
+    }
+
+    .sound-toggle-btn.off {
+      background: #6b7280;
     }
 
     .card {
@@ -1373,8 +1396,13 @@
 <body>
   <div class="app" id="appRoot">
     <div class="header">
-      <h1>Pioneer Delivery Tracker</h1>
-      <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
+      <div class="header-bar">
+        <div class="header-copy">
+          <h1>Pioneer Delivery Tracker</h1>
+          <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
+        </div>
+        <button class="sound-toggle-btn" id="soundToggleBtn" type="button">Sound: On</button>
+      </div>
     </div>
 
     <div class="card">
@@ -1711,6 +1739,7 @@
               <option value="UPS">UPS</option>
               <option value="FedEx">FedEx</option>
               <option value="LTL">LTL</option>
+              <option value="Customer Pickup">Customer Pickup</option>
             </select>
           </div>
 
@@ -1774,6 +1803,8 @@
     const DENVER_TZ = "America/Denver";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
+    let soundEnabled = localStorage.getItem("pioneerDeliverySoundEnabled") !== "false";
+    let audioPrimed = false;
 
     function getActionTimeValue(job) {
       const raw = job?.updatedAt || job?.createdAt || job?.deliveredAt || null;
@@ -1783,14 +1814,85 @@
       const parsed = new Date(raw).getTime();
       return Number.isFinite(parsed) ? parsed : 0;
     }
-    function flashLastActionBox() {
-      if (!notificationBox) return;
-      notificationBox.classList.remove("last-action-flash");
-      void notificationBox.offsetWidth;
-      notificationBox.classList.add("last-action-flash");
+
+    function playUpdateChime() {
+      try {
+        if (!soundEnabled) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+        gain.connect(ctx.destination);
+
+        const n1 = ctx.createOscillator();
+        n1.type = "sine";
+        n1.frequency.setValueAtTime(880, now);
+        n1.connect(gain);
+        n1.start(now);
+        n1.stop(now + 0.18);
+
+        const n2 = ctx.createOscillator();
+        n2.type = "sine";
+        n2.frequency.setValueAtTime(1174.66, now + 0.16);
+        n2.connect(gain);
+        n2.start(now + 0.16);
+        n2.stop(now + 0.42);
+
+        const n3 = ctx.createOscillator();
+        n3.type = "triangle";
+        n3.frequency.setValueAtTime(1567.98, now + 0.38);
+        n3.connect(gain);
+        n3.start(now + 0.38);
+        n3.stop(now + 0.85);
+
+        setTimeout(() => { try { ctx.close(); } catch(e) {} }, 1400);
+      } catch (error) {
+        console.error("Could not play chime", error);
+      }
     }
 
-    function renderLatestAction(shouldFlash = false) {
+    function updateSoundToggleButton() {
+      if (!soundToggleBtn) return;
+      soundToggleBtn.textContent = `Sound: ${soundEnabled ? "On" : "Off"}`;
+      soundToggleBtn.classList.toggle("off", !soundEnabled);
+      soundToggleBtn.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
+    }
+
+    function primeAudio() {
+      if (audioPrimed) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        audioPrimed = true;
+        return;
+      }
+
+      try {
+        const ctx = new AudioCtx();
+        if (typeof ctx.resume === "function") ctx.resume();
+        const buffer = ctx.createBuffer(1, 1, 22050);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        source.start(0);
+        setTimeout(() => { try { ctx.close(); } catch (e) {} }, 50);
+        audioPrimed = true;
+      } catch (error) {
+        console.error("Could not prime audio", error);
+      }
+    }
+
+    function handleFirstInteraction() {
+      primeAudio();
+      window.removeEventListener("pointerdown", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
+    }
+
+    function renderLatestAction(shouldChime = false) {
       const latestJob = [...jobs].sort((a, b) => getActionTimeValue(b) - getActionTimeValue(a))[0];
       if (!latestJob) {
         notificationText.textContent = "No recent actions yet.";
@@ -1804,7 +1906,7 @@
       notificationText.textContent = `${actionLabel}: ${latestJob.customerName} • ${latestJob.route} • ${formatDateLabel(latestJob.deliveryDate)}`;
       notificationTime.textContent = `${actionLabel} ${new Date(actionTime || Date.now()).toLocaleString()}`;
 
-      if (shouldFlash && hasLoadedInitialSnapshot && nextKey && nextKey !== lastActionKey) flashLastActionBox();
+      if (shouldChime && hasLoadedInitialSnapshot && nextKey && nextKey !== lastActionKey) playUpdateChime();
       lastActionKey = nextKey;
     }
 
@@ -1914,6 +2016,7 @@
     const fsOutsideCount = document.getElementById("fsOutsideCount");
     const fsCompletedCount = document.getElementById("fsCompletedCount");
     const scheduleDateLabel = document.getElementById("scheduleDateLabel");
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -2658,7 +2761,7 @@
     function createScheduleCard(job, accentClass) {
       const statusClass = job.status === "delivered" ? "delivered-card" : "";
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
-      const actionHtml = job.status !== "delivered" ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Mark as Delivered</button></div>` : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
+      const actionHtml = job.status !== "delivered" ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Delivered</button></div>` : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
@@ -3424,6 +3527,13 @@ Thank you.`;
       renderAll();
     });
 
+    if (scheduleDateInput) {
+      scheduleDateInput.addEventListener("change", () => {
+        scheduleViewDate = scheduleDateInput.value || currentDenverDate;
+        renderAll();
+      });
+    }
+
     if (summaryDateInput) {
       summaryDateInput.addEventListener("change", () => {
         if (summaryDateLabel) {
@@ -3461,6 +3571,7 @@ Thank you.`;
       renderFullSchedule();
       updateQuickTotals();
       updateQuickTotalsVisibility();
+      updateSoundToggleButton();
       renderLatestAction(false);
       requestAnimationFrame(() => applyFullscreenFit());
     }
@@ -3490,13 +3601,13 @@ Thank you.`;
         const changes = snapshot.docChanges();
         jobs = snapshot.docs.map(docItem => normalizeJob(docItem.id, docItem.data()));
 
-        let shouldFlash = false;
+        let shouldChime = false;
         if (hasLoadedInitialSnapshot) {
-          shouldFlash = changes.some(change => change.type === "added" || change.type === "modified");
+          shouldChime = changes.some(change => change.type === "added" || change.type === "modified");
         }
 
         renderAll();
-        renderLatestAction(shouldFlash);
+        renderLatestAction(shouldChime);
         hasLoadedInitialSnapshot = true;
       },
       (error) => {
@@ -3505,6 +3616,20 @@ Thank you.`;
         setNotification("Could not load deliveries. Check Firebase setup.", "danger");
       }
     );
+
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem("pioneerDeliverySoundEnabled", String(soundEnabled));
+        updateSoundToggleButton();
+        if (soundEnabled) primeAudio();
+        requestAnimationFrame(() => renderLatestAction(false));
+      });
+    }
+
+    window.addEventListener("pointerdown", handleFirstInteraction, { passive: true });
+    window.addEventListener("keydown", handleFirstInteraction, { passive: true });
+    window.addEventListener("touchstart", handleFirstInteraction, { passive: true });
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 700) closeMobileMenu();
