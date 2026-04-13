@@ -1099,6 +1099,157 @@
       align-content: stretch;
     }
 
+
+
+    .schedule-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-inline-meta {
+      flex: 1 1 220px;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .schedule-delivered-time {
+      flex: 0 0 auto;
+      margin-left: auto;
+      text-align: right;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #15803d;
+      white-space: nowrap;
+    }
+
+    .schedule-card.delivered-card .schedule-delivered-time {
+      color: #166534;
+    }
+
+    .live-alert-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px;
+      pointer-events: none;
+      z-index: 10001;
+    }
+
+    .live-alert-overlay.show {
+      display: flex;
+    }
+
+    .live-alert-card {
+      width: min(560px, 100%);
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.28);
+      border: 2px solid #bfdbfe;
+      overflow: hidden;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .live-alert-card.is-new {
+      border-color: #2563eb;
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    }
+
+    .live-alert-card.is-updated {
+      border-color: #f59e0b;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+    }
+
+    .live-alert-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px 10px;
+    }
+
+    .live-alert-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .live-alert-card.is-new .live-alert-label {
+      color: #1d4ed8;
+    }
+
+    .live-alert-card.is-updated .live-alert-label {
+      color: #b45309;
+    }
+
+    .live-alert-close {
+      width: auto;
+      min-width: 88px;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .live-alert-close:hover {
+      background: #d1d5db;
+    }
+
+    .live-alert-body {
+      padding: 0 16px 16px;
+    }
+
+    .live-alert-title {
+      margin: 0 0 8px;
+      font-size: 1.22rem;
+      line-height: 1.2;
+      color: #111827;
+    }
+
+    .live-alert-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .live-alert-item {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .live-alert-item span {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .live-alert-item strong {
+      display: block;
+      color: #0f172a;
+      line-height: 1.25;
+      font-size: 0.97rem;
+      word-break: break-word;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1204,6 +1355,34 @@
 
       .schedule-toolbar {
         flex-direction: column;
+      }
+
+      .schedule-meta-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .schedule-delivered-time {
+        margin-left: 0;
+        text-align: right;
+        width: 100%;
+      }
+
+      .live-alert-overlay {
+        padding: 10px;
+      }
+
+      .live-alert-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .live-alert-close {
+        width: 100%;
+      }
+
+      .live-alert-grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1752,6 +1931,33 @@
   </div>
 
   
+
+  <div class="live-alert-overlay" id="liveAlertOverlay" aria-live="assertive" aria-atomic="true">
+    <div class="live-alert-card is-new" id="liveAlertCard" role="alertdialog" aria-modal="false" aria-labelledby="liveAlertTitle">
+      <div class="live-alert-top">
+        <div class="live-alert-label" id="liveAlertLabel">New Delivery</div>
+        <button class="live-alert-close" id="liveAlertCloseBtn" type="button">Close</button>
+      </div>
+      <div class="live-alert-body">
+        <h3 class="live-alert-title" id="liveAlertTitle">Waiting for delivery updates...</h3>
+        <div class="live-alert-grid">
+          <div class="live-alert-item">
+            <span>Customer</span>
+            <strong id="liveAlertCustomer">—</strong>
+          </div>
+          <div class="live-alert-item">
+            <span>Route</span>
+            <strong id="liveAlertRoute">—</strong>
+          </div>
+          <div class="live-alert-item">
+            <span>Date</span>
+            <strong id="liveAlertDate">—</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -1918,6 +2124,69 @@
     const fsOutsideCount = document.getElementById("fsOutsideCount");
     const fsCompletedCount = document.getElementById("fsCompletedCount");
     const scheduleDateLabel = document.getElementById("scheduleDateLabel");
+    const liveAlertOverlay = document.getElementById("liveAlertOverlay");
+    const liveAlertCard = document.getElementById("liveAlertCard");
+    const liveAlertLabel = document.getElementById("liveAlertLabel");
+    const liveAlertTitle = document.getElementById("liveAlertTitle");
+    const liveAlertCustomer = document.getElementById("liveAlertCustomer");
+    const liveAlertRoute = document.getElementById("liveAlertRoute");
+    const liveAlertDate = document.getElementById("liveAlertDate");
+    const liveAlertCloseBtn = document.getElementById("liveAlertCloseBtn");
+
+    let liveAlertTimer = null;
+
+    function hideLiveAlert() {
+      if (liveAlertTimer) {
+        clearTimeout(liveAlertTimer);
+        liveAlertTimer = null;
+      }
+      liveAlertOverlay.classList.remove("show");
+    }
+
+    function showLiveAlert(kind, job) {
+      if (!job) return;
+
+      if (liveAlertTimer) clearTimeout(liveAlertTimer);
+
+      const isNew = kind === "added";
+      liveAlertCard.classList.toggle("is-new", isNew);
+      liveAlertCard.classList.toggle("is-updated", !isNew);
+      liveAlertLabel.textContent = isNew ? "New Delivery" : "Delivery Updated";
+      liveAlertTitle.textContent = isNew
+        ? `${job.customerName || "Delivery"} was just added`
+        : `${job.customerName || "Delivery"} was just updated`;
+      liveAlertCustomer.textContent = job.customerName || "—";
+      liveAlertRoute.textContent = job.route || "—";
+      liveAlertDate.textContent = formatDateLabel(job.deliveryDate || currentDenverDate);
+
+      liveAlertOverlay.classList.add("show");
+      liveAlertTimer = setTimeout(() => {
+        hideLiveAlert();
+      }, 8000);
+    }
+
+    function getTimestampMillis(raw) {
+      if (!raw) return 0;
+      if (typeof raw.toMillis === "function") return raw.toMillis();
+      if (typeof raw.seconds === "number") return raw.seconds * 1000;
+      const parsed = new Date(raw).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function formatTimeOnly(raw) {
+      const millis = getTimestampMillis(raw);
+      if (!millis) return "";
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: DENVER_TZ,
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(new Date(millis));
+    }
+
+    liveAlertCloseBtn.addEventListener("click", hideLiveAlert);
+    liveAlertOverlay.addEventListener("click", (event) => {
+      if (event.target === liveAlertOverlay) hideLiveAlert();
+    });
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -2666,6 +2935,8 @@
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
+      const deliveredTimeText = job.status === "delivered" ? formatTimeOnly(job.deliveredAt) : "";
+      const deliveredTimeHtml = deliveredTimeText ? `<div class="schedule-delivered-time">Delivered: ${escapeHtml(deliveredTimeText)}</div>` : "";
 
       const card = document.createElement("div");
       card.className = `schedule-card ${accentClass} ${statusClass} ${job.isRush ? "rush-card" : ""}`;
@@ -2676,7 +2947,7 @@
           ${job.isPickup ? getPickupBadge() : ""}
         </div>
         <h4>${escapeHtml(job.customerName)}</h4>
-        ${metaParts.length ? `<div class="schedule-inline-meta">${metaParts.join(", ")}</div>` : ""}
+        ${(metaParts.length || deliveredTimeHtml) ? `<div class="schedule-meta-row">${metaParts.length ? `<div class="schedule-inline-meta">${metaParts.join(", ")}</div>` : `<div class="schedule-inline-meta"></div>`}${deliveredTimeHtml}</div>` : ""}
         <div class="address">${escapeHtml(job.address)}</div>
         ${getMiniNotesHtml(job.notes)}
         ${actionHtml}
@@ -3501,13 +3772,34 @@ Thank you.`;
         const changes = snapshot.docChanges();
         jobs = snapshot.docs.map(docItem => normalizeJob(docItem.id, docItem.data()));
 
-        let shouldChime = false;
+        let latestLiveAlert = null;
         if (hasLoadedInitialSnapshot) {
-          shouldChime = changes.some(change => change.type === "added" || change.type === "modified");
+          changes.forEach((change) => {
+            if (change.type !== "added" && change.type !== "modified") return;
+            const normalized = normalizeJob(change.doc.id, change.doc.data());
+            const changeMillis = Math.max(
+              getTimestampMillis(normalized.updatedAt),
+              getTimestampMillis(normalized.createdAt),
+              getTimestampMillis(normalized.deliveredAt)
+            );
+
+            if (!latestLiveAlert || changeMillis >= latestLiveAlert.changeMillis) {
+              latestLiveAlert = {
+                kind: change.type,
+                job: normalized,
+                changeMillis
+              };
+            }
+          });
         }
 
         renderAll();
-        renderLatestAction(shouldChime);
+        renderLatestAction();
+
+        if (latestLiveAlert) {
+          showLiveAlert(latestLiveAlert.kind, latestLiveAlert.job);
+        }
+
         hasLoadedInitialSnapshot = true;
       },
       (error) => {
