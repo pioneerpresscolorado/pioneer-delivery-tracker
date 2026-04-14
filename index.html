@@ -3148,7 +3148,7 @@
       const compactNotes = compactMultiline(job.notes);
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(compactAddress)}`;
       const actionHtml = job.status !== "delivered"
-        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Delivered</button></div>`
+        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Mark As Delivered</button></div>`
         : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
