@@ -4000,7 +4000,13 @@ Thank you.`;
         if (hasLoadedInitialSnapshot) {
           changes.forEach((change) => {
             if (change.type !== "added" && change.type !== "modified") return;
+
             const normalized = normalizeJob(change.doc.id, change.doc.data());
+            const isTodayDelivery = normalized.deliveryDate === currentDenverDate;
+            const isAllowedPopupRoute = isLocalRoute(normalized.route);
+
+            if (!isTodayDelivery || !isAllowedPopupRoute) return;
+
             const changeMillis = Math.max(
               getTimestampMillis(normalized.updatedAt),
               getTimestampMillis(normalized.createdAt),
