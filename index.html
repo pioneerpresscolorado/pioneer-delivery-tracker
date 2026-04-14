@@ -570,6 +570,16 @@
       flex-direction: column;
     }
 
+    #scheduleFullscreenArea {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #notificationBox { order: 1; }
+    #quickTotalsCard { order: 2; }
+    #fullPage { order: 3; }
+
     #scheduleFullscreenArea:fullscreen,
     #scheduleFullscreenArea:-webkit-full-screen {
       width: 100vw;
@@ -664,6 +674,7 @@
       min-height: 0;
       overflow: visible;
       align-content: start;
+      align-items: start;
       flex: 1;
     }
 
@@ -680,6 +691,8 @@
       border-radius: 10px;
       padding: 9px 10px;
       min-width: 0;
+      height: auto;
+      align-self: start;
     }
 
     .schedule-card.rush-card {
@@ -1324,6 +1337,19 @@
     }
 
     @media (max-width: 700px) {
+      html, body {
+        overflow-x: hidden;
+      }
+
+      .app {
+        padding: 10px;
+      }
+
+      .card {
+        padding: 14px;
+        overflow-x: hidden;
+      }
+
       .mobile-nav-bar {
         display: flex;
       }
@@ -1353,13 +1379,134 @@
         min-width: 100%;
       }
 
+      .form-row,
+      .date-toolbar,
+      .manager-top-grid,
+      .summary-actions,
+      .checkbox-row-wrap {
+        min-width: 0;
+      }
+
+      input,
+      select,
+      textarea,
+      button,
+      .date-picker-wrap,
+      .schedule-date-wrap {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      input[type="date"],
+      select {
+        width: 100%;
+        max-width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
       .schedule-toolbar {
         flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .schedule-date-wrap {
+        width: 100%;
+        min-width: 0;
+        margin-right: 0;
+      }
+
+      .schedule-date-wrap label {
+        font-size: 0.9rem;
+        margin-bottom: 4px !important;
+      }
+
+      #scheduleDate {
+        margin-top: 0;
+        padding: 10px 12px;
+      }
+
+      .print-btn {
+        display: none !important;
+      }
+
+      #quickTotalsCard {
+        order: 3;
+        margin-top: 0;
+      }
+
+      #fullPage {
+        order: 2;
+      }
+
+      .schedule-note {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 0.84rem;
+      }
+
+      .full-page-card {
+        padding: 12px;
+      }
+
+      .full-column {
+        padding: 8px;
+        min-height: auto;
+      }
+
+      .column-header {
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+      }
+
+      .schedule-list {
+        gap: 4px;
+        align-items: start;
+      }
+
+      .schedule-card {
+        padding: 8px 8px;
+      }
+
+      .schedule-badges-row {
+        margin-bottom: 6px;
+      }
+
+      .schedule-card h4 {
+        margin-bottom: 3px;
       }
 
       .schedule-meta-row {
         flex-direction: column;
         align-items: stretch;
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+
+      .schedule-inline-meta {
+        margin-bottom: 0;
+        line-height: 1.2;
+      }
+
+      .schedule-card .address {
+        line-height: 1.15;
+      }
+
+      .schedule-card .notes-mini {
+        margin-top: 4px;
+        padding-top: 4px;
+      }
+
+      .schedule-actions {
+        margin-top: 6px;
+        gap: 6px;
+      }
+
+      .schedule-actions button {
+        flex: 1 1 0;
+        padding: 9px 10px;
       }
 
       .schedule-delivered-time {
@@ -1383,6 +1530,67 @@
 
       .live-alert-grid {
         grid-template-columns: 1fr;
+      }
+
+      .schedule-list,
+      .schedule-list.double-stack {
+        align-content: start !important;
+        align-items: start !important;
+        grid-template-columns: 1fr !important;
+      }
+
+      .schedule-list > .schedule-card {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+      }
+
+      .schedule-card {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: stretch !important;
+        align-self: start !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        gap: 6px !important;
+      }
+
+      .schedule-card > * {
+        flex: 0 0 auto !important;
+      }
+
+      .schedule-card h4,
+      .schedule-card .address,
+      .schedule-card .notes-mini,
+      .schedule-actions {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .schedule-meta-row {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        gap: 4px !important;
+        margin-bottom: 0 !important;
+      }
+
+      .schedule-inline-meta {
+        flex: 0 0 auto !important;
+      }
+
+      .schedule-delivered-time {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        text-align: left !important;
+        margin-left: 0 !important;
+      }
+
+      .schedule-actions {
+        margin-top: 2px !important;
       }
     }
 
@@ -2160,9 +2368,7 @@
       liveAlertDate.textContent = formatDateLabel(job.deliveryDate || currentDenverDate);
 
       liveAlertOverlay.classList.add("show");
-      liveAlertTimer = setTimeout(() => {
-        hideLiveAlert();
-      }, 8000);
+      liveAlertTimer = null;
     }
 
     function getTimestampMillis(raw) {
@@ -2192,6 +2398,14 @@
       const div = document.createElement("div");
       div.textContent = value ?? "";
       return div.innerHTML;
+    }
+
+    function compactMultiline(value) {
+      return String(value || "")
+        .replace(/\r\n/g, "\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{2,}/g, "\n")
+        .trim();
     }
 
     function getDenverTodayString() {
@@ -2930,8 +3144,12 @@
 
     function createScheduleCard(job, accentClass) {
       const statusClass = job.status === "delivered" ? "delivered-card" : "";
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
-      const actionHtml = job.status !== "delivered" ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Delivered</button></div>` : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
+      const compactAddress = compactMultiline(job.address);
+      const compactNotes = compactMultiline(job.notes);
+      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(compactAddress)}`;
+      const actionHtml = job.status !== "delivered"
+        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Delivered</button></div>`
+        : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
@@ -2948,8 +3166,8 @@
         </div>
         <h4>${escapeHtml(job.customerName)}</h4>
         ${(metaParts.length || deliveredTimeHtml) ? `<div class="schedule-meta-row">${metaParts.length ? `<div class="schedule-inline-meta">${metaParts.join(", ")}</div>` : `<div class="schedule-inline-meta"></div>`}${deliveredTimeHtml}</div>` : ""}
-        <div class="address">${escapeHtml(job.address)}</div>
-        ${getMiniNotesHtml(job.notes)}
+        <div class="address">${escapeHtml(compactAddress)}</div>
+        ${compactNotes ? `<div class="notes-mini"><strong>Notes:</strong> ${escapeHtml(compactNotes)}</div>` : ""}
         ${actionHtml}
       `;
 
@@ -3744,7 +3962,13 @@ Thank you.`;
       updateQuickTotals();
       updateQuickTotalsVisibility();
       renderLatestAction(false);
-      requestAnimationFrame(() => applyFullscreenFit());
+      const isScheduleFullscreen =
+        document.fullscreenElement === scheduleFullscreenArea ||
+        document.webkitFullscreenElement === scheduleFullscreenArea ||
+        document.body.classList.contains("is-fullscreen");
+      if (isScheduleFullscreen && window.innerWidth > 700) {
+        requestAnimationFrame(() => applyFullscreenFit());
+      }
     }
 
     function checkForDateChange() {
@@ -3811,15 +4035,31 @@ Thank you.`;
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 700) closeMobileMenu();
-      requestAnimationFrame(() => applyFullscreenFit());
+
+      const isScheduleFullscreen =
+        document.fullscreenElement === scheduleFullscreenArea ||
+        document.webkitFullscreenElement === scheduleFullscreenArea ||
+        document.body.classList.contains("is-fullscreen");
+
+      if (isScheduleFullscreen && window.innerWidth > 700) {
+        requestAnimationFrame(() => applyFullscreenFit());
+      }
     });
+
+    function isMobileView() {
+      return window.innerWidth <= 700;
+    }
 
     setInterval(checkForDateChange, 30000);
 
     deliveryDateInput.value = currentDenverDate;
     managerDateInput.value = managerViewDate;
     renderAll();
-    showMainPage();
+    if (isMobileView()) {
+      showFullPage();
+    } else {
+      showMainPage();
+    }
   </script>
 
 </body>
