@@ -4004,8 +4004,9 @@ Thank you.`;
             const normalized = normalizeJob(change.doc.id, change.doc.data());
             const isTodayDelivery = normalized.deliveryDate === currentDenverDate;
             const isAllowedPopupRoute = isLocalRoute(normalized.route);
+            const isDeliveredUpdate = normalized.status === "delivered" || !!normalized.deliveredAt;
 
-            if (!isTodayDelivery || !isAllowedPopupRoute) return;
+            if (!isTodayDelivery || !isAllowedPopupRoute || isDeliveredUpdate) return;
 
             const changeMillis = Math.max(
               getTimestampMillis(normalized.updatedAt),
