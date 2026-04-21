@@ -806,6 +806,21 @@
       background: #059669;
     }
 
+    .schedule-delivered-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #166534;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
     .south-accent {
       border-left-color: #0ea5e9;
     }
@@ -2195,7 +2210,7 @@
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
 
-    const ACTOR_NAME = "Shipping";
+    const ACTOR_NAME = "Cristina";
     const DENVER_TZ = "America/Denver";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3143,18 +3158,20 @@
     }
 
     function createScheduleCard(job, accentClass) {
-      const statusClass = job.status === "delivered" ? "delivered-card" : "";
+      const isDelivered = job.status === "delivered";
+      const statusClass = isDelivered ? "delivered-card" : "";
       const compactAddress = compactMultiline(job.address);
       const compactNotes = compactMultiline(job.notes);
       const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(compactAddress)}`;
-      const actionHtml = job.status !== "delivered"
+      const actionHtml = !isDelivered
         ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Mark As Delivered</button></div>`
-        : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button></div>`;
+        : "";
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
-      const deliveredTimeText = job.status === "delivered" ? formatTimeOnly(job.deliveredAt) : "";
+      const deliveredTimeText = isDelivered ? formatTimeOnly(job.deliveredAt) : "";
       const deliveredTimeHtml = deliveredTimeText ? `<div class="schedule-delivered-time">Delivered: ${escapeHtml(deliveredTimeText)}</div>` : "";
+      const deliveredBadgeHtml = isDelivered ? `<span class="schedule-delivered-badge">Delivered ✔</span>` : "";
 
       const card = document.createElement("div");
       card.className = `schedule-card ${accentClass} ${statusClass} ${job.isRush ? "rush-card" : ""}`;
@@ -3163,6 +3180,7 @@
           ${getRouteBadge(job.route)}
           ${job.isRush ? getRushBadge() : ""}
           ${job.isPickup ? getPickupBadge() : ""}
+          ${deliveredBadgeHtml}
         </div>
         <h4>${escapeHtml(job.customerName)}</h4>
         ${(metaParts.length || deliveredTimeHtml) ? `<div class="schedule-meta-row">${metaParts.length ? `<div class="schedule-inline-meta">${metaParts.join(", ")}</div>` : `<div class="schedule-inline-meta"></div>`}${deliveredTimeHtml}</div>` : ""}
