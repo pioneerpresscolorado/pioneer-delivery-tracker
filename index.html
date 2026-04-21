@@ -736,29 +736,30 @@
 
     .schedule-card h4 {
       margin: 0 0 4px;
-      font-size: 0.95rem;
+      font-size: 1.02rem;
+      font-weight: 700;     /* bold but clean */
       color: #111827;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .schedule-card .meta {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: #374151;
       margin-bottom: 4px;
       line-height: 1.2;
     }
 
     .schedule-card .address {
-      font-size: var(--fs-address, 1rem);
-      line-height: 1.2;
+      font-size: 1.1rem;    /* small bump */
+      line-height: 1.28;    /* easier to read */
       color: #111827;
       white-space: pre-line;
       word-break: break-word;
     }
 
     .schedule-card .notes-mini {
-      font-size: var(--fs-notes, 0.9rem);
-      line-height: 1.15;
+      font-size: 0.94rem;   /* subtle increase */
+      line-height: 1.28;    /* more breathing room */
       color: #475569;
       margin-top: 6px;
       padding-top: 6px;
@@ -1784,7 +1785,7 @@
       <div class="header-bar">
         <div class="header-copy">
           <h1>Pioneer Delivery Tracker</h1>
-          <p>Manage routes, view the full schedule, and mark deliveries complete.</p>
+          <p>Manage routes, view schedule, and mark deliveries complete.</p>
         </div>
       </div>
     </div>
@@ -2210,10 +2211,177 @@
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
 
-    const ACTOR_NAME = "Cristina";
+    const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
+    const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
+    const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
+    let geocodeCache = loadGeocodeCache();
+    let geocodeRequestChain = Promise.resolve();
+    let lastGeocodeRequestAt = 0;
+    let homeBaseCoords = null;
+    let homeBaseCoordsPromise = null;
+    const geocodeInFlight = new Map();
+    let scheduleResortTimer = null;
+
+    function loadGeocodeCache() {
+      try {
+        const raw = localStorage.getItem(GEOCODE_CACHE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        console.warn("Could not load geocode cache.", error);
+        return {};
+      }
+    }
+
+    function saveGeocodeCache() {
+      try {
+        localStorage.setItem(GEOCODE_CACHE_KEY, JSON.stringify(geocodeCache));
+      } catch (error) {
+        console.warn("Could not save geocode cache.", error);
+      }
+    }
+
+    function normalizeAddressKey(address) {
+      return String(address || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+    }
+
+    function queueGeocodeRequest(url) {
+      const task = geocodeRequestChain.then(async () => {
+        const waitMs = Math.max(0, 1100 - (Date.now() - lastGeocodeRequestAt));
+        if (waitMs) {
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+        }
+
+        const response = await fetch(url, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        lastGeocodeRequestAt = Date.now();
+        if (!response.ok) {
+          throw new Error(`Geocoding failed with status ${response.status}`);
+        }
+
+        return response.json();
+      });
+
+      geocodeRequestChain = task.catch(() => {});
+      return task;
+    }
+
+    function requestScheduleResort() {
+      if (scheduleResortTimer) clearTimeout(scheduleResortTimer);
+      scheduleResortTimer = setTimeout(() => {
+        scheduleResortTimer = null;
+        renderFullSchedule();
+      }, 60);
+    }
+
+    async function geocodeAddress(address) {
+      const key = normalizeAddressKey(address);
+      if (!key) return null;
+
+      const cached = geocodeCache[key];
+      if (cached && Number.isFinite(cached.lat) && Number.isFinite(cached.lng)) {
+        return cached;
+      }
+
+      if (geocodeInFlight.has(key)) {
+        return geocodeInFlight.get(key);
+      }
+
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q=${encodeURIComponent(address)}`;
+      const promise = queueGeocodeRequest(url)
+        .then(results => {
+          const first = Array.isArray(results) ? results[0] : null;
+          if (!first) return null;
+
+          const coords = {
+            lat: Number(first.lat),
+            lng: Number(first.lon),
+            displayName: first.display_name || address
+          };
+
+          if (!Number.isFinite(coords.lat) || !Number.isFinite(coords.lng)) {
+            return null;
+          }
+
+          geocodeCache[key] = coords;
+          saveGeocodeCache();
+          return coords;
+        })
+        .catch(error => {
+          console.warn(`Could not geocode address: ${address}`, error);
+          return null;
+        })
+        .finally(() => {
+          geocodeInFlight.delete(key);
+        });
+
+      geocodeInFlight.set(key, promise);
+      return promise;
+    }
+
+    function ensureHomeBaseCoords() {
+      if (homeBaseCoords) return Promise.resolve(homeBaseCoords);
+      if (homeBaseCoordsPromise) return homeBaseCoordsPromise;
+
+      homeBaseCoordsPromise = geocodeAddress(HOME_BASE_ADDRESS)
+        .then(coords => {
+          homeBaseCoords = coords;
+          if (coords) requestScheduleResort();
+          return coords;
+        })
+        .finally(() => {
+          homeBaseCoordsPromise = null;
+        });
+
+      return homeBaseCoordsPromise;
+    }
+
+    function ensureJobCoords(job) {
+      if (!job?.address) return;
+
+      const key = normalizeAddressKey(job.address);
+      const cached = geocodeCache[key];
+      if (cached && Number.isFinite(cached.lat) && Number.isFinite(cached.lng)) return;
+
+      geocodeAddress(job.address).then(coords => {
+        if (coords) requestScheduleResort();
+      });
+    }
+
+    function haversineMiles(lat1, lng1, lat2, lng2) {
+      const toRad = value => (value * Math.PI) / 180;
+      const earthRadiusMiles = 3958.8;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return earthRadiusMiles * c;
+    }
+
+    function getDistanceFromHome(job) {
+      if (!homeBaseCoords || !job?.address) return Number.POSITIVE_INFINITY;
+
+      const cached = geocodeCache[normalizeAddressKey(job.address)];
+      if (!cached || !Number.isFinite(cached.lat) || !Number.isFinite(cached.lng)) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      return haversineMiles(homeBaseCoords.lat, homeBaseCoords.lng, cached.lat, cached.lng);
+    }
 
     function getActionTimeValue(job) {
       const raw = job?.updatedAt || job?.createdAt || job?.deliveredAt || null;
@@ -2496,7 +2664,7 @@
         summaryDateLabel.textContent = `Summary will include only ${formatDateLabel(getSelectedSummaryDate())}.`;
       }
       if (scheduleDateLabel) {
-        scheduleDateLabel.textContent = `Showing ${formatDateLabel(scheduleViewDate)}.`;
+        scheduleDateLabel.textContent = `Showing ${formatDateLabel(scheduleViewDate)}. Rush stays on top, the rest sorts by distance from Pioneer.`;
       }
     }
 
@@ -2607,7 +2775,9 @@
       });
     }
 
-    function sortScheduleJobsList(list) {
+    function sortScheduleJobsList(list, options = {}) {
+      const { useDistance = false } = options;
+
       return [...list].sort((a, b) => {
         const deliveredA = a.status === "delivered" ? 1 : 0;
         const deliveredB = b.status === "delivered" ? 1 : 0;
@@ -2616,6 +2786,21 @@
         const rushA = a.isRush ? 1 : 0;
         const rushB = b.isRush ? 1 : 0;
         if (rushA !== rushB) return rushB - rushA;
+
+        if (useDistance) {
+          const distanceA = getDistanceFromHome(a);
+          const distanceB = getDistanceFromHome(b);
+          const hasDistanceA = Number.isFinite(distanceA);
+          const hasDistanceB = Number.isFinite(distanceB);
+
+          if (hasDistanceA && hasDistanceB && Math.abs(distanceA - distanceB) > 0.01) {
+            return distanceA - distanceB;
+          }
+
+          if (hasDistanceA !== hasDistanceB) {
+            return hasDistanceA ? -1 : 1;
+          }
+        }
 
         return (a.order ?? 0) - (b.order ?? 0);
       });
@@ -2645,7 +2830,8 @@
           (job.status === "active" || job.status === "delivered") &&
           job.route === routeName &&
           !isOutsideRoute(job.route)
-        )
+        ),
+        { useDistance: true }
       );
     }
 
@@ -3345,9 +3531,12 @@
       northList.innerHTML = "";
       localList.innerHTML = "";
 
+      ensureHomeBaseCoords();
+
       const southJobs = getScheduleJobsForRoute("South Run");
       const northJobs = getScheduleJobsForRoute("North / West Run");
       const localJobs = getScheduleJobsForRoute("Local Delivery");
+      [...southJobs, ...northJobs, ...localJobs].forEach(job => ensureJobCoords(job));
 
       applyScheduleLayout(southJobs, northJobs, localJobs);
       renderScheduleColumn(southJobs, southList, "south-accent");
