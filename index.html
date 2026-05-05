@@ -1721,22 +1721,23 @@
 
     .history-day-group {
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
+      border-radius: 14px;
       background: #f8fafc;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       overflow: hidden;
     }
 
     .history-day-toggle {
       list-style: none;
       cursor: pointer;
-      padding: 14px;
+      padding: 9px 14px;
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
       align-items: center;
       border-bottom: 1px solid transparent;
+      min-height: 54px;
     }
 
     .history-day-toggle::-webkit-details-marker {
@@ -1769,27 +1770,108 @@
     }
 
     .history-day-body {
-      padding: 14px;
+      padding: 10px 14px 14px;
     }
 
     .history-day-title {
       margin: 0;
-      font-size: 1.05rem;
+      font-size: 1rem;
+      line-height: 1.15;
     }
 
     .history-day-subtitle {
       color: #6b7280;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
+      line-height: 1.15;
     }
 
     .history-grid {
       display: grid;
-      gap: 10px;
+      gap: 6px;
     }
 
-    @media (min-width: 900px) {
-      .history-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .history-route-section {
+      margin-top: 8px;
+    }
+
+    .history-route-heading {
+      font-weight: 800;
+      margin: 0 0 6px;
+      color: #334155;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .history-card-compact {
+      display: grid;
+      grid-template-columns: minmax(170px, 1.15fr) minmax(140px, 0.9fr) minmax(110px, 0.55fr);
+      gap: 10px;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+      border-left: 4px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 7px 10px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .history-card-compact.rush-card {
+      background: #fef2f2;
+      border-color: #fecaca;
+      border-left-color: #dc2626;
+    }
+
+    .history-card-compact.delivered-history-card {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      border-left-color: #16a34a;
+    }
+
+    .history-main strong {
+      display: block;
+      color: #111827;
+      font-size: 0.92rem;
+      line-height: 1.15;
+    }
+
+    .history-job-line,
+    .history-address-line,
+    .history-time-line {
+      font-size: 0.82rem;
+      color: #475569;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .history-time-line {
+      text-align: right;
+      font-weight: 800;
+      color: #166534;
+      white-space: nowrap;
+    }
+
+    .history-card-compact .schedule-badges-row {
+      margin: 0 0 3px;
+      gap: 4px;
+    }
+
+    .history-card-compact .route-badge,
+    .history-card-compact .rush-badge,
+    .history-card-compact .pickup-badge {
+      font-size: 0.62rem;
+      padding: 2px 6px;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 800px) {
+      .history-card-compact {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .history-time-line {
+        text-align: left;
       }
     }
 
@@ -1860,6 +1942,82 @@
       padding: 2px 6px !important;
       margin-bottom: 2px !important;
     }
+
+
+    /* Fullscreen delivered jobs collapse + masonry spacing fix */
+    .is-fullscreen .schedule-list {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: var(--fs-grid-gap) !important;
+      align-content: start !important;
+      align-items: stretch !important;
+    }
+
+    .is-fullscreen .schedule-list.double-stack {
+      display: block !important;
+      column-count: 2;
+      column-gap: var(--fs-grid-gap);
+    }
+
+    .is-fullscreen .schedule-list.double-stack .schedule-card {
+      display: inline-block !important;
+      width: 100% !important;
+      margin: 0 0 var(--fs-grid-gap) 0 !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .is-fullscreen .schedule-list:not(.double-stack) .schedule-card {
+      margin: 0 !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card .address,
+    .is-fullscreen .schedule-card.delivered-card .notes-mini {
+      display: none !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card {
+      padding-top: calc(var(--fs-card-padding-y) * 0.72) !important;
+      padding-bottom: calc(var(--fs-card-padding-y) * 0.72) !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card .schedule-badges-row {
+      margin-bottom: 2px !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card h4 {
+      margin-bottom: 2px !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card .schedule-meta-row {
+      margin-bottom: 0 !important;
+      gap: 4px !important;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card .schedule-inline-meta {
+      margin-bottom: 0 !important;
+    }
+
+
+    /* Fullscreen space-fill polish: bigger cards first, shrink only if needed */
+    .is-fullscreen .schedule-card:not(.delivered-card) {
+      min-height: 74px;
+    }
+
+    .is-fullscreen .schedule-list.double-stack .schedule-card:not(.delivered-card) {
+      min-height: 78px;
+    }
+
+    .is-fullscreen .schedule-card.delivered-card {
+      min-height: 48px;
+    }
+
+    .is-fullscreen.fullscreen-hide-notes .schedule-card:not(.delivered-card),
+    .is-fullscreen.fullscreen-ultra-compact .schedule-card:not(.delivered-card),
+    .is-fullscreen.fullscreen-micro .schedule-card:not(.delivered-card) {
+      min-height: 0;
+    }
+
 
   </style>
 </head>
@@ -2311,7 +2469,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.05 — Fullscreen Fit Fix";
+    const CODE_VERSION = "2026.05.05 — Fullscreen and History Fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3214,20 +3372,20 @@
         }
       });
 
-      let step = totalJobs >= 20 || maxColumnJobs >= 8 ? 4 : totalJobs >= 14 || maxColumnJobs >= 6 ? 2 : 0;
+      let step = 0;
       const maxStep = 24;
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.08 - level * 0.035, 0.58);
-        const cardTitleSize = Math.max(1.02 - level * 0.038, 0.50);
-        const metaSize = Math.max(0.84 - level * 0.03, 0.44);
-        const addressSize = Math.max(0.90 - level * 0.032, 0.46);
-        const notesSize = Math.max(0.70 - level * 0.028, 0.42);
-        const badgeSize = Math.max(0.66 - level * 0.027, 0.40);
-        const padY = Math.max(7 - level * 0.35, 1.5);
-        const padX = Math.max(8 - level * 0.30, 2.5);
-        const columnPad = Math.max(7 - level * 0.28, 2);
-        const gap = Math.max(5 - level * 0.25, 1.5);
+        const titleSize = Math.max(1.18 - level * 0.035, 0.58);
+        const cardTitleSize = Math.max(1.12 - level * 0.038, 0.50);
+        const metaSize = Math.max(0.92 - level * 0.03, 0.44);
+        const addressSize = Math.max(1.00 - level * 0.032, 0.46);
+        const notesSize = Math.max(0.80 - level * 0.028, 0.42);
+        const badgeSize = Math.max(0.72 - level * 0.027, 0.40);
+        const padY = Math.max(9 - level * 0.35, 1.5);
+        const padX = Math.max(10 - level * 0.30, 2.5);
+        const columnPad = Math.max(8 - level * 0.28, 2);
+        const gap = Math.max(7 - level * 0.25, 1.5);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -3493,20 +3651,30 @@
 
     function createHistoryCard(job) {
       const card = document.createElement("div");
-      card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
+      const isDelivered = job.status === "delivered";
+      const isPickedUp = job.status === "pickedUp";
+      const completedTime = formatTimeOnly(job.deliveredAt);
+      const statusLabel = isDelivered ? "Delivered" : isPickedUp ? "Picked Up" : "Active";
+      const statusTimeLabel = completedTime
+        ? `${statusLabel}: ${completedTime}`
+        : (isDelivered || isPickedUp ? `${statusLabel}: time not saved` : statusLabel);
+      const metaParts = [];
+      if (job.jobNumber) metaParts.push(`Job #: ${escapeHtml(job.jobNumber)}`);
+      if (job.poNumber) metaParts.push(`PO #: ${escapeHtml(job.poNumber)}`);
+
+      card.className = `history-card-compact ${job.isRush ? "rush-card" : ""} ${(isDelivered || isPickedUp) ? "delivered-history-card" : ""}`;
       card.innerHTML = `
-        ${getRouteBadge(job.route)}
-        ${job.isRush ? getRushBadge() : ""}
-        ${job.isPickup ? getPickupBadge() : ""}
-        <div class="job-meta-row">
-          <div class="job-meta-main">
-            <strong>${escapeHtml(job.customerName)}</strong>
-            <div>${escapeHtml(job.address)}</div>
+        <div class="history-main">
+          <div class="schedule-badges-row">
+            ${getRouteBadge(job.route)}
+            ${job.isRush ? getRushBadge() : ""}
+            ${job.isPickup ? getPickupBadge() : ""}
           </div>
-          ${getJobMetaSideHtml(job)}
+          <strong>${escapeHtml(job.customerName)}</strong>
+          ${metaParts.length ? `<div class="history-job-line">${metaParts.join(" • ")}</div>` : ""}
         </div>
-        <div class="muted">${job.status === "delivered" ? "Delivered" : job.status === "pickedUp" ? "Picked Up" : "Active"} • ${escapeHtml(job.route)}</div>
-        ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
+        <div class="history-address-line">${escapeHtml(compactMultiline(job.address))}</div>
+        <div class="history-time-line">${escapeHtml(statusTimeLabel)}</div>
       `;
       return card;
     }
@@ -3679,9 +3847,9 @@
             .filter(route => routeGroups[route]?.length)
             .forEach(route => {
               const section = document.createElement("div");
-              section.style.marginTop = "12px";
+              section.className = "history-route-section";
               section.innerHTML = `
-                <div style="font-weight:bold; margin:0 0 8px; color:#334155;">${escapeHtml(route)}</div>
+                <div class="history-route-heading">${escapeHtml(route)}</div>
                 <div class="history-grid"></div>
               `;
               const grid = section.querySelector(".history-grid");
