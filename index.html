@@ -2046,6 +2046,58 @@
 
 
 
+    /* v2 hard no-scroll safety for short monitors */
+    .is-fullscreen.fullscreen-super-compact .schedule-toolbar {
+      margin-bottom: 2px !important;
+    }
+
+    .is-fullscreen.fullscreen-super-compact .column-header {
+      margin-bottom: 2px !important;
+      padding-bottom: 2px !important;
+    }
+
+    .is-fullscreen.fullscreen-super-compact .schedule-card {
+      margin-bottom: 1px !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .address,
+    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .notes-mini {
+      display: none !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card {
+      padding: 2px 4px !important;
+      min-height: 0 !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-badges-row {
+      margin-bottom: 1px !important;
+      gap: 2px !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .route-badge,
+    .is-fullscreen.fullscreen-emergency .rush-badge,
+    .is-fullscreen.fullscreen-emergency .pickup-badge,
+    .is-fullscreen.fullscreen-emergency .schedule-delivered-badge {
+      font-size: 0.5rem !important;
+      padding: 1px 4px !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card h4 {
+      font-size: 0.64rem !important;
+      line-height: 0.95 !important;
+      margin-bottom: 1px !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card .meta,
+    .is-fullscreen.fullscreen-emergency .schedule-inline-meta,
+    .is-fullscreen.fullscreen-emergency .schedule-delivered-time {
+      font-size: 0.54rem !important;
+      line-height: 0.95 !important;
+      margin-bottom: 0 !important;
+    }
+
+
   </style>
 </head>
 
@@ -2496,7 +2548,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.05 — Small Monitor Fullscreen Fit Fix";
+    const CODE_VERSION = "2026.05.05 — Fullscreen Fit v2 Small Monitor";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3399,20 +3451,25 @@
         }
       });
 
-      let step = 0;
-      const maxStep = 44;
+      const screenHeight = window.innerHeight || document.documentElement.clientHeight || 900;
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth || 1400;
+
+      // Small monitors need to start compact immediately.
+      // This keeps every delivery visible instead of trying a pretty oversized layout first.
+      let step = screenHeight < 760 ? 24 : screenHeight < 850 ? 16 : screenHeight < 950 ? 8 : 0;
+      const maxStep = 80;
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.18 - level * 0.035, 0.42);
-        const cardTitleSize = Math.max(1.12 - level * 0.038, 0.38);
-        const metaSize = Math.max(0.92 - level * 0.03, 0.34);
-        const addressSize = Math.max(1.00 - level * 0.032, 0.34);
-        const notesSize = Math.max(0.80 - level * 0.028, 0.32);
-        const badgeSize = Math.max(0.72 - level * 0.027, 0.30);
-        const padY = Math.max(9 - level * 0.35, 1);
-        const padX = Math.max(10 - level * 0.30, 2);
-        const columnPad = Math.max(8 - level * 0.28, 1);
-        const gap = Math.max(7 - level * 0.25, 1);
+        const titleSize = Math.max(1.18 - level * 0.035, 0.34);
+        const cardTitleSize = Math.max(1.12 - level * 0.038, 0.30);
+        const metaSize = Math.max(0.92 - level * 0.03, 0.28);
+        const addressSize = Math.max(1.00 - level * 0.032, 0.28);
+        const notesSize = Math.max(0.80 - level * 0.028, 0.26);
+        const badgeSize = Math.max(0.72 - level * 0.027, 0.25);
+        const padY = Math.max(9 - level * 0.35, 0);
+        const padX = Math.max(10 - level * 0.30, 1);
+        const columnPad = Math.max(8 - level * 0.28, 0);
+        const gap = Math.max(7 - level * 0.25, 0);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -3427,7 +3484,13 @@
       };
 
       const hasOverflow = () => {
-        const areaBottom = scheduleFullscreenArea.getBoundingClientRect().bottom - 4;
+        const areaBottom = scheduleFullscreenArea.getBoundingClientRect().bottom - 6;
+        const fullCard = document.getElementById("fullPageCard");
+        const gridRect = fullGrid.getBoundingClientRect();
+
+        if (fullCard && fullCard.scrollHeight > fullCard.clientHeight + 2) return true;
+        if (fullGrid.scrollHeight > fullGrid.clientHeight + 2) return true;
+        if (gridRect.bottom > areaBottom) return true;
 
         return lists.some(list => {
           const column = list.closest(".full-column");
@@ -3435,13 +3498,17 @@
           if (!column || !cards.length) return false;
 
           const columnRect = column.getBoundingClientRect();
+          const listRect = list.getBoundingClientRect();
           const lowestCardBottom = Math.max(...cards.map(card => card.getBoundingClientRect().bottom));
+          const rightMostCard = Math.max(...cards.map(card => card.getBoundingClientRect().right));
 
           return (
             list.scrollHeight > list.clientHeight + 1 ||
             column.scrollHeight > column.clientHeight + 1 ||
             lowestCardBottom > columnRect.bottom - 3 ||
-            lowestCardBottom > areaBottom
+            lowestCardBottom > listRect.bottom - 3 ||
+            lowestCardBottom > areaBottom ||
+            rightMostCard > columnRect.right + 2
           );
         });
       };
@@ -3455,11 +3522,11 @@
           });
         }
 
-        if (step >= 12) appRoot.classList.add("fullscreen-hide-notes");
-        if (step >= 16) appRoot.classList.add("fullscreen-ultra-compact");
-        if (step >= 20) appRoot.classList.add("fullscreen-micro");
-        if (step >= 28) appRoot.classList.add("fullscreen-super-compact");
-        if (step >= 34) appRoot.classList.add("fullscreen-emergency");
+        if (step >= 10) appRoot.classList.add("fullscreen-hide-notes");
+        if (step >= 14) appRoot.classList.add("fullscreen-ultra-compact");
+        if (step >= 18) appRoot.classList.add("fullscreen-micro");
+        if (step >= 22) appRoot.classList.add("fullscreen-super-compact");
+        if (step >= 28) appRoot.classList.add("fullscreen-emergency");
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
