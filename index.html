@@ -1142,20 +1142,10 @@
       flex: 1;
       overflow: hidden;
       min-height: 0;
-      height: 100%;
       align-content: stretch;
-      grid-auto-rows: minmax(0, 1fr);
     }
 
-    .is-fullscreen .schedule-list {
-      overflow: hidden;
-      min-height: 0;
-    }
 
-    .is-fullscreen .schedule-list.double-stack {
-      grid-auto-flow: row;
-      align-content: start;
-    }
 
     .schedule-meta-row {
       display: flex;
@@ -1803,6 +1793,74 @@
       }
     }
 
+
+    .version-tag {
+      text-align: center;
+      margin: 18px 0 4px;
+      padding: 10px 12px;
+      color: #64748b;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .version-tag span {
+      display: inline-block;
+      background: #f8fafc;
+      border: 1px solid #dbe3ee;
+      border-radius: 999px;
+      padding: 6px 12px;
+    }
+
+    /* Fullscreen no-scroll fit helpers */
+    .is-fullscreen .schedule-date-wrap {
+      min-width: 185px;
+    }
+
+    .is-fullscreen #scheduleDate {
+      padding: 8px 10px;
+      font-size: 0.95rem;
+    }
+
+    .is-fullscreen .print-btn,
+    .is-fullscreen .fullscreen-btn {
+      padding: 8px 12px;
+      margin-bottom: 0;
+    }
+
+    .is-fullscreen .schedule-toolbar label {
+      font-size: 0.82rem;
+      margin-bottom: 3px !important;
+    }
+
+    .is-fullscreen .schedule-list,
+    .is-fullscreen .full-column,
+    .is-fullscreen .full-grid {
+      overflow: hidden !important;
+    }
+
+    .is-fullscreen .schedule-list.double-stack {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .is-fullscreen.fullscreen-hide-notes .notes-mini {
+      display: none !important;
+    }
+
+    .is-fullscreen.fullscreen-micro .schedule-card .address {
+      line-height: 1 !important;
+    }
+
+    .is-fullscreen.fullscreen-micro .schedule-badges-row {
+      margin-bottom: 2px !important;
+    }
+
+    .is-fullscreen.fullscreen-micro .route-badge,
+    .is-fullscreen.fullscreen-micro .rush-badge,
+    .is-fullscreen.fullscreen-micro .pickup-badge {
+      padding: 2px 6px !important;
+      margin-bottom: 2px !important;
+    }
+
   </style>
 </head>
 
@@ -2057,6 +2115,10 @@
           </div>
         </div>
       </div>
+
+      <div class="version-tag" id="versionTag" aria-label="Code version">
+        <span id="versionText">Version loading...</span>
+      </div>
     </div>
 
     <div id="historyPage" style="display:none;">
@@ -2249,6 +2311,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
+    const CODE_VERSION = "2026.05.05 — Fullscreen Fit Fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3103,13 +3166,13 @@
       if (fitClass) appRoot.classList.add(fitClass);
     }
 
-    async function applyFullscreenFit() {
-      const isScheduleFullscreen =
+    function applyFullscreenFit() {
+      const isFullscreen =
         document.fullscreenElement === scheduleFullscreenArea ||
         document.webkitFullscreenElement === scheduleFullscreenArea ||
-        appRoot.classList.contains("is-fullscreen");
+        document.body.classList.contains("is-fullscreen");
 
-      const resetFit = () => {
+      const resetFullscreenFit = () => {
         appRoot.style.removeProperty("--fs-column-title");
         appRoot.style.removeProperty("--fs-card-title");
         appRoot.style.removeProperty("--fs-meta");
@@ -3120,46 +3183,51 @@
         appRoot.style.removeProperty("--fs-card-padding-x");
         appRoot.style.removeProperty("--fs-column-padding");
         appRoot.style.removeProperty("--fs-grid-gap");
-        appRoot.classList.remove("fullscreen-ultra-compact");
+        appRoot.classList.remove("fullscreen-ultra-compact", "fullscreen-hide-notes", "fullscreen-micro");
         [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
       };
 
-      if (!isScheduleFullscreen || currentPageView !== "full") {
-        resetFit();
+      if (!isFullscreen || currentPageView !== "full") {
+        resetFullscreenFit();
         return;
       }
 
-      const waitFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
-      const visibleLists = () => [southList, northList, localList].filter(list => {
+      const lists = [southList, northList, localList].filter(list => {
         const column = list.closest(".full-column");
-        return column && column.style.display !== "none" && list.querySelector(".schedule-card");
+        return column && column.style.display !== "none" && list.children.length > 0;
       });
 
-      const lists = visibleLists();
       if (!lists.length) return;
 
-      resetFit();
-      await waitFrame();
+      resetFullscreenFit();
 
-      const jobCounts = lists.map(list => list.querySelectorAll(".schedule-card").length);
+      const getCards = (list) => Array.from(list.children).filter(child => child.classList.contains("schedule-card"));
+      const jobCounts = lists.map(list => getCards(list).length);
       const totalJobs = jobCounts.reduce((sum, count) => sum + count, 0);
       const maxColumnJobs = Math.max(...jobCounts, 0);
 
-      // Start a little tighter when the dispatch board is crowded, but keep it readable.
-      let step = totalJobs >= 20 || maxColumnJobs >= 8 ? 3 : totalJobs >= 14 || maxColumnJobs >= 6 ? 2 : totalJobs >= 10 ? 1 : 0;
-      const maxStep = 14;
+      // Start with a smarter layout instead of waiting until cards are already cut off.
+      lists.forEach(list => {
+        const count = getCards(list).length;
+        if (count >= 6 || (totalJobs >= 16 && count >= 4)) {
+          list.classList.add("double-stack");
+        }
+      });
+
+      let step = totalJobs >= 20 || maxColumnJobs >= 8 ? 4 : totalJobs >= 14 || maxColumnJobs >= 6 ? 2 : 0;
+      const maxStep = 24;
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.08 - level * 0.035, 0.76);
-        const cardTitleSize = Math.max(1.02 - level * 0.04, 0.66);
-        const metaSize = Math.max(0.86 - level * 0.032, 0.56);
-        const addressSize = Math.max(0.9 - level * 0.035, 0.58);
-        const notesSize = Math.max(0.72 - level * 0.03, 0.52);
-        const badgeSize = Math.max(0.68 - level * 0.03, 0.5);
-        const padY = Math.max(7 - level * 0.45, 2.5);
-        const padX = Math.max(9 - level * 0.4, 4);
-        const columnPad = Math.max(8 - level * 0.4, 3);
-        const gap = Math.max(6 - level * 0.3, 2);
+        const titleSize = Math.max(1.08 - level * 0.035, 0.58);
+        const cardTitleSize = Math.max(1.02 - level * 0.038, 0.50);
+        const metaSize = Math.max(0.84 - level * 0.03, 0.44);
+        const addressSize = Math.max(0.90 - level * 0.032, 0.46);
+        const notesSize = Math.max(0.70 - level * 0.028, 0.42);
+        const badgeSize = Math.max(0.66 - level * 0.027, 0.40);
+        const padY = Math.max(7 - level * 0.35, 1.5);
+        const padX = Math.max(8 - level * 0.30, 2.5);
+        const columnPad = Math.max(7 - level * 0.28, 2);
+        const gap = Math.max(5 - level * 0.25, 1.5);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -3173,60 +3241,57 @@
         appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
       };
 
-      const listOverflows = (list) => {
-        const column = list.closest(".full-column");
-        if (!column) return false;
+      const hasOverflow = () => {
+        const areaBottom = scheduleFullscreenArea.getBoundingClientRect().bottom - 4;
 
-        const columnRect = column.getBoundingClientRect();
-        const listRect = list.getBoundingClientRect();
-        const cards = Array.from(list.querySelectorAll(".schedule-card"));
-        const lastCard = cards[cards.length - 1];
-        const lastBottom = lastCard ? lastCard.getBoundingClientRect().bottom : listRect.bottom;
+        return lists.some(list => {
+          const column = list.closest(".full-column");
+          const cards = getCards(list);
+          const lastCard = cards[cards.length - 1];
+          if (!column || !lastCard) return false;
 
-        return (
-          list.scrollHeight > list.clientHeight + 1 ||
-          column.scrollHeight > column.clientHeight + 1 ||
-          lastBottom > columnRect.bottom - 4 ||
-          listRect.bottom > columnRect.bottom - 4
-        );
+          const columnRect = column.getBoundingClientRect();
+          const cardRect = lastCard.getBoundingClientRect();
+
+          return (
+            list.scrollHeight > list.clientHeight + 1 ||
+            column.scrollHeight > column.clientHeight + 1 ||
+            cardRect.bottom > columnRect.bottom - 3 ||
+            cardRect.bottom > areaBottom
+          );
+        });
       };
 
-      const anyOverflow = () => visibleLists().some(listOverflows);
-
-      // Give crowded columns two lanes earlier so a short column does not get cut off.
-      lists.forEach(list => {
-        if (list.querySelectorAll(".schedule-card").length >= 6) {
-          list.classList.add("double-stack");
-        }
-      });
-
-      for (let i = 0; i <= maxStep; i += 1) {
+      const fitPass = () => {
         setVarsForStep(step);
-        await waitFrame();
-
-        let changedLayout = false;
-        visibleLists().forEach(list => {
-          const count = list.querySelectorAll(".schedule-card").length;
-          if (listOverflows(list) && count >= 4 && !list.classList.contains("double-stack")) {
-            list.classList.add("double-stack");
-            changedLayout = true;
-          }
-        });
-
-        if (changedLayout) {
-          await waitFrame();
-        }
-
-        if (!anyOverflow()) break;
 
         if (step >= 8) {
-          appRoot.classList.add("fullscreen-ultra-compact");
-          await waitFrame();
-          if (!anyOverflow()) break;
+          lists.forEach(list => {
+            if (getCards(list).length >= 4) list.classList.add("double-stack");
+          });
         }
 
-        step += 1;
-      }
+        if (step >= 12) appRoot.classList.add("fullscreen-hide-notes");
+        if (step >= 16) appRoot.classList.add("fullscreen-ultra-compact");
+        if (step >= 20) appRoot.classList.add("fullscreen-micro");
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (hasOverflow() && step < maxStep) {
+              step += 1;
+              fitPass();
+            }
+          });
+        });
+      };
+
+      fitPass();
+    }
+
+    function updateVersionTag() {
+      const versionText = document.getElementById("versionText");
+      if (!versionText) return;
+      versionText.textContent = `Version: ${CODE_VERSION}`;
     }
 
     function createRushToggleButton(job) {
@@ -4429,6 +4494,8 @@ Thank you.`;
     }
 
     setInterval(checkForDateChange, 30000);
+
+    updateVersionTag();
 
     deliveryDateInput.value = currentDenverDate;
     managerDateInput.value = managerViewDate;
