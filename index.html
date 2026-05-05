@@ -2019,6 +2019,33 @@
     }
 
 
+    /* Small-monitor emergency fit: only turns on if measuring shows a column would cut off */
+    .is-fullscreen.fullscreen-super-compact .schedule-card:not(.delivered-card) .notes-mini {
+      display: none !important;
+    }
+
+    .is-fullscreen.fullscreen-super-compact .schedule-card:not(.delivered-card) {
+      padding-top: 2px !important;
+      padding-bottom: 2px !important;
+      border-radius: 6px !important;
+      min-height: 0 !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .address {
+      display: none !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) {
+      min-height: 0 !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card h4 {
+      white-space: normal;
+      line-height: 1 !important;
+    }
+
+
+
   </style>
 </head>
 
@@ -2469,7 +2496,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.05 — Fullscreen and History Fix";
+    const CODE_VERSION = "2026.05.05 — Small Monitor Fullscreen Fit Fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3341,7 +3368,7 @@
         appRoot.style.removeProperty("--fs-card-padding-x");
         appRoot.style.removeProperty("--fs-column-padding");
         appRoot.style.removeProperty("--fs-grid-gap");
-        appRoot.classList.remove("fullscreen-ultra-compact", "fullscreen-hide-notes", "fullscreen-micro");
+        appRoot.classList.remove("fullscreen-ultra-compact", "fullscreen-hide-notes", "fullscreen-micro", "fullscreen-super-compact", "fullscreen-emergency");
         [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
       };
 
@@ -3367,25 +3394,25 @@
       // Start with a smarter layout instead of waiting until cards are already cut off.
       lists.forEach(list => {
         const count = getCards(list).length;
-        if (count >= 6 || (totalJobs >= 16 && count >= 4)) {
+        if (count >= 5 || (totalJobs >= 14 && count >= 4)) {
           list.classList.add("double-stack");
         }
       });
 
       let step = 0;
-      const maxStep = 24;
+      const maxStep = 44;
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.18 - level * 0.035, 0.58);
-        const cardTitleSize = Math.max(1.12 - level * 0.038, 0.50);
-        const metaSize = Math.max(0.92 - level * 0.03, 0.44);
-        const addressSize = Math.max(1.00 - level * 0.032, 0.46);
-        const notesSize = Math.max(0.80 - level * 0.028, 0.42);
-        const badgeSize = Math.max(0.72 - level * 0.027, 0.40);
-        const padY = Math.max(9 - level * 0.35, 1.5);
-        const padX = Math.max(10 - level * 0.30, 2.5);
-        const columnPad = Math.max(8 - level * 0.28, 2);
-        const gap = Math.max(7 - level * 0.25, 1.5);
+        const titleSize = Math.max(1.18 - level * 0.035, 0.42);
+        const cardTitleSize = Math.max(1.12 - level * 0.038, 0.38);
+        const metaSize = Math.max(0.92 - level * 0.03, 0.34);
+        const addressSize = Math.max(1.00 - level * 0.032, 0.34);
+        const notesSize = Math.max(0.80 - level * 0.028, 0.32);
+        const badgeSize = Math.max(0.72 - level * 0.027, 0.30);
+        const padY = Math.max(9 - level * 0.35, 1);
+        const padX = Math.max(10 - level * 0.30, 2);
+        const columnPad = Math.max(8 - level * 0.28, 1);
+        const gap = Math.max(7 - level * 0.25, 1);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -3405,17 +3432,16 @@
         return lists.some(list => {
           const column = list.closest(".full-column");
           const cards = getCards(list);
-          const lastCard = cards[cards.length - 1];
-          if (!column || !lastCard) return false;
+          if (!column || !cards.length) return false;
 
           const columnRect = column.getBoundingClientRect();
-          const cardRect = lastCard.getBoundingClientRect();
+          const lowestCardBottom = Math.max(...cards.map(card => card.getBoundingClientRect().bottom));
 
           return (
             list.scrollHeight > list.clientHeight + 1 ||
             column.scrollHeight > column.clientHeight + 1 ||
-            cardRect.bottom > columnRect.bottom - 3 ||
-            cardRect.bottom > areaBottom
+            lowestCardBottom > columnRect.bottom - 3 ||
+            lowestCardBottom > areaBottom
           );
         });
       };
@@ -3425,13 +3451,15 @@
 
         if (step >= 8) {
           lists.forEach(list => {
-            if (getCards(list).length >= 4) list.classList.add("double-stack");
+            if (getCards(list).length >= 3) list.classList.add("double-stack");
           });
         }
 
         if (step >= 12) appRoot.classList.add("fullscreen-hide-notes");
         if (step >= 16) appRoot.classList.add("fullscreen-ultra-compact");
         if (step >= 20) appRoot.classList.add("fullscreen-micro");
+        if (step >= 28) appRoot.classList.add("fullscreen-super-compact");
+        if (step >= 34) appRoot.classList.add("fullscreen-emergency");
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
