@@ -1058,6 +1058,23 @@
       line-height: 1.18;
     }
 
+
+    .is-fullscreen .schedule-card .notes-mini {
+      font-size: var(--fs-notes);
+      line-height: 1.08;
+      margin-top: 3px;
+      padding-top: 3px;
+    }
+
+    .is-fullscreen .schedule-badges-row {
+      margin-bottom: 4px;
+      gap: 4px;
+    }
+
+    .is-fullscreen.fullscreen-ultra-compact .notes-mini {
+      display: none;
+    }
+
      .is-fullscreen .route-badge,
     .is-fullscreen .rush-badge,
     .is-fullscreen .pickup-badge {
@@ -2055,7 +2072,11 @@
             <h2 style="margin:0 0 6px;">Outside Shipments</h2>
             <p class="muted" style="margin:0;">UPS, FedEx, and LTL jobs for the selected delivery date.</p>
           </div>
-          <div class="history-summary-chip" id="outsideDateChip"></div>
+          <div class="date-picker-wrap">
+            <label for="outsideDate" style="margin:0;">Viewing Date</label>
+            <input id="outsideDate" type="date" />
+            <div class="history-summary-chip" id="outsideDateChip" style="margin-top:8px;"></div>
+          </div>
         </div>
         <div class="job-list" id="outsideList"></div>
       </div>
@@ -2068,7 +2089,11 @@
             <h2 style="margin:0 0 6px;">Customer Pickup</h2>
             <p class="muted" style="margin:0;">Customer pickup jobs for the selected delivery date.</p>
           </div>
-          <div class="history-summary-chip" id="pickupDateChip"></div>
+          <div class="date-picker-wrap">
+            <label for="pickupDate" style="margin:0;">Viewing Date</label>
+            <input id="pickupDate" type="date" />
+            <div class="history-summary-chip" id="pickupDateChip" style="margin-top:8px;"></div>
+          </div>
         </div>
         <div class="job-list" id="pickupList"></div>
       </div>
@@ -2418,6 +2443,10 @@
     let currentDenverDate = getDenverTodayString();
     let scheduleViewDate = currentDenverDate;
     let managerViewDate = currentDenverDate;
+    let outsideViewDate = currentDenverDate;
+    let pickupViewDate = currentDenverDate;
+    let rolloverInProgress = false;
+    let lastRolloverKey = "";
 
     const appRoot = document.getElementById("appRoot");
     const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
@@ -2463,6 +2492,8 @@
     const historySummaryChip = document.getElementById("historySummaryChip");
     const outsideDateChip = document.getElementById("outsideDateChip");
     const pickupDateChip = document.getElementById("pickupDateChip");
+    const outsideDateInput = document.getElementById("outsideDate");
+    const pickupDateInput = document.getElementById("pickupDate");
 
     const editModalOverlay = document.getElementById("editModalOverlay");
     const editJobForm = document.getElementById("editJobForm");
@@ -2654,10 +2685,17 @@
       if (scheduleDateInput) {
         scheduleDateInput.value = scheduleViewDate;
       }
+      if (outsideDateInput) {
+        outsideDateInput.value = outsideViewDate;
+      }
+      if (pickupDateInput) {
+        pickupDateInput.value = pickupViewDate;
+      }
       if (summaryDateInput && !summaryDateInput.value) {
         summaryDateInput.value = managerViewDate;
       }
-      outsideDateChip.textContent = formatDateLabel(managerViewDate);
+      outsideDateChip.textContent = formatDateLabel(outsideViewDate);
+      pickupDateChip.textContent = formatDateLabel(pickupViewDate);
       managerDateLabel.textContent = `Showing active ${currentRoute} jobs for ${formatDateLabel(managerViewDate)}.`;
       completedDateLabel.textContent = `Completed jobs for ${formatDateLabel(managerViewDate)}.`;
       if (summaryDateLabel) {
@@ -3067,63 +3105,84 @@
         appRoot.style.removeProperty("--fs-card-padding-x");
         appRoot.style.removeProperty("--fs-column-padding");
         appRoot.style.removeProperty("--fs-grid-gap");
+        appRoot.classList.remove("fullscreen-ultra-compact");
         [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
         return;
       }
 
-      const southJobs = getScheduleJobsForRoute("South Run");
-      const northJobs = getScheduleJobsForRoute("North / West Run");
-      const localJobs = getScheduleJobsForRoute("Local Delivery");
-      const visibleRoutes = [southJobs, northJobs, localJobs].filter(list => list.length > 0);
-      const totalJobs = visibleRoutes.reduce((sum, list) => sum + list.length, 0);
-      const maxColumnJobs = visibleRoutes.length ? Math.max(...visibleRoutes.map(list => list.length)) : 0;
-      const titleSize = maxColumnJobs >= 12 ? 1.02 : maxColumnJobs >= 9 ? 1.08 : 1.14;
-      const cardTitleSize = maxColumnJobs >= 12 ? 0.96 : maxColumnJobs >= 9 ? 1.02 : 1.08;
-      const metaSize = maxColumnJobs >= 12 ? 0.78 : maxColumnJobs >= 9 ? 0.84 : 0.9;
-      const addressSize = maxColumnJobs >= 12 ? 0.86 : maxColumnJobs >= 9 ? 0.92 : 1.0;
-      const badgeSize = maxColumnJobs >= 12 ? 0.6 : maxColumnJobs >= 9 ? 0.66 : 0.72;
-      const padY = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
-      const padX = maxColumnJobs >= 12 ? 6 : maxColumnJobs >= 9 ? 7 : 9;
-      const columnPad = maxColumnJobs >= 12 ? 5 : maxColumnJobs >= 9 ? 6 : 8;
-      const gap = totalJobs >= 24 ? 4 : 6;
+      const lists = [southList, northList, localList].filter(list => {
+        const column = list.closest(".full-column");
+        return column && column.style.display !== "none" && list.children.length > 0;
+      });
 
-      appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
-      appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
-      appRoot.style.setProperty("--fs-meta", `${metaSize}rem`);
-      appRoot.style.setProperty("--fs-address", `${addressSize}rem`);
-      appRoot.style.setProperty("--fs-notes", `0.72rem`);
-      appRoot.style.setProperty("--fs-badge", `${badgeSize}rem`);
-      appRoot.style.setProperty("--fs-card-padding-y", `${padY}px`);
-      appRoot.style.setProperty("--fs-card-padding-x", `${padX}px`);
-      appRoot.style.setProperty("--fs-column-padding", `${columnPad}px`);
-      appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
+      if (!lists.length) return;
 
-      requestAnimationFrame(() => {
-        [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
-        const maybeStack = (list) => {
-          if (!list || !list.children.length) return;
-          if (list.scrollHeight > list.clientHeight + 2) list.classList.add("double-stack");
-        };
-        maybeStack(southList);
-        maybeStack(northList);
-        maybeStack(localList);
+      const jobCounts = lists.map(list => Array.from(list.children).filter(child => child.classList.contains("schedule-card")).length);
+      const totalJobs = jobCounts.reduce((sum, count) => sum + count, 0);
+      const maxColumnJobs = Math.max(...jobCounts, 0);
+      const needsTightStart = totalJobs >= 14 || maxColumnJobs >= 7;
+
+      [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
+      appRoot.classList.remove("fullscreen-ultra-compact");
+
+      let step = needsTightStart ? 1 : 0;
+      const maxStep = 12;
+
+      const setVarsForStep = (level) => {
+        const titleSize = Math.max(1.12 - level * 0.045, 0.68);
+        const cardTitleSize = Math.max(1.06 - level * 0.05, 0.58);
+        const metaSize = Math.max(0.9 - level * 0.04, 0.5);
+        const addressSize = Math.max(0.98 - level * 0.045, 0.54);
+        const notesSize = Math.max(0.74 - level * 0.035, 0.48);
+        const badgeSize = Math.max(0.7 - level * 0.035, 0.44);
+        const padY = Math.max(8 - level * 0.55, 2);
+        const padX = Math.max(9 - level * 0.45, 3);
+        const columnPad = Math.max(8 - level * 0.45, 3);
+        const gap = Math.max(6 - level * 0.35, 2);
+
+        appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
+        appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
+        appRoot.style.setProperty("--fs-meta", `${metaSize}rem`);
+        appRoot.style.setProperty("--fs-address", `${addressSize}rem`);
+        appRoot.style.setProperty("--fs-notes", `${notesSize}rem`);
+        appRoot.style.setProperty("--fs-badge", `${badgeSize}rem`);
+        appRoot.style.setProperty("--fs-card-padding-y", `${padY}px`);
+        appRoot.style.setProperty("--fs-card-padding-x", `${padX}px`);
+        appRoot.style.setProperty("--fs-column-padding", `${columnPad}px`);
+        appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
+      };
+
+      const hasOverflow = () => lists.some(list => {
+        const column = list.closest(".full-column");
+        return list.scrollHeight > list.clientHeight + 2 || column.scrollHeight > column.clientHeight + 2;
+      });
+
+      const fitPass = () => {
+        setVarsForStep(step);
 
         requestAnimationFrame(() => {
-          const lists = [southList, northList, localList].filter(list => list.children.length > 0);
-          const overflow = lists.some(list => list.scrollHeight > list.clientHeight + 2 || list.scrollWidth > list.clientWidth + 2);
-          if (overflow) {
-            appRoot.style.setProperty("--fs-column-title", `${Math.max(titleSize - 0.08, 0.94)}rem`);
-            appRoot.style.setProperty("--fs-card-title", `${Math.max(cardTitleSize - 0.08, 0.9)}rem`);
-            appRoot.style.setProperty("--fs-meta", `${Math.max(metaSize - 0.06, 0.74)}rem`);
-            appRoot.style.setProperty("--fs-address", `${Math.max(addressSize - 0.08, 0.82)}rem`);
-            appRoot.style.setProperty("--fs-badge", `${Math.max(badgeSize - 0.05, 0.56)}rem`);
-            appRoot.style.setProperty("--fs-card-padding-y", `${Math.max(padY - 1, 4)}px`);
-            appRoot.style.setProperty("--fs-card-padding-x", `${Math.max(padX - 1, 5)}px`);
-            appRoot.style.setProperty("--fs-column-padding", `${Math.max(columnPad - 1, 4)}px`);
-            appRoot.style.setProperty("--fs-grid-gap", `${Math.max(gap - 1, 3)}px`);
+          if (step >= 5) {
+            lists.forEach(list => {
+              if (list.scrollHeight > list.clientHeight + 2 && list.children.length >= 4) {
+                list.classList.add("double-stack");
+              }
+            });
           }
+
+          if (step >= 9) {
+            appRoot.classList.add("fullscreen-ultra-compact");
+          }
+
+          requestAnimationFrame(() => {
+            if (hasOverflow() && step < maxStep) {
+              step += 1;
+              fitPass();
+            }
+          });
         });
-      });
+      };
+
+      fitPass();
     }
 
     function createRushToggleButton(job) {
@@ -3433,10 +3492,10 @@
 
     function renderOutside() {
       outsideList.innerHTML = "";
-      outsideDateChip.textContent = formatDateLabel(managerViewDate);
-      const outsideJobs = getOutsideJobsForDate(managerViewDate);
+      outsideDateChip.textContent = formatDateLabel(outsideViewDate);
+      const outsideJobs = getOutsideJobsForDate(outsideViewDate);
       if (outsideJobs.length === 0) {
-        outsideList.innerHTML = `<div class="empty-state">No outside shipments for ${formatDateLabel(managerViewDate)}.</div>`;
+        outsideList.innerHTML = `<div class="empty-state">No outside shipments for ${formatDateLabel(outsideViewDate)}.</div>`;
         return;
       }
       outsideJobs.forEach(job => outsideList.appendChild(createOutsideCard(job)));
@@ -3444,10 +3503,10 @@
 
     function renderPickup() {
       pickupList.innerHTML = "";
-      pickupDateChip.textContent = formatDateLabel(managerViewDate);
-      const pickupJobs = getPickupJobsForDate(managerViewDate);
+      pickupDateChip.textContent = formatDateLabel(pickupViewDate);
+      const pickupJobs = getPickupJobsForDate(pickupViewDate);
       if (pickupJobs.length === 0) {
-        pickupList.innerHTML = `<div class="empty-state">No customer pickup jobs for ${formatDateLabel(managerViewDate)}.</div>`;
+        pickupList.innerHTML = `<div class="empty-state">No customer pickup jobs for ${formatDateLabel(pickupViewDate)}.</div>`;
         return;
       }
       pickupJobs.forEach(job => pickupList.appendChild(createPickupCard(job)));
@@ -4131,6 +4190,20 @@ Thank you.`;
       });
     }
 
+    if (outsideDateInput) {
+      outsideDateInput.addEventListener("change", () => {
+        outsideViewDate = outsideDateInput.value || currentDenverDate;
+        renderAll();
+      });
+    }
+
+    if (pickupDateInput) {
+      pickupDateInput.addEventListener("change", () => {
+        pickupViewDate = pickupDateInput.value || currentDenverDate;
+        renderAll();
+      });
+    }
+
     if (summaryDateInput) {
       summaryDateInput.addEventListener("change", () => {
         if (summaryDateLabel) {
@@ -4157,6 +4230,48 @@ Thank you.`;
     });
 
     setupDropZone(singleRouteDropZone, () => dragTargetIndex);
+
+    function isRolloverRoute(job) {
+      return isLocalRoute(job.route) || isCustomerPickupRoute(job.route);
+    }
+
+    function shouldAutoRolloverJob(job, todayKey) {
+      if (!job || job.status !== "active") return false;
+      if (!isRolloverRoute(job)) return false;
+      return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
+    }
+
+    async function rolloverUnfinishedJobsToToday(todayKey = currentDenverDate) {
+      const rolloverJobs = jobs.filter(job => shouldAutoRolloverJob(job, todayKey));
+      if (!rolloverJobs.length || rolloverInProgress) return;
+
+      const rolloverKey = `${todayKey}-${rolloverJobs.map(job => job.id).sort().join("|")}`;
+      if (rolloverKey === lastRolloverKey) return;
+
+      rolloverInProgress = true;
+      lastRolloverKey = rolloverKey;
+
+      try {
+        await Promise.all(rolloverJobs.map(job => {
+          const nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, deliveryDate: todayKey, status: "active" }, job.route, todayKey);
+          return updateDoc(doc(db, "deliveryJobs", job.id), {
+            deliveryDate: todayKey,
+            status: "active",
+            order: nextOrder,
+            rolledFromDate: job.deliveryDate,
+            rolledOverAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+        }));
+
+        setNotification(`${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "s"} moved to ${formatDateLabel(todayKey)}.`, "warning");
+      } catch (error) {
+        console.error(error);
+        setNotification("Could not auto-move unfinished deliveries to the next day.", "danger");
+      } finally {
+        rolloverInProgress = false;
+      }
+    }
 
     function renderAll() {
       syncDateInputs();
@@ -4190,7 +4305,11 @@ Thank you.`;
         managerDateInput.value = latestDenverDate;
         deliveryDateInput.value = latestDenverDate;
       }
+      if (scheduleViewDate === oldDate) scheduleViewDate = latestDenverDate;
+      if (outsideViewDate === oldDate) outsideViewDate = latestDenverDate;
+      if (pickupViewDate === oldDate) pickupViewDate = latestDenverDate;
 
+      rolloverUnfinishedJobsToToday(latestDenverDate);
       renderAll();
       setNotification(`Today's Schedule switched automatically to ${formatDateLabel(latestDenverDate)} using Denver time.`, "warning");
     }
@@ -4232,6 +4351,7 @@ Thank you.`;
         }
 
         renderAll();
+        rolloverUnfinishedJobsToToday(currentDenverDate);
         renderLatestAction();
 
         if (latestLiveAlert) {
@@ -4268,6 +4388,8 @@ Thank you.`;
 
     deliveryDateInput.value = currentDenverDate;
     managerDateInput.value = managerViewDate;
+    if (outsideDateInput) outsideDateInput.value = outsideViewDate;
+    if (pickupDateInput) pickupDateInput.value = pickupViewDate;
     renderAll();
     if (isMobileView()) {
       showFullPage();
