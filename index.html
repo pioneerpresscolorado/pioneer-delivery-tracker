@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Pioneer Delivery Tracker </title>
-  <!--deploy fix-->
+  <title>Pioneer Delivery Tracker</title>
 
   <style>
     :root {
@@ -1143,10 +1142,20 @@
       flex: 1;
       overflow: hidden;
       min-height: 0;
+      height: 100%;
       align-content: stretch;
+      grid-auto-rows: minmax(0, 1fr);
     }
 
+    .is-fullscreen .schedule-list {
+      overflow: hidden;
+      min-height: 0;
+    }
 
+    .is-fullscreen .schedule-list.double-stack {
+      grid-auto-flow: row;
+      align-content: start;
+    }
 
     .schedule-meta-row {
       display: flex;
@@ -3094,8 +3103,13 @@
       if (fitClass) appRoot.classList.add(fitClass);
     }
 
-    function applyFullscreenFit() {
-      if (!document.fullscreenElement || currentPageView !== "full") {
+    async function applyFullscreenFit() {
+      const isScheduleFullscreen =
+        document.fullscreenElement === scheduleFullscreenArea ||
+        document.webkitFullscreenElement === scheduleFullscreenArea ||
+        appRoot.classList.contains("is-fullscreen");
+
+      const resetFit = () => {
         appRoot.style.removeProperty("--fs-column-title");
         appRoot.style.removeProperty("--fs-card-title");
         appRoot.style.removeProperty("--fs-meta");
@@ -3108,38 +3122,44 @@
         appRoot.style.removeProperty("--fs-grid-gap");
         appRoot.classList.remove("fullscreen-ultra-compact");
         [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
+      };
+
+      if (!isScheduleFullscreen || currentPageView !== "full") {
+        resetFit();
         return;
       }
 
-      const lists = [southList, northList, localList].filter(list => {
+      const waitFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+      const visibleLists = () => [southList, northList, localList].filter(list => {
         const column = list.closest(".full-column");
-        return column && column.style.display !== "none" && list.children.length > 0;
+        return column && column.style.display !== "none" && list.querySelector(".schedule-card");
       });
 
+      const lists = visibleLists();
       if (!lists.length) return;
 
-      const jobCounts = lists.map(list => Array.from(list.children).filter(child => child.classList.contains("schedule-card")).length);
+      resetFit();
+      await waitFrame();
+
+      const jobCounts = lists.map(list => list.querySelectorAll(".schedule-card").length);
       const totalJobs = jobCounts.reduce((sum, count) => sum + count, 0);
       const maxColumnJobs = Math.max(...jobCounts, 0);
-      const needsTightStart = totalJobs >= 14 || maxColumnJobs >= 7;
 
-      [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
-      appRoot.classList.remove("fullscreen-ultra-compact");
-
-      let step = needsTightStart ? 1 : 0;
-      const maxStep = 12;
+      // Start a little tighter when the dispatch board is crowded, but keep it readable.
+      let step = totalJobs >= 20 || maxColumnJobs >= 8 ? 3 : totalJobs >= 14 || maxColumnJobs >= 6 ? 2 : totalJobs >= 10 ? 1 : 0;
+      const maxStep = 14;
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.12 - level * 0.045, 0.68);
-        const cardTitleSize = Math.max(1.06 - level * 0.05, 0.58);
-        const metaSize = Math.max(0.9 - level * 0.04, 0.5);
-        const addressSize = Math.max(0.98 - level * 0.045, 0.54);
-        const notesSize = Math.max(0.74 - level * 0.035, 0.48);
-        const badgeSize = Math.max(0.7 - level * 0.035, 0.44);
-        const padY = Math.max(8 - level * 0.55, 2);
-        const padX = Math.max(9 - level * 0.45, 3);
-        const columnPad = Math.max(8 - level * 0.45, 3);
-        const gap = Math.max(6 - level * 0.35, 2);
+        const titleSize = Math.max(1.08 - level * 0.035, 0.76);
+        const cardTitleSize = Math.max(1.02 - level * 0.04, 0.66);
+        const metaSize = Math.max(0.86 - level * 0.032, 0.56);
+        const addressSize = Math.max(0.9 - level * 0.035, 0.58);
+        const notesSize = Math.max(0.72 - level * 0.03, 0.52);
+        const badgeSize = Math.max(0.68 - level * 0.03, 0.5);
+        const padY = Math.max(7 - level * 0.45, 2.5);
+        const padX = Math.max(9 - level * 0.4, 4);
+        const columnPad = Math.max(8 - level * 0.4, 3);
+        const gap = Math.max(6 - level * 0.3, 2);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -3153,37 +3173,60 @@
         appRoot.style.setProperty("--fs-grid-gap", `${gap}px`);
       };
 
-      const hasOverflow = () => lists.some(list => {
+      const listOverflows = (list) => {
         const column = list.closest(".full-column");
-        return list.scrollHeight > list.clientHeight + 2 || column.scrollHeight > column.clientHeight + 2;
-      });
+        if (!column) return false;
 
-      const fitPass = () => {
-        setVarsForStep(step);
+        const columnRect = column.getBoundingClientRect();
+        const listRect = list.getBoundingClientRect();
+        const cards = Array.from(list.querySelectorAll(".schedule-card"));
+        const lastCard = cards[cards.length - 1];
+        const lastBottom = lastCard ? lastCard.getBoundingClientRect().bottom : listRect.bottom;
 
-        requestAnimationFrame(() => {
-          if (step >= 5) {
-            lists.forEach(list => {
-              if (list.scrollHeight > list.clientHeight + 2 && list.children.length >= 4) {
-                list.classList.add("double-stack");
-              }
-            });
-          }
-
-          if (step >= 9) {
-            appRoot.classList.add("fullscreen-ultra-compact");
-          }
-
-          requestAnimationFrame(() => {
-            if (hasOverflow() && step < maxStep) {
-              step += 1;
-              fitPass();
-            }
-          });
-        });
+        return (
+          list.scrollHeight > list.clientHeight + 1 ||
+          column.scrollHeight > column.clientHeight + 1 ||
+          lastBottom > columnRect.bottom - 4 ||
+          listRect.bottom > columnRect.bottom - 4
+        );
       };
 
-      fitPass();
+      const anyOverflow = () => visibleLists().some(listOverflows);
+
+      // Give crowded columns two lanes earlier so a short column does not get cut off.
+      lists.forEach(list => {
+        if (list.querySelectorAll(".schedule-card").length >= 6) {
+          list.classList.add("double-stack");
+        }
+      });
+
+      for (let i = 0; i <= maxStep; i += 1) {
+        setVarsForStep(step);
+        await waitFrame();
+
+        let changedLayout = false;
+        visibleLists().forEach(list => {
+          const count = list.querySelectorAll(".schedule-card").length;
+          if (listOverflows(list) && count >= 4 && !list.classList.contains("double-stack")) {
+            list.classList.add("double-stack");
+            changedLayout = true;
+          }
+        });
+
+        if (changedLayout) {
+          await waitFrame();
+        }
+
+        if (!anyOverflow()) break;
+
+        if (step >= 8) {
+          appRoot.classList.add("fullscreen-ultra-compact");
+          await waitFrame();
+          if (!anyOverflow()) break;
+        }
+
+        step += 1;
+      }
     }
 
     function createRushToggleButton(job) {
