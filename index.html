@@ -2019,6 +2019,18 @@
     }
 
 
+    /* Light fullscreen days: use the room instead of forcing tiny two-column cards */
+    .is-fullscreen:not(.dispatch-fit-1):not(.dispatch-fit-2):not(.dispatch-fit-3) .schedule-list:not(.double-stack) .schedule-card {
+      width: 100% !important;
+      max-width: none !important;
+      min-height: 96px;
+    }
+
+    .is-fullscreen:not(.dispatch-fit-1):not(.dispatch-fit-2):not(.dispatch-fit-3) .schedule-list:not(.double-stack) .schedule-card.delivered-card {
+      min-height: 64px;
+    }
+
+
     /* Small-monitor emergency fit: only turns on if measuring shows a column would cut off */
     .is-fullscreen.fullscreen-super-compact .schedule-card:not(.delivered-card) .notes-mini {
       display: none !important;
@@ -3444,9 +3456,10 @@
       const maxColumnJobs = Math.max(...jobCounts, 0);
 
       // Start with a smarter layout instead of waiting until cards are already cut off.
+      // Light days keep full-width rows; busy columns can split into two columns.
       lists.forEach(list => {
         const count = getCards(list).length;
-        if (count >= 5 || (totalJobs >= 14 && count >= 4)) {
+        if (count >= 6 || (totalJobs >= 14 && count >= 5) || (totalJobs >= 22 && count >= 4)) {
           list.classList.add("double-stack");
         }
       });
@@ -3454,9 +3467,14 @@
       const screenHeight = window.innerHeight || document.documentElement.clientHeight || 900;
       const screenWidth = window.innerWidth || document.documentElement.clientWidth || 1400;
 
-      // Small monitors need to start compact immediately.
-      // This keeps every delivery visible instead of trying a pretty oversized layout first.
-      let step = screenHeight < 760 ? 24 : screenHeight < 850 ? 16 : screenHeight < 950 ? 8 : 0;
+      // Smart fullscreen sizing:
+      // - Light days stay roomy and one-card-per-row.
+      // - Busy days start more compact so every job still stays visible.
+      // - Double-stack only turns on when the day is crowded or the fit checker needs it.
+      let step = 0;
+      if (totalJobs >= 22) step = screenHeight < 760 ? 24 : screenHeight < 850 ? 16 : screenHeight < 950 ? 8 : 0;
+      else if (totalJobs >= 14) step = screenHeight < 760 ? 14 : screenHeight < 850 ? 8 : 0;
+      else if (totalJobs >= 10) step = screenHeight < 760 ? 8 : 0;
       const maxStep = 80;
 
       const setVarsForStep = (level) => {
@@ -3516,9 +3534,12 @@
       const fitPass = () => {
         setVarsForStep(step);
 
-        if (step >= 8) {
+        if (step >= 8 && totalJobs >= 10) {
           lists.forEach(list => {
-            if (getCards(list).length >= 3) list.classList.add("double-stack");
+            const count = getCards(list).length;
+            if (count >= 5 || (totalJobs >= 14 && count >= 4) || (totalJobs >= 22 && count >= 3)) {
+              list.classList.add("double-stack");
+            }
           });
         }
 
