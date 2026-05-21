@@ -1145,10 +1145,11 @@
       align-items: center;
       justify-content: center;
       font-size: var(--fs-badge);
-      padding: 4px 8px;
-      min-height: 1.45rem;
-      margin-bottom: 5px;
+      padding: 2px 8px;
+      min-height: 1.2rem;
+      margin-bottom: 4px;
       line-height: 1;
+      box-sizing: border-box;
     }
 
     .is-fullscreen .schedule-card .schedule-actions {
@@ -2431,7 +2432,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 10px;
       background: rgba(15, 23, 42, 0.56);
       z-index: 10005;
       pointer-events: none;
@@ -2442,9 +2443,9 @@
     }
 
     .tomorrow-preview-card {
-      width: min(1180px, 96vw);
-      height: min(92vh, 760px);
-      max-height: 92vh;
+      width: min(1600px, 99vw);
+      height: min(97vh, 980px);
+      max-height: 97vh;
       overflow: hidden;
       background: #ffffff;
       border-radius: 24px;
@@ -2571,11 +2572,26 @@
       align-content: start;
     }
 
+    .tomorrow-preview-list.split-preview {
+      display: block;
+      column-count: 2;
+      column-gap: 7px;
+    }
+
     .tomorrow-preview-job {
       background: #ffffff;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       padding: 10px 11px;
+    }
+
+    .tomorrow-preview-list.split-preview .tomorrow-preview-job,
+    .tomorrow-preview-list.split-preview .tomorrow-preview-empty {
+      display: inline-block;
+      width: 100%;
+      margin: 0 0 7px;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .tomorrow-preview-job strong {
@@ -2663,9 +2679,18 @@
       padding: 6px;
     }
 
+    .tomorrow-preview-overlay.fit-tight .tomorrow-preview-list.split-preview {
+      column-gap: 5px;
+    }
+
     .tomorrow-preview-overlay.fit-tight .tomorrow-preview-job {
       padding: 6px 7px;
       border-radius: 9px;
+    }
+
+    .tomorrow-preview-overlay.fit-tight .tomorrow-preview-list.split-preview .tomorrow-preview-job,
+    .tomorrow-preview-overlay.fit-tight .tomorrow-preview-list.split-preview .tomorrow-preview-empty {
+      margin-bottom: 5px;
     }
 
     .tomorrow-preview-overlay.fit-tight .tomorrow-preview-job strong {
@@ -2739,6 +2764,10 @@
       padding: 4px;
     }
 
+    .tomorrow-preview-overlay.fit-tighter .tomorrow-preview-list.split-preview {
+      column-gap: 3px;
+    }
+
     .tomorrow-preview-overlay.fit-tighter .tomorrow-preview-job {
       padding: 4px 5px;
       border-radius: 7px;
@@ -2763,6 +2792,10 @@
 
     .tomorrow-preview-overlay.fit-emergency .tomorrow-preview-address {
       display: none;
+    }
+
+    .tomorrow-preview-overlay.fit-emergency .tomorrow-preview-list.split-preview {
+      column-gap: 2px;
     }
 
     .tomorrow-preview-overlay.fit-emergency .tomorrow-preview-job {
@@ -3348,7 +3381,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.21 — Collapsible history - Roll-over tracking and Administrator tab added";
+    const CODE_VERSION = "2026.05.21 — Roll-over tracking added and Administrator tab added";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3857,6 +3890,9 @@
       `;
 
       const list = section.querySelector(".tomorrow-preview-list");
+      if (routeJobs.length >= 5) {
+        list.classList.add("split-preview");
+      }
 
       if (!routeJobs.length) {
         list.innerHTML = `<div class="tomorrow-preview-empty">No deliveries scheduled.</div>`;
