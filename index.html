@@ -125,7 +125,7 @@
 
     .top-nav {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 8px;
     }
 
@@ -474,6 +474,19 @@
       letter-spacing: 0.3px;
     }
 
+    .rollover-badge {
+      display: inline-block;
+      background: #f97316;
+      color: white;
+      font-size: 0.62rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
     .badge-south { background: #0ea5e9; }
     .badge-north { background: #7c3aed; }
     .badge-local { background: #f59e0b; }
@@ -738,11 +751,11 @@
 
     .schedule-card h4 {
       margin: 0 0 4px;
-      font-size: 1.48rem;
+      font-size: 1.32rem;
       font-weight: 800;
       color: #111827;
-      line-height: 1.15;
-      letter-spacing: -0.01em;
+      line-height: 1.18;
+      letter-spacing: -0.005em;
     }
 
     .schedule-card .meta {
@@ -840,6 +853,51 @@
     .completed-list {
       display: grid;
       gap: 12px;
+    }
+
+    .completed-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+
+    .completed-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+    }
+
+    .completed-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .completed-toggle-copy {
+      min-width: 0;
+    }
+
+    .completed-toggle::after {
+      content: "▾";
+      font-size: 1rem;
+      font-weight: 800;
+      color: #475569;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .completed-section[open] .completed-toggle::after {
+      content: "▴";
+    }
+
+    .completed-section-body {
+      padding: 0 16px 16px;
+      border-top: 1px solid #dbe3ee;
+      background: #fff;
     }
 
     .completed-card {
@@ -1080,10 +1138,17 @@
 
      .is-fullscreen .route-badge,
     .is-fullscreen .rush-badge,
-    .is-fullscreen .pickup-badge {
+    .is-fullscreen .pickup-badge,
+    .is-fullscreen .rollover-badge,
+    .is-fullscreen .schedule-delivered-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: var(--fs-badge);
       padding: 4px 8px;
+      min-height: 1.45rem;
       margin-bottom: 5px;
+      line-height: 1;
     }
 
     .is-fullscreen .schedule-card .schedule-actions {
@@ -1867,6 +1932,223 @@
       margin-bottom: 0;
     }
 
+    .admin-controls {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .admin-search-form {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .admin-search-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-search-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .admin-summary {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .admin-summary-chip {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #dbe3ee;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .admin-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-card {
+      border: 1px solid #dbe3ee;
+      border-left: 5px solid #94a3b8;
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .admin-card.is-delivered {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .admin-card.is-picked-up {
+      border-left-color: #0f766e;
+      background: #f0fdfa;
+    }
+
+    .admin-card.is-rolled {
+      box-shadow: inset 0 0 0 1px #fbbf24;
+    }
+
+    .admin-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .admin-card-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .admin-card-title {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+      line-height: 1.2;
+      color: #111827;
+    }
+
+    .admin-card-meta {
+      display: grid;
+      gap: 4px;
+      color: #475569;
+      font-size: 0.94rem;
+      line-height: 1.28;
+    }
+
+    .admin-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .admin-status-pill.is-active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .admin-status-pill.is-delivered {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .admin-status-pill.is-picked-up {
+      background: #ccfbf1;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+    }
+
+    .admin-card-notes {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #dbe3ee;
+      color: #475569;
+      white-space: pre-line;
+      word-break: break-word;
+      line-height: 1.3;
+      font-size: 0.92rem;
+    }
+
+    .admin-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .admin-card-actions .small-btn {
+      flex: 0 0 auto;
+      min-width: 110px;
+    }
+
+    .admin-card-edit-btn {
+      margin-left: auto;
+    }
+
+    .admin-search-empty {
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      color: #64748b;
+      background: #f8fafc;
+    }
+
+    .admin-history-card {
+      margin-top: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .admin-action-history {
+      display: grid;
+      gap: 10px;
+    }
+
+    .admin-action-item {
+      border: 1px solid #dbe3ee;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px 14px;
+    }
+
+    .admin-action-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .admin-action-title {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.25;
+      color: #111827;
+      font-weight: 800;
+    }
+
+    .admin-action-time {
+      color: #64748b;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .admin-action-text {
+      color: #475569;
+      font-size: 0.9rem;
+      line-height: 1.32;
+      word-break: break-word;
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
     @media (max-width: 800px) {
       .history-card-compact {
         grid-template-columns: 1fr;
@@ -1875,6 +2157,29 @@
 
       .history-time-line {
         text-align: left;
+      }
+
+      .admin-card-top {
+        flex-direction: column;
+      }
+
+      .admin-card-actions {
+        width: 100%;
+      }
+
+      .admin-card-edit-btn {
+        margin-left: 0;
+      }
+
+      .admin-card-actions .small-btn {
+        flex: 1 1 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (min-width: 850px) {
+      .admin-search-grid {
+        grid-template-columns: 1fr 1fr 1.2fr;
       }
     }
 
@@ -1894,6 +2199,9 @@
       border: 1px solid #dbe3ee;
       border-radius: 999px;
       padding: 6px 12px;
+      max-width: min(980px, 100%);
+      white-space: normal;
+      line-height: 1.35;
     }
 
     /* Fullscreen no-scroll fit helpers */
@@ -1941,7 +2249,9 @@
 
     .is-fullscreen.fullscreen-micro .route-badge,
     .is-fullscreen.fullscreen-micro .rush-badge,
-    .is-fullscreen.fullscreen-micro .pickup-badge {
+    .is-fullscreen.fullscreen-micro .pickup-badge,
+    .is-fullscreen.fullscreen-micro .rollover-badge,
+    .is-fullscreen.fullscreen-micro .schedule-delivered-badge {
       padding: 2px 6px !important;
       margin-bottom: 2px !important;
     }
@@ -2093,6 +2403,7 @@
     .is-fullscreen.fullscreen-emergency .route-badge,
     .is-fullscreen.fullscreen-emergency .rush-badge,
     .is-fullscreen.fullscreen-emergency .pickup-badge,
+    .is-fullscreen.fullscreen-emergency .rollover-badge,
     .is-fullscreen.fullscreen-emergency .schedule-delivered-badge {
       font-size: 0.5rem !important;
       padding: 1px 4px !important;
@@ -2509,6 +2820,7 @@
           <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
           <button class="tab-btn" id="pickupPageBtn" type="button">Customer Pickup</button>
           <button class="tab-btn" id="historyPageBtn" type="button">History</button>
+          <button class="tab-btn" id="adminPageBtn" type="button">Administrator</button>
         </div>
       </div>
     </div>
@@ -2747,9 +3059,17 @@
 
         <div class="manager-full">
           <div class="card">
-            <h2>Completed Deliveries</h2>
-            <p class="muted" id="completedDateLabel">Completed jobs for the selected delivery date.</p>
-            <div class="completed-list" id="completedList"></div>
+            <details class="completed-section" id="completedSection">
+              <summary class="completed-toggle">
+                <div class="completed-toggle-copy">
+                  <h2 style="margin:0 0 6px;">Completed Deliveries</h2>
+                  <p class="muted" id="completedDateLabel" style="margin:0;">Completed jobs for the selected delivery date.</p>
+                </div>
+              </summary>
+              <div class="completed-section-body">
+                <div class="completed-list" id="completedList"></div>
+              </div>
+            </details>
           </div>
         </div>
       </div>
@@ -2772,6 +3092,63 @@
           </div>
         </div>
         <div id="historyList"></div>
+      </div>
+    </div>
+
+    <div id="adminPage" style="display:none;">
+      <div class="card">
+        <div class="date-toolbar">
+          <div>
+            <h2 style="margin:0 0 6px;">Administrator</h2>
+            <p class="muted" style="margin:0;">Search history, pull up a delivery, then use Edit to correct the delivered date, time, and other details.</p>
+          </div>
+        </div>
+        <form id="adminSearchForm" class="admin-search-form">
+          <div class="admin-search-grid">
+            <div>
+              <label for="adminDate">Delivery Date</label>
+              <input id="adminDate" type="date" />
+            </div>
+            <div>
+              <label for="adminMethod">Delivery Method</label>
+              <select id="adminMethod">
+                <option value="">All Methods</option>
+                <option value="South Run">South Run</option>
+                <option value="North / West Run">North / West Run</option>
+                <option value="Local Delivery">Local Delivery</option>
+                <option value="UPS">UPS</option>
+                <option value="FedEx">FedEx</option>
+                <option value="LTL">LTL</option>
+                <option value="Customer Pickup">Customer Pickup</option>
+              </select>
+            </div>
+            <div>
+              <label for="adminCompany">Company</label>
+              <input id="adminCompany" type="text" placeholder="Search customer name" />
+            </div>
+          </div>
+          <div class="checkbox-row-wrap">
+            <label class="checkbox-row">
+              <input id="adminPushedOnly" type="checkbox" />
+              <span>Roll-over Only</span>
+            </label>
+          </div>
+          <div class="admin-search-actions">
+            <button class="primary-btn" type="submit">Search History</button>
+            <button class="cancel-btn" id="adminClearBtn" type="button">Clear Search</button>
+          </div>
+        </form>
+        <div class="admin-summary" id="adminSummary"></div>
+        <div id="adminList" class="admin-list"></div>
+        <div class="card admin-history-card">
+          <div class="date-toolbar" style="margin-bottom:10px;">
+            <div>
+              <h3 style="margin:0 0 6px;">Action History</h3>
+              <p class="muted" style="margin:0;">Last 20 tracked changes on the site.</p>
+            </div>
+          </div>
+          <div id="adminActionHistory" class="admin-action-history"></div>
+        </div>
       </div>
     </div>
 
@@ -2880,6 +3257,22 @@
           </label>
         </div>
 
+        <div class="form-row">
+          <div>
+            <label for="editDeliveryStatus">Delivery Status</label>
+            <select id="editDeliveryStatus">
+              <option value="active">Active</option>
+              <option value="delivered">Delivered</option>
+              <option value="pickedUp">Picked Up</option>
+            </select>
+          </div>
+
+          <div id="editDeliveredAtWrap" class="is-hidden">
+            <label for="editDeliveredAt">Delivered / Picked Up Time</label>
+            <input id="editDeliveredAt" type="datetime-local" />
+          </div>
+        </div>
+
         <div class="summary-actions">
           <button class="primary-btn" type="submit">Save Changes</button>
           <button class="cancel-btn" id="cancelEditBtn" type="button">Cancel</button>
@@ -2931,6 +3324,7 @@
       onSnapshot,
       query,
       orderBy,
+      limit,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -2947,11 +3341,14 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
+    const activityCollection = collection(db, "deliveryActivity");
+    const ADMIN_PASSWORD = "2219";
+    const ADMIN_SESSION_KEY = "pioneer-admin-unlocked";
 
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.21 — Fullscreen Text Fix and Pop-up";
+    const CODE_VERSION = "2026.05.21 — Collapsible history - Roll-over tracking and Administrator tab added";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3156,6 +3553,13 @@
     let currentDenverDate = getDenverTodayString();
     let scheduleViewDate = currentDenverDate;
     let managerViewDate = currentDenverDate;
+    let adminViewDate = "";
+    let adminMethodFilter = "";
+    let adminCompanyFilter = "";
+    let adminPushedOnly = false;
+    let adminHasSearched = false;
+    let adminUnlocked = window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+    let activityEntries = [];
     let outsideViewDate = currentDenverDate;
     let pickupViewDate = currentDenverDate;
     let rolloverInProgress = false;
@@ -3166,6 +3570,7 @@
     const mainPage = document.getElementById("mainPage");
     const fullPage = document.getElementById("fullPage");
     const historyPage = document.getElementById("historyPage");
+    const adminPage = document.getElementById("adminPage");
     const outsidePage = document.getElementById("outsidePage");
     const pickupPage = document.getElementById("pickupPage");
     const quickTotalsCard = document.getElementById("quickTotalsCard");
@@ -3174,6 +3579,7 @@
     const mainPageBtn = document.getElementById("mainPageBtn");
     const fullPageBtn = document.getElementById("fullPageBtn");
     const historyPageBtn = document.getElementById("historyPageBtn");
+    const adminPageBtn = document.getElementById("adminPageBtn");
     const outsidePageBtn = document.getElementById("outsidePageBtn");
     const pickupPageBtn = document.getElementById("pickupPageBtn");
 
@@ -3189,6 +3595,8 @@
     const outsideList = document.getElementById("outsideList");
     const pickupList = document.getElementById("pickupList");
     const historyList = document.getElementById("historyList");
+    const adminList = document.getElementById("adminList");
+    const adminActionHistory = document.getElementById("adminActionHistory");
 
     const customerNameInput = document.getElementById("customerName");
     const jobNumberInput = document.getElementById("jobNumber");
@@ -3203,6 +3611,13 @@
     const managerDateLabel = document.getElementById("managerDateLabel");
     const completedDateLabel = document.getElementById("completedDateLabel");
     const historySummaryChip = document.getElementById("historySummaryChip");
+    const adminSummary = document.getElementById("adminSummary");
+    const adminSearchForm = document.getElementById("adminSearchForm");
+    const adminDateInput = document.getElementById("adminDate");
+    const adminMethodInput = document.getElementById("adminMethod");
+    const adminCompanyInput = document.getElementById("adminCompany");
+    const adminPushedOnlyInput = document.getElementById("adminPushedOnly");
+    const adminClearBtn = document.getElementById("adminClearBtn");
     const outsideDateChip = document.getElementById("outsideDateChip");
     const pickupDateChip = document.getElementById("pickupDateChip");
     const outsideDateInput = document.getElementById("outsideDate");
@@ -3219,6 +3634,9 @@
     const editDeliveryDateInput = document.getElementById("editDeliveryDate");
     const editRushDeliveryInput = document.getElementById("editRushDelivery");
     const editPickupDeliveryInput = document.getElementById("editPickupDelivery");
+    const editDeliveryStatusInput = document.getElementById("editDeliveryStatus");
+    const editDeliveredAtInput = document.getElementById("editDeliveredAt");
+    const editDeliveredAtWrap = document.getElementById("editDeliveredAtWrap");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const deleteEditBtn = document.getElementById("deleteEditBtn");
     const modalCloseBtn = document.getElementById("modalCloseBtn");
@@ -3320,6 +3738,70 @@
         hour: "numeric",
         minute: "2-digit"
       }).format(new Date(millis));
+    }
+
+    function formatActionTimestamp(raw) {
+      const millis = getTimestampMillis(raw);
+      if (!millis) return "Time unavailable";
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: DENVER_TZ,
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(new Date(millis));
+    }
+
+    function formatDateTimeLocal(raw) {
+      const millis = getTimestampMillis(raw);
+      if (!millis) return "";
+      const date = new Date(millis);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    function buildDefaultDeliveredAtLocal(dateKey) {
+      return `${dateKey || currentDenverDate}T12:00`;
+    }
+
+    function syncEditDeliveredAtVisibility() {
+      if (!editDeliveredAtWrap || !editDeliveryStatusInput) return;
+      const needsCompletedTime = editDeliveryStatusInput.value === "delivered" || editDeliveryStatusInput.value === "pickedUp";
+      editDeliveredAtWrap.classList.toggle("is-hidden", !needsCompletedTime);
+      if (needsCompletedTime && editDeliveredAtInput && !editDeliveredAtInput.value) {
+        editDeliveredAtInput.value = buildDefaultDeliveredAtLocal(editDeliveryDateInput?.value || currentDenverDate);
+      }
+    }
+
+    async function logActivity(type, title, details) {
+      try {
+        await addDoc(activityCollection, {
+          type,
+          title,
+          details,
+          createdAt: serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Could not log activity.", error);
+      }
+    }
+
+    function ensureAdminAccess() {
+      if (adminUnlocked) return true;
+      const entered = window.prompt("Enter Administrator password");
+      if (entered === null) return false;
+      if (entered !== ADMIN_PASSWORD) {
+        setNotification("Incorrect Administrator password.", "danger");
+        return false;
+      }
+      adminUnlocked = true;
+      window.sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+      return true;
     }
 
     liveAlertCloseBtn.addEventListener("click", hideLiveAlert);
@@ -3595,6 +4077,9 @@
       if (pickupDateInput) {
         pickupDateInput.value = pickupViewDate;
       }
+      if (adminDateInput) {
+        adminDateInput.value = adminViewDate;
+      }
       if (summaryDateInput && !summaryDateInput.value) {
         summaryDateInput.value = managerViewDate;
       }
@@ -3643,6 +4128,8 @@
         isRush: !!data.isRush,
         isPickup: normalizedRoute === "Customer Pickup" ? false : !!data.isPickup,
         order: typeof data.order === "number" ? data.order : 0,
+        rolledFromDate: data.rolledFromDate || "",
+        rolledOverAt: data.rolledOverAt || null,
         createdAt: data.createdAt || null,
         updatedAt: data.updatedAt || null,
         deliveredAt: data.deliveredAt || null
@@ -3838,6 +4325,10 @@
       return `<div class="pickup-badge">Pickup</div>`;
     }
 
+    function getRollOverBadge() {
+      return `<div class="rollover-badge">Roll-over</div>`;
+    }
+
     function getNotesHtml(notes) {
       if (!notes || !notes.trim()) return "";
       return `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(notes)}</div>`;
@@ -3890,6 +4381,7 @@
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
         });
+        await logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`);
         statusMessage.textContent = "Delivery marked complete.";
         setNotification(`${job.customerName} marked completed.`, "success");
       } catch (error) {
@@ -3906,12 +4398,52 @@
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
         });
+        await logActivity("picked-up", "Pickup marked complete", `${job.customerName} was marked picked up for ${formatDateLabel(job.deliveryDate)}.`);
         statusMessage.textContent = "Delivery marked picked up.";
         setNotification(`${job.customerName} marked customer picked up.`, "success");
       } catch (error) {
         console.error(error);
         statusMessage.textContent = "Could not mark pickup complete.";
         setNotification("Could not mark pickup complete.", "danger");
+      }
+    }
+
+    async function restoreJobToActive(job) {
+      try {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
+          status: "active",
+          updatedAt: serverTimestamp(),
+          deliveredAt: null,
+          order: job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" }, job.route, job.deliveryDate)
+        });
+        await logActivity("restored", "Delivery restored to active", `${job.customerName} was restored to active on ${formatDateLabel(job.deliveryDate)}.`);
+        statusMessage.textContent = "Delivery restored.";
+        setNotification(`${job.customerName} restored to active status.`, "warning");
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not restore delivery.";
+        setNotification("Could not restore delivery.", "danger");
+      }
+    }
+
+    async function moveJobBackToRolledDate(job) {
+      if (!job?.rolledFromDate || job.deliveryDate === job.rolledFromDate) return;
+
+      try {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
+          deliveryDate: job.rolledFromDate,
+          updatedAt: serverTimestamp(),
+          order: (job.status === "active" && !job.isRush)
+            ? getNextNonRushOrder({ ...job, deliveryDate: job.rolledFromDate }, job.route, job.rolledFromDate)
+            : job.order ?? 0
+        });
+        await logActivity("move-back", "Rolled delivery moved back", `${job.customerName} was moved from ${formatDateLabel(job.deliveryDate)} back to ${formatDateLabel(job.rolledFromDate)}.`);
+        statusMessage.textContent = "Delivery moved back to original date.";
+        setNotification(`${job.customerName} moved back to ${formatDateLabel(job.rolledFromDate)}.`, "success");
+      } catch (error) {
+        console.error(error);
+        statusMessage.textContent = "Could not move delivery back.";
+        setNotification("Could not move delivery back to the prior date.", "danger");
       }
     }
 
@@ -3922,6 +4454,7 @@
         updates.order = nextRushState ? -1 : getNextNonRushOrder(job);
 
         await updateDoc(doc(db, "deliveryJobs", job.id), updates);
+        await logActivity("rush-toggle", nextRushState ? "Rush added" : "Rush removed", `${job.customerName} ${nextRushState ? "was marked rush" : "had rush removed"} for ${formatDateLabel(job.deliveryDate)}.`);
 
         setNotification(
           nextRushState ? `${job.customerName} marked as rush.` : `${job.customerName} removed from rush.`,
@@ -3946,6 +4479,15 @@
       editDeliveryDateInput.value = job.deliveryDate || currentDenverDate;
       editRushDeliveryInput.checked = !!job.isRush;
       editPickupDeliveryInput.checked = !!job.isPickup;
+      if (editDeliveryStatusInput) editDeliveryStatusInput.value = job.status || "active";
+      if (editDeliveredAtInput) {
+        editDeliveredAtInput.value = formatDateTimeLocal(job.deliveredAt) || (
+          (job.status === "delivered" || job.status === "pickedUp")
+            ? buildDefaultDeliveredAtLocal(job.deliveryDate || currentDenverDate)
+            : ""
+        );
+      }
+      syncEditDeliveredAtVisibility();
       editModalOverlay.classList.add("show");
     }
 
@@ -3953,6 +4495,9 @@
       editingJobId = null;
       editJobForm.reset();
       if (editPickupDeliveryInput) editPickupDeliveryInput.checked = false;
+      if (editDeliveryStatusInput) editDeliveryStatusInput.value = "active";
+      if (editDeliveredAtInput) editDeliveredAtInput.value = "";
+      syncEditDeliveredAtVisibility();
       editModalOverlay.classList.remove("show");
     }
 
@@ -4212,6 +4757,7 @@
         ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         ${job.isPickup ? getPickupBadge() : ""}
+        ${job.rolledFromDate ? getRollOverBadge() : ""}
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
         ${job.poNumber ? `<p><strong>PO #:</strong> ${escapeHtml(job.poNumber)}</p>` : ""}
@@ -4265,6 +4811,7 @@
         ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         ${job.isPickup ? getPickupBadge() : ""}
+        ${job.rolledFromDate ? getRollOverBadge() : ""}
         <div class="job-meta-row">
           <div class="job-meta-main">
             <strong>${escapeHtml(job.customerName)}</strong>
@@ -4284,20 +4831,7 @@
       actions.appendChild(createRushToggleButton(job));
 
       card.querySelector(".restore-btn").addEventListener("click", async () => {
-        try {
-          await updateDoc(doc(db, "deliveryJobs", job.id), {
-            status: "active",
-            updatedAt: serverTimestamp(),
-            deliveredAt: null,
-            order: job.isRush ? -1 : getNextNonRushOrder({ ...job, status: "active" })
-          });
-          statusMessage.textContent = "Delivery restored.";
-          setNotification(`${job.customerName} restored to ${job.route}.`, "warning");
-        } catch (error) {
-          console.error(error);
-          statusMessage.textContent = "Could not restore delivery.";
-          setNotification("Could not restore delivery.", "danger");
-        }
+        await restoreJobToActive(job);
       });
 
       return card;
@@ -4310,6 +4844,7 @@
         ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         ${job.isPickup ? getPickupBadge() : ""}
+        ${job.rolledFromDate ? getRollOverBadge() : ""}
         <div class="job-meta-row">
           <div class="job-meta-main">
             <strong>${escapeHtml(job.customerName)}</strong>
@@ -4340,6 +4875,7 @@
         ${getRouteBadge(job.route)}
         ${job.isRush ? getRushBadge() : ""}
         ${job.isPickup ? getPickupBadge() : ""}
+        ${job.rolledFromDate ? getRollOverBadge() : ""}
         <div class="job-meta-row">
           <div class="job-meta-main">
             <strong>${escapeHtml(job.customerName)}</strong>
@@ -4379,6 +4915,7 @@
             ${getRouteBadge(job.route)}
             ${job.isRush ? getRushBadge() : ""}
             ${job.isPickup ? getPickupBadge() : ""}
+            ${job.rolledFromDate ? getRollOverBadge() : ""}
           </div>
           <strong>${escapeHtml(job.customerName)}</strong>
           ${metaParts.length ? `<div class="history-job-line">${metaParts.join(" • ")}</div>` : ""}
@@ -4412,6 +4949,7 @@
           ${getRouteBadge(job.route)}
           ${job.isRush ? getRushBadge() : ""}
           ${job.isPickup ? getPickupBadge() : ""}
+          ${job.rolledFromDate ? getRollOverBadge() : ""}
           ${deliveredBadgeHtml}
         </div>
         <h4>${escapeHtml(job.customerName)}</h4>
@@ -4571,6 +5109,116 @@
         });
     }
 
+    function getAdminSearchResults() {
+      const companyNeedle = adminCompanyFilter.trim().toLowerCase();
+      const hasDate = !!adminViewDate;
+      const hasMethod = !!adminMethodFilter;
+      const hasCompany = !!companyNeedle;
+
+      return [...jobs]
+        .filter(job => {
+          const dateMatch = !hasDate || job.deliveryDate === adminViewDate || job.rolledFromDate === adminViewDate;
+          const methodMatch = !hasMethod || job.route === adminMethodFilter;
+          const companyMatch = !hasCompany || (job.customerName || "").toLowerCase().includes(companyNeedle);
+          const rollOverMatch = !adminPushedOnly || !!job.rolledFromDate;
+          return dateMatch && methodMatch && companyMatch && rollOverMatch;
+        })
+        .sort((a, b) => {
+          const rolledA = adminViewDate && a.rolledFromDate === adminViewDate && a.deliveryDate !== adminViewDate ? 1 : 0;
+          const rolledB = adminViewDate && b.rolledFromDate === adminViewDate && b.deliveryDate !== adminViewDate ? 1 : 0;
+          if (rolledA !== rolledB) return rolledB - rolledA;
+          if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
+          const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
+          if (routeOrder !== 0) return routeOrder;
+          const statusRank = (job) => job.status === "active" ? 0 : job.status === "delivered" ? 1 : 2;
+          const statusDiff = statusRank(a) - statusRank(b);
+          if (statusDiff !== 0) return statusDiff;
+          const rushDiff = (b.isRush ? 1 : 0) - (a.isRush ? 1 : 0);
+          if (rushDiff !== 0) return rushDiff;
+          return (a.order ?? 0) - (b.order ?? 0);
+        });
+    }
+
+    function createAdminCard(job) {
+      const card = document.createElement("div");
+      const isDelivered = job.status === "delivered";
+      const isPickedUp = job.status === "pickedUp";
+      const isRolled = adminViewDate && job.rolledFromDate === adminViewDate && job.deliveryDate !== adminViewDate;
+
+      card.className = `admin-card${isDelivered ? " is-delivered" : ""}${isPickedUp ? " is-picked-up" : ""}${isRolled ? " is-rolled" : ""}`;
+      card.innerHTML = `
+        <div class="admin-card-top">
+          <div class="admin-card-main">
+            <div class="schedule-badges-row">
+              ${getRouteBadge(job.route)}
+              ${job.rolledFromDate ? getRollOverBadge() : ""}
+            </div>
+            <h3 class="admin-card-title">${escapeHtml(job.customerName)}</h3>
+            <div class="admin-card-meta">
+              <div><strong>Delivery Date:</strong> ${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card-actions">
+          <button class="small-btn edit-btn admin-card-edit-btn" type="button">Edit</button>
+        </div>
+      `;
+
+      const editBtn = card.querySelector(".admin-card-edit-btn");
+      if (editBtn) editBtn.addEventListener("click", () => openEditDelivery(job));
+
+      return card;
+    }
+
+    function renderAdmin() {
+      if (!adminList || !adminSummary) return;
+
+      adminList.innerHTML = "";
+      if (!adminHasSearched) {
+        adminSummary.innerHTML = `<div class="admin-summary-chip">Search by date, method, company, or any mix of those.</div>`;
+        adminList.innerHTML = `<div class="admin-search-empty">Enter at least one search field, then press Search History or hit Enter.</div>`;
+        return;
+      }
+
+      const adminJobs = getAdminSearchResults();
+      const filterBits = [];
+      if (adminViewDate) filterBits.push(formatDateLabel(adminViewDate));
+      if (adminMethodFilter) filterBits.push(adminMethodFilter);
+      if (adminCompanyFilter.trim()) filterBits.push(`Company: ${adminCompanyFilter.trim()}`);
+      if (adminPushedOnly) filterBits.push("Roll-over Only");
+
+      adminSummary.innerHTML = `
+        <div class="admin-summary-chip">${adminJobs.length} result${adminJobs.length === 1 ? "" : "s"}</div>
+        ${filterBits.map(bit => `<div class="admin-summary-chip">${escapeHtml(bit)}</div>`).join("")}
+      `;
+
+      if (!adminJobs.length) {
+        adminList.innerHTML = `<div class="admin-search-empty">No deliveries matched that search. Roll-over jobs from the selected date are included in these results too.</div>`;
+        return;
+      }
+
+      adminJobs.forEach(job => adminList.appendChild(createAdminCard(job)));
+    }
+
+    function renderAdminActionHistory() {
+      if (!adminActionHistory) return;
+
+      if (!activityEntries.length) {
+        adminActionHistory.innerHTML = `<div class="admin-search-empty">No action history has been logged yet. New adds, edits, moves, roll-over actions, and status changes will start showing here.</div>`;
+        return;
+      }
+
+      adminActionHistory.innerHTML = activityEntries.map(entry => `
+        <div class="admin-action-item">
+          <div class="admin-action-top">
+            <h4 class="admin-action-title">${escapeHtml(entry.title || "Site action")}</h4>
+            <div class="admin-action-time">${escapeHtml(formatActionTimestamp(entry.createdAt))}</div>
+          </div>
+          <div class="admin-action-text">${escapeHtml(entry.details || "No details available.")}</div>
+        </div>
+      `).join("");
+    }
+
     function renderFullSchedule() {
       applyDispatchDensity();
       southList.innerHTML = "";
@@ -4639,6 +5287,7 @@
       mainPageBtn.classList.remove("active");
       fullPageBtn.classList.remove("active");
       historyPageBtn.classList.remove("active");
+      adminPageBtn.classList.remove("active");
       outsidePageBtn.classList.remove("active");
       pickupPageBtn.classList.remove("active");
     }
@@ -4648,6 +5297,7 @@
       mainPage.style.display = "block";
       fullPage.style.display = "none";
       historyPage.style.display = "none";
+      adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
       resetTopTabs();
@@ -4665,6 +5315,7 @@
       mainPage.style.display = "none";
       fullPage.style.display = "block";
       historyPage.style.display = "none";
+      adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
       resetTopTabs();
@@ -4681,6 +5332,7 @@
       mainPage.style.display = "none";
       fullPage.style.display = "none";
       historyPage.style.display = "block";
+      adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
       resetTopTabs();
@@ -4692,11 +5344,31 @@
       updateQuickTotalsVisibility();
     }
 
+    function showAdminPage() {
+      if (!ensureAdminAccess()) return;
+      currentPageView = "admin";
+      mainPage.style.display = "none";
+      fullPage.style.display = "none";
+      historyPage.style.display = "none";
+      adminPage.style.display = "block";
+      outsidePage.style.display = "none";
+      pickupPage.style.display = "none";
+      resetTopTabs();
+      adminPageBtn.classList.add("active");
+      updateMobileNavTitle("Administrator");
+      closeMobileMenu();
+      document.body.classList.remove("no-scroll");
+      renderAdmin();
+      renderAdminActionHistory();
+      updateQuickTotalsVisibility();
+    }
+
     function showOutsidePage() {
       currentPageView = "outside";
       mainPage.style.display = "none";
       fullPage.style.display = "none";
       historyPage.style.display = "none";
+      adminPage.style.display = "none";
       outsidePage.style.display = "block";
       pickupPage.style.display = "none";
       resetTopTabs();
@@ -4713,6 +5385,7 @@
       mainPage.style.display = "none";
       fullPage.style.display = "none";
       historyPage.style.display = "none";
+      adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "block";
       resetTopTabs();
@@ -4747,6 +5420,7 @@
         );
         await Promise.all(updates);
 
+        await logActivity("move-route", "Delivery moved to another route", `${draggedJob.customerName} was moved to ${targetRoute} for ${formatDateLabel(managerViewDate)}.`);
         statusMessage.textContent = "Route updated.";
         setNotification(`${draggedJob.customerName} moved to ${targetRoute}.`, "warning");
       } catch (error) {
@@ -5071,6 +5745,7 @@ Thank you.`;
 
       try {
         await addDoc(jobsCollection, newJob);
+        await logActivity("added", "New delivery added", `${newJob.customerName} was added to ${newJob.route} for ${formatDateLabel(newJob.deliveryDate)}.`);
         jobForm.reset();
         deliveryDateInput.value = managerViewDate;
         rushDeliveryInput.checked = false;
@@ -5093,6 +5768,7 @@ Thank you.`;
 
       try {
         await deleteDoc(doc(db, "deliveryJobs", editingJobId));
+        await logActivity("deleted", "Delivery deleted", `${customerLabel} was deleted.`);
         closeEditDelivery();
         statusMessage.textContent = "Delivery deleted.";
         setNotification(`${customerLabel} was deleted.`, "danger");
@@ -5110,8 +5786,13 @@ Thank you.`;
       try {
         const selectedRoute = editRouteInput.value;
         const selectedDate = editDeliveryDateInput.value || currentDenverDate;
+        const selectedStatus = editDeliveryStatusInput?.value || "active";
         const isRush = editRushDeliveryInput.checked;
-                const nextOrder = isRush ? -1 : getNextNonRushOrder({ id: editingJobId, route: selectedRoute, deliveryDate: selectedDate, status: "active" }, selectedRoute, selectedDate);
+        const nextOrder = selectedStatus === "active"
+          ? (isRush ? -1 : getNextNonRushOrder({ id: editingJobId, route: selectedRoute, deliveryDate: selectedDate, status: "active" }, selectedRoute, selectedDate))
+          : 0;
+        const completedAtValue = editDeliveredAtInput?.value || "";
+        const completedAtDate = completedAtValue ? new Date(completedAtValue) : null;
 
         await updateDoc(doc(db, "deliveryJobs", editingJobId), {
           customerName: editCustomerNameInput.value.trim(),
@@ -5121,11 +5802,16 @@ Thank you.`;
           notes: editDeliveryNotesInput.value.trim(),
           route: selectedRoute,
           deliveryDate: selectedDate,
+          status: selectedStatus,
           isRush,
           isPickup: editPickupDeliveryInput.checked,
           order: nextOrder,
+          deliveredAt: selectedStatus === "active"
+            ? null
+            : (completedAtDate && Number.isFinite(completedAtDate.getTime()) ? completedAtDate : new Date(`${selectedDate}T12:00`)),
           updatedAt: serverTimestamp()
         });
+        await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()} was updated to ${selectedRoute} on ${formatDateLabel(selectedDate)} with status ${selectedStatus}.`);
 
         closeEditDelivery();
         statusMessage.textContent = "Delivery updated.";
@@ -5140,6 +5826,15 @@ Thank you.`;
     cancelEditBtn.addEventListener("click", closeEditDelivery);
     deleteEditBtn.addEventListener("click", deleteEditingJob);
     modalCloseBtn.addEventListener("click", closeEditDelivery);
+    if (editDeliveryStatusInput) editDeliveryStatusInput.addEventListener("change", syncEditDeliveredAtVisibility);
+    if (editDeliveryDateInput) {
+      editDeliveryDateInput.addEventListener("change", () => {
+        if (!editDeliveredAtInput || !editDeliveryStatusInput) return;
+        if ((editDeliveryStatusInput.value === "delivered" || editDeliveryStatusInput.value === "pickedUp") && !editDeliveredAtInput.value) {
+          editDeliveredAtInput.value = buildDefaultDeliveredAtLocal(editDeliveryDateInput.value || currentDenverDate);
+        }
+      });
+    }
 
     editModalOverlay.addEventListener("click", (e) => {
       if (e.target === editModalOverlay) closeEditDelivery();
@@ -5154,6 +5849,7 @@ Thank you.`;
     mainPageBtn.addEventListener("click", showMainPage);
     fullPageBtn.addEventListener("click", showFullPage);
     historyPageBtn.addEventListener("click", showHistoryPage);
+    if (adminPageBtn) adminPageBtn.addEventListener("click", showAdminPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
     pickupPageBtn.addEventListener("click", showPickupPage);
     fullscreenBtn.addEventListener("click", toggleFullScreen);
@@ -5176,6 +5872,33 @@ Thank you.`;
       scheduleDateInput.addEventListener("change", () => {
         scheduleViewDate = scheduleDateInput.value || currentDenverDate;
         renderAll();
+      });
+    }
+
+    if (adminSearchForm) {
+      adminSearchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        adminViewDate = adminDateInput?.value || "";
+        adminMethodFilter = adminMethodInput?.value || "";
+        adminCompanyFilter = adminCompanyInput?.value || "";
+        adminPushedOnly = !!adminPushedOnlyInput?.checked;
+        adminHasSearched = !!(adminViewDate || adminMethodFilter || adminCompanyFilter.trim() || adminPushedOnly);
+        renderAdmin();
+      });
+    }
+
+    if (adminClearBtn) {
+      adminClearBtn.addEventListener("click", () => {
+        adminViewDate = "";
+        adminMethodFilter = "";
+        adminCompanyFilter = "";
+        adminPushedOnly = false;
+        adminHasSearched = false;
+        if (adminDateInput) adminDateInput.value = "";
+        if (adminMethodInput) adminMethodInput.value = "";
+        if (adminCompanyInput) adminCompanyInput.value = "";
+        if (adminPushedOnlyInput) adminPushedOnlyInput.checked = false;
+        renderAdmin();
       });
     }
 
@@ -5253,7 +5976,8 @@ Thank you.`;
           });
         }));
 
-        setNotification(`${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "s"} moved to ${formatDateLabel(todayKey)}.`, "warning");
+        await logActivity("rollover", "Unfinished deliveries rolled over", `${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "ies"} rolled over to ${formatDateLabel(todayKey)}.`);
+        setNotification(`${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "ies"} rolled over to ${formatDateLabel(todayKey)}.`, "warning");
       } catch (error) {
         console.error(error);
         setNotification("Could not auto-move unfinished deliveries to the next day.", "danger");
@@ -5269,6 +5993,8 @@ Thank you.`;
       renderOutside();
       renderPickup();
       renderHistory();
+      renderAdmin();
+      renderAdminActionHistory();
       renderFullSchedule();
       updateQuickTotals();
       updateQuickTotalsVisibility();
@@ -5292,6 +6018,7 @@ Thank you.`;
         deliveryDateInput.value = latestDenverDate;
       }
       if (scheduleViewDate === oldDate) scheduleViewDate = latestDenverDate;
+      if (adminViewDate === oldDate) adminViewDate = addDaysToDateKey(latestDenverDate, -1);
       if (outsideViewDate === oldDate) outsideViewDate = latestDenverDate;
       if (pickupViewDate === oldDate) pickupViewDate = latestDenverDate;
 
@@ -5301,6 +6028,21 @@ Thank you.`;
     }
 
     const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
+    const activityQuery = query(activityCollection, orderBy("createdAt", "desc"), limit(20));
+
+    onSnapshot(
+      activityQuery,
+      (snapshot) => {
+        activityEntries = snapshot.docs.map(docItem => ({
+          id: docItem.id,
+          ...docItem.data()
+        }));
+        renderAdminActionHistory();
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
 
     onSnapshot(
       jobsQuery,
