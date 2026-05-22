@@ -1106,27 +1106,29 @@
 
     .is-fullscreen .schedule-card h4 {
       font-size: var(--fs-card-title);
-      line-height: 1.15;
-      margin-bottom: 4px;
+      line-height: 1.05;
+      margin-bottom: 2px;
     }
 
-    .is-fullscreen .schedule-card .meta {
+    .is-fullscreen .schedule-card .meta,
+    .is-fullscreen .schedule-inline-meta,
+    .is-fullscreen .schedule-delivered-time {
       font-size: var(--fs-meta);
-      line-height: 1.12;
-      margin-bottom: 4px;
+      line-height: 1;
+      margin-bottom: 2px;
     }
 
     .is-fullscreen .schedule-card .address {
       font-size: var(--fs-address);
-      line-height: 1.18;
+      line-height: 1.04;
     }
 
 
     .is-fullscreen .schedule-card .notes-mini {
       font-size: var(--fs-notes);
-      line-height: 1.08;
-      margin-top: 3px;
-      padding-top: 3px;
+      line-height: 1;
+      margin-top: 2px;
+      padding-top: 2px;
     }
 
     .is-fullscreen .schedule-badges-row {
@@ -1147,9 +1149,9 @@
       align-items: center;
       justify-content: center;
       font-size: var(--fs-badge);
-      padding: 2px 8px;
-      min-height: 1.2rem;
-      margin-bottom: 4px;
+      padding: 1px 6px;
+      min-height: 1rem;
+      margin-bottom: 2px;
       line-height: 1;
       box-sizing: border-box;
     }
@@ -2318,15 +2320,15 @@
 
     /* Fullscreen space-fill polish: bigger cards first, shrink only if needed */
     .is-fullscreen .schedule-card:not(.delivered-card) {
-      min-height: 74px;
+      min-height: 54px;
     }
 
     .is-fullscreen .schedule-list.double-stack .schedule-card:not(.delivered-card) {
-      min-height: 78px;
+      min-height: 56px;
     }
 
     .is-fullscreen .schedule-card.delivered-card {
-      min-height: 48px;
+      min-height: 38px;
     }
 
     .is-fullscreen.fullscreen-hide-notes .schedule-card:not(.delivered-card),
@@ -3398,13 +3400,13 @@
     const db = getFirestore(app);
     const jobsCollection = collection(db, "deliveryJobs");
     const activityCollection = collection(db, "deliveryActivity");
-    const ADMIN_PASSWORD = "2219";
+    const ADMIN_PASSWORD = "2965";
     const ADMIN_SESSION_KEY = "pioneer-admin-unlocked";
 
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.22 — Roll-over tracking added and Administrator tab upgraded.";
+    const CODE_VERSION = "2026.05.22 — Sizing fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -4647,7 +4649,7 @@
       // Light days keep full-width rows; busy columns can split into two columns.
       lists.forEach(list => {
         const count = getCards(list).length;
-        if (count >= 6 || (totalJobs >= 14 && count >= 5) || (totalJobs >= 22 && count >= 4)) {
+        if (count >= 5 || (totalJobs >= 12 && count >= 4) || (totalJobs >= 18 && count >= 3)) {
           list.classList.add("double-stack");
         }
       });
@@ -4667,28 +4669,28 @@
       const maxStep = 80;
       const minReadableSizes = {
         title: 1.14,
-        cardTitle: 0.94,
-        meta: 0.74,
-        address: 0.78,
-        notes: 0.7,
-        badge: 0.78,
+        cardTitle: 0.84,
+        meta: 0.64,
+        address: 0.66,
+        notes: 0.6,
+        badge: 0.62,
         padY: 2,
-        padX: 4,
-        columnPad: 4,
+        padX: 3,
+        columnPad: 3,
         gap: 2
       };
 
       const setVarsForStep = (level) => {
-        const titleSize = Math.max(1.18 - level * 0.035, minReadableSizes.title);
-        const cardTitleSize = Math.max(1.12 - level * 0.038, minReadableSizes.cardTitle);
-        const metaSize = Math.max(0.92 - level * 0.03, minReadableSizes.meta);
-        const addressSize = Math.max(1.00 - level * 0.032, minReadableSizes.address);
-        const notesSize = Math.max(0.80 - level * 0.028, minReadableSizes.notes);
-        const badgeSize = Math.max(0.72 - level * 0.027, minReadableSizes.badge);
-        const padY = Math.max(9 - level * 0.35, minReadableSizes.padY);
-        const padX = Math.max(10 - level * 0.30, minReadableSizes.padX);
-        const columnPad = Math.max(8 - level * 0.28, minReadableSizes.columnPad);
-        const gap = Math.max(7 - level * 0.25, minReadableSizes.gap);
+        const titleSize = Math.max(1.16 - level * 0.035, minReadableSizes.title);
+        const cardTitleSize = Math.max(1.02 - level * 0.042, minReadableSizes.cardTitle);
+        const metaSize = Math.max(0.84 - level * 0.032, minReadableSizes.meta);
+        const addressSize = Math.max(0.9 - level * 0.034, minReadableSizes.address);
+        const notesSize = Math.max(0.72 - level * 0.03, minReadableSizes.notes);
+        const badgeSize = Math.max(0.68 - level * 0.026, minReadableSizes.badge);
+        const padY = Math.max(7 - level * 0.36, minReadableSizes.padY);
+        const padX = Math.max(8 - level * 0.3, minReadableSizes.padX);
+        const columnPad = Math.max(6 - level * 0.25, minReadableSizes.columnPad);
+        const gap = Math.max(5 - level * 0.2, minReadableSizes.gap);
 
         appRoot.style.setProperty("--fs-column-title", `${titleSize}rem`);
         appRoot.style.setProperty("--fs-card-title", `${cardTitleSize}rem`);
@@ -4735,20 +4737,20 @@
       const fitPass = () => {
         setVarsForStep(step);
 
-        if (step >= 8 && totalJobs >= 10) {
+        if (step >= 4 && totalJobs >= 8) {
           lists.forEach(list => {
             const count = getCards(list).length;
-            if (count >= 5 || (totalJobs >= 14 && count >= 4) || (totalJobs >= 22 && count >= 3)) {
+            if (count >= 4 || (totalJobs >= 12 && count >= 3) || (totalJobs >= 18 && count >= 2)) {
               list.classList.add("double-stack");
             }
           });
         }
 
-        if (step >= 10) appRoot.classList.add("fullscreen-hide-notes");
-        if (step >= 14) appRoot.classList.add("fullscreen-ultra-compact");
-        if (step >= 18) appRoot.classList.add("fullscreen-micro");
-        if (step >= 22) appRoot.classList.add("fullscreen-super-compact");
-        if (step >= 28) appRoot.classList.add("fullscreen-emergency");
+        if (step >= 4) appRoot.classList.add("fullscreen-hide-notes");
+        if (step >= 10) appRoot.classList.add("fullscreen-ultra-compact");
+        if (step >= 14) appRoot.classList.add("fullscreen-micro");
+        if (step >= 18) appRoot.classList.add("fullscreen-super-compact");
+        if (step >= 24) appRoot.classList.add("fullscreen-emergency");
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
