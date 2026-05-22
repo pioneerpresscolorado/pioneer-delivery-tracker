@@ -2237,7 +2237,8 @@
       overflow: hidden !important;
     }
 
-    .is-fullscreen .schedule-list.double-stack {
+    .is-fullscreen .schedule-list.double-stack,
+    .is-fullscreen .schedule-list.triple-stack {
       grid-template-columns: 1fr 1fr;
     }
 
@@ -2272,13 +2273,19 @@
       align-items: stretch !important;
     }
 
-    .is-fullscreen .schedule-list.double-stack {
+    .is-fullscreen .schedule-list.double-stack,
+    .is-fullscreen .schedule-list.triple-stack {
       display: block !important;
       column-count: 2;
       column-gap: var(--fs-grid-gap);
     }
 
-    .is-fullscreen .schedule-list.double-stack .schedule-card {
+    .is-fullscreen .schedule-list.triple-stack {
+      column-count: 3;
+    }
+
+    .is-fullscreen .schedule-list.double-stack .schedule-card,
+    .is-fullscreen .schedule-list.triple-stack .schedule-card {
       display: inline-block !important;
       width: 100% !important;
       margin: 0 0 var(--fs-grid-gap) 0 !important;
@@ -2323,7 +2330,8 @@
       min-height: 54px;
     }
 
-    .is-fullscreen .schedule-list.double-stack .schedule-card:not(.delivered-card) {
+    .is-fullscreen .schedule-list.double-stack .schedule-card:not(.delivered-card),
+    .is-fullscreen .schedule-list.triple-stack .schedule-card:not(.delivered-card) {
       min-height: 56px;
     }
 
@@ -2362,10 +2370,6 @@
       min-height: 0 !important;
     }
 
-    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .address {
-      display: none !important;
-    }
-
     .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) {
       min-height: 0 !important;
     }
@@ -2391,8 +2395,8 @@
       margin-bottom: 1px !important;
     }
 
-    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .address,
-    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .notes-mini {
+    .is-fullscreen.fullscreen-emergency .schedule-card:not(.delivered-card) .notes-mini,
+    .is-fullscreen.fullscreen-emergency .schedule-card.delivered-card .schedule-meta-row {
       display: none !important;
     }
 
@@ -2419,6 +2423,11 @@
       font-size: 0.64rem !important;
       line-height: 0.95 !important;
       margin-bottom: 1px !important;
+    }
+
+    .is-fullscreen.fullscreen-emergency .schedule-card .address {
+      font-size: 0.54rem !important;
+      line-height: 0.95 !important;
     }
 
     .is-fullscreen.fullscreen-emergency .schedule-card .meta,
@@ -3406,7 +3415,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.22 — Sizing fix";
+    const CODE_VERSION = "2026.05.22 — Size fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -4623,7 +4632,7 @@
         appRoot.style.removeProperty("--fs-column-padding");
         appRoot.style.removeProperty("--fs-grid-gap");
         appRoot.classList.remove("fullscreen-ultra-compact", "fullscreen-hide-notes", "fullscreen-micro", "fullscreen-super-compact", "fullscreen-emergency");
-        [southList, northList, localList].forEach(list => list.classList.remove("double-stack"));
+        [southList, northList, localList].forEach(list => list.classList.remove("double-stack", "triple-stack"));
       };
 
       if (!isFullscreen || currentPageView !== "full") {
@@ -4651,6 +4660,10 @@
         const count = getCards(list).length;
         if (count >= 5 || (totalJobs >= 12 && count >= 4) || (totalJobs >= 18 && count >= 3)) {
           list.classList.add("double-stack");
+        }
+        if (count >= 10 || (totalJobs >= 24 && count >= 8)) {
+          list.classList.remove("double-stack");
+          list.classList.add("triple-stack");
         }
       });
 
@@ -4742,6 +4755,10 @@
             const count = getCards(list).length;
             if (count >= 4 || (totalJobs >= 12 && count >= 3) || (totalJobs >= 18 && count >= 2)) {
               list.classList.add("double-stack");
+            }
+            if (step >= 16 && (count >= 8 || (totalJobs >= 20 && count >= 6))) {
+              list.classList.remove("double-stack");
+              list.classList.add("triple-stack");
             }
           });
         }
