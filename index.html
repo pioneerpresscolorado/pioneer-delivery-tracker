@@ -3415,7 +3415,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.22 — Size fix";
+    const CODE_VERSION = "2026.05.26 — Rollover fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -6028,8 +6028,13 @@ Thank you.`;
       return isLocalRoute(job.route) || isCustomerPickupRoute(job.route);
     }
 
+    function isJobCompleted(job) {
+      if (!job) return false;
+      return job.status === "delivered" || job.status === "pickedUp" || !!job.deliveredAt;
+    }
+
     function shouldAutoRolloverJob(job, todayKey) {
-      if (!job || job.status !== "active") return false;
+      if (!job || isJobCompleted(job) || job.status !== "active") return false;
       if (!isRolloverRoute(job)) return false;
       return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
     }
