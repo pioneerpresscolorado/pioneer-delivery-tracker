@@ -3415,7 +3415,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.26 — Rollover fix";
+    const CODE_VERSION = "2026.05.28 — Delivered rollover cleanup fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -3630,7 +3630,9 @@
     let outsideViewDate = currentDenverDate;
     let pickupViewDate = currentDenverDate;
     let rolloverInProgress = false;
+    let rolloverCleanupInProgress = false;
     let lastRolloverKey = "";
+    let lastRolloverCleanupKey = "";
 
     const appRoot = document.getElementById("appRoot");
     const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
@@ -4181,6 +4183,12 @@
 
       if (status === "nextDay") {
         status = "active";
+      }
+
+      // Safety fix: older records can sometimes have a deliveredAt time but still say "active".
+      // Treat those as completed so they do not show up as active or roll over again.
+      if (data.deliveredAt && status === "active") {
+        status = data.route === "Customer Pickup" || data.route === "Pickup" ? "pickedUp" : "delivered";
       }
 
       const normalizedRoute = data.route === "Pickup"
@@ -6033,10 +6041,78 @@ Thank you.`;
       return job.status === "delivered" || job.status === "pickedUp" || !!job.deliveredAt;
     }
 
+    function getDenverDateKeyFromTimestamp(raw) {
+      const millis = getTimestampMillis(raw);
+      if (!millis) return "";
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: DENVER_TZ,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date(millis));
+    }
+
+    function getCompletedStatusForJob(job) {
+      if (job?.status === "pickedUp") return "pickedUp";
+      if (job?.status === "delivered") return "delivered";
+      return isCustomerPickupRoute(job?.route) ? "pickedUp" : "delivered";
+    }
+
     function shouldAutoRolloverJob(job, todayKey) {
-      if (!job || isJobCompleted(job) || job.status !== "active") return false;
+      if (!job) return false;
+      if (job.status !== "active") return false;
+      if (isJobCompleted(job)) return false;
+      if (job.deliveredAt) return false;
       if (!isRolloverRoute(job)) return false;
       return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
+    }
+
+    function getBadCompletedRolloverFix(job, todayKey) {
+      if (!job || !isJobCompleted(job)) return null;
+
+      const completedDate = getDenverDateKeyFromTimestamp(job.deliveredAt);
+      const preferredDate = job.rolledFromDate || completedDate;
+      if (!preferredDate) return null;
+
+      const wasPushedForward = parseDateKey(job.deliveryDate) > parseDateKey(preferredDate);
+      const isCurrentBadRollover = job.rolledFromDate && job.deliveryDate !== job.rolledFromDate;
+      const completedBeforeTodayButShowingToday = completedDate && parseDateKey(completedDate) < parseDateKey(todayKey) && job.deliveryDate === todayKey;
+
+      if (!wasPushedForward && !isCurrentBadRollover && !completedBeforeTodayButShowingToday) return null;
+
+      return {
+        deliveryDate: preferredDate,
+        status: getCompletedStatusForJob(job),
+        order: 0,
+        rolledFromDate: "",
+        rolledOverAt: null,
+        updatedAt: serverTimestamp()
+      };
+    }
+
+    async function cleanupBadCompletedRollovers(todayKey = currentDenverDate) {
+      const fixes = jobs
+        .map(job => ({ job, fix: getBadCompletedRolloverFix(job, todayKey) }))
+        .filter(item => item.fix);
+
+      if (!fixes.length || rolloverCleanupInProgress) return;
+
+      const cleanupKey = `${todayKey}-${fixes.map(item => item.job.id).sort().join("|")}`;
+      if (cleanupKey === lastRolloverCleanupKey) return;
+
+      rolloverCleanupInProgress = true;
+      lastRolloverCleanupKey = cleanupKey;
+
+      try {
+        await Promise.all(fixes.map(({ job, fix }) => updateDoc(doc(db, "deliveryJobs", job.id), fix)));
+        await logActivity("rollover-cleanup", "Delivered rollovers fixed", `${fixes.length} completed delivery${fixes.length === 1 ? "" : "ies"} moved back to the correct completed date.`);
+        setNotification(`${fixes.length} completed delivery${fixes.length === 1 ? "" : "ies"} fixed so delivered jobs no longer roll over.`, "success");
+      } catch (error) {
+        console.error(error);
+        setNotification("Could not clean up completed rollovers.", "danger");
+      } finally {
+        rolloverCleanupInProgress = false;
+      }
     }
 
     async function rolloverUnfinishedJobsToToday(todayKey = currentDenverDate) {
@@ -6108,6 +6184,7 @@ Thank you.`;
       if (outsideViewDate === oldDate) outsideViewDate = latestDenverDate;
       if (pickupViewDate === oldDate) pickupViewDate = latestDenverDate;
 
+      cleanupBadCompletedRollovers(latestDenverDate);
       rolloverUnfinishedJobsToToday(latestDenverDate);
       renderAll();
       setNotification(`Today's Schedule switched automatically to ${formatDateLabel(latestDenverDate)} using Denver time.`, "warning");
@@ -6165,6 +6242,7 @@ Thank you.`;
         }
 
         renderAll();
+        cleanupBadCompletedRollovers(currentDenverDate);
         rolloverUnfinishedJobsToToday(currentDenverDate);
         renderLatestAction();
 
