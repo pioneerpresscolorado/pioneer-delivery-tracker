@@ -2840,8 +2840,7 @@
 
     @media (min-width: 1600px) {
       .is-fullscreen .schedule-toolbar {
-        display: grid;
-        grid-template-columns: minmax(180px, 240px) auto auto minmax(0, 1fr);
+        display: flex;
         align-items: center;
       }
 
@@ -2860,7 +2859,54 @@
       }
     }
 
-  </style>
+  .pickup-overdue { border: 2px solid #b45309 !important; background: #fffbeb !important; }
+    .pickup-overdue-label { color:#92400e; font-weight:700; margin:8px 0; }
+    #undoPanel { display:inline-flex; align-items:center; gap:8px; }
+    #undoPanel[hidden], .is-fullscreen #undoPanel, :fullscreen #undoPanel { display:none !important; }
+    #undoLabel { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+    #deliveryConfirm { width:min(420px, calc(100vw - 32px)); box-sizing:border-box; border:0; border-radius:16px; padding:24px; color:#172033; }
+    #deliveryConfirm::backdrop { background:rgb(0 0 0 / 60%); }
+    #deliveryConfirm .confirm-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+    #deliveryConfirm button, #undoPanel button { min-height:48px; min-width:88px; font-size:16px; }
+    #deliveryConfirmAddress { white-space:pre-wrap; overflow-wrap:anywhere; }
+    #scheduleProgress { display:none; flex:1 1 220px; min-width:120px; margin:0; padding:6px 10px; border-radius:10px; background:#eff6ff; color:#172033; }
+    .is-fullscreen #scheduleProgress, :fullscreen #scheduleProgress { display:block !important; }
+    #scheduleProgressText { display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
+    #scheduleProgressBar { display:block; width:100%; height:14px; accent-color:#15803d; border:0; border-radius:8px; overflow:hidden; }
+    #scheduleProgressBar::-webkit-progress-bar { background:#dbe3ec; }
+    #scheduleProgressBar::-webkit-progress-value { background:#15803d; }
+    #scheduleProgressBar::-moz-progress-bar { background:#15803d; }
+    .is-fullscreen .schedule-toolbar {
+      display:flex;
+      flex-direction:row;
+      flex-wrap:nowrap;
+      align-items:center;
+      justify-content:flex-start;
+      gap:8px;
+    }
+    .is-fullscreen .schedule-date-wrap {
+      flex:0 0 185px;
+      width:185px;
+      min-width:0;
+      margin-right:0;
+    }
+    .is-fullscreen #printSheetBtn,
+    .is-fullscreen #fullscreenBtn {
+      flex:0 0 auto;
+      width:auto;
+      white-space:nowrap;
+    }
+    .is-fullscreen #scheduleProgress {
+      flex:1 1 0;
+      min-width:120px;
+      width:auto;
+    }
+    .is-fullscreen #fullscreenTotals {
+      flex:0 0 auto;
+      flex-wrap:nowrap;
+      margin-left:0;
+    }
+    </style>
 </head>
 
 <body>
@@ -2934,9 +2980,14 @@
                 <input id="scheduleDate" type="date" />
               </div>
               <button id="printSheetBtn" class="print-btn" type="button">Print Dispatch Sheet</button>
+              <div id="undoPanel" role="status"><span id="undoLabel"></span><button id="undoRecent" type="button" class="small-btn" disabled aria-describedby="undoLabel">Undo</button><button id="dismissUndo" type="button" class="small-btn" hidden>Dismiss</button></div>
               <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
+              <div id="scheduleProgress">
+                <span id="scheduleProgressText" aria-live="polite">No stops scheduled</span>
+                <progress id="scheduleProgressBar" max="1" value="0" aria-label="Schedule completion"></progress>
+              </div>
               <div class="fullscreen-totals" id="fullscreenTotals">
-                <div class="fullscreen-total-chip">Today <strong id="fsActiveTodayCount">0</strong></div>
+                <div class="fullscreen-total-chip" aria-live="polite">Stops left <strong id="fsActiveTodayCount">0</strong></div>
                 <div class="fullscreen-total-chip">Rush <strong id="fsRushCount">0</strong></div>
                 <div class="fullscreen-total-chip">Outside <strong id="fsOutsideCount">0</strong></div>
                 <div class="fullscreen-total-chip">Done <strong id="fsCompletedCount">0</strong></div>
@@ -3151,12 +3202,26 @@
         <div class="date-toolbar">
           <div>
             <h2 style="margin:0 0 6px;">History</h2>
-            <p class="muted" style="margin:0;">Last 30 days of shipments, grouped by delivery day.</p>
+            <p class="muted" style="margin:0;">Shipments grouped by delivery day. Choose dates or browse all history.</p>
           </div>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-            <div class="history-summary-chip" id="historySummaryChip">0 jobs</div>
+            <div class="history-summary-chip" aria-live="polite" id="historySummaryChip">0 jobs</div>
             <button id="printHistoryBtn" class="print-btn" type="button" style="margin-bottom:0;">Print History Report</button>
           </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:12px;">
+            <div><label for="historyFrom">From</label><input id="historyFrom" type="date" /></div>
+            <div><label for="historyTo">Through</label><input id="historyTo" type="date" /></div>
+            <button id="history30Days" class="small-btn" type="button">Last 30 days</button>
+            <button id="historyAllDates" class="small-btn" type="button">All dates</button>
+            <button id="exportHistory" class="small-btn" type="button">Export spreadsheet (CSV)</button>
+          </div>
+          <p id="historyRangeError" role="alert" style="color:#b91c1c;"></p>
+          <label for="historySearch">Search History</label>
+          <input id="historySearch" type="search" placeholder="Customer, job #, PO #, address, route, status, date or notes" aria-describedby="historySearchHelp" />
+          <p id="historySearchHelp" class="muted">Search the selected dates. Print and spreadsheet exports include only matching jobs.</p>
+          <button id="clearHistorySearch" class="small-btn" type="button">Clear search</button>
         </div>
         <div id="historyList"></div>
       </div>
@@ -3379,10 +3444,22 @@
     </div>
   </div>
 
+  <dialog id="deliveryConfirm" aria-labelledby="deliveryConfirmTitle" aria-describedby="deliveryConfirmCustomer deliveryConfirmAddress">
+    <h2 id="deliveryConfirmTitle">Mark this stop delivered?</h2>
+    <strong id="deliveryConfirmCustomer"></strong>
+    <p id="deliveryConfirmAddress"></p>
+    <p>Confirm only after the delivery is complete. You can undo afterward.</p>
+    <form method="dialog" class="confirm-actions">
+      <button value="cancel" class="small-btn" autofocus>Not yet</button>
+      <button value="confirm" class="small-btn">Confirm delivered</button>
+    </form>
+  </dialog>
+  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getFirestore,
+      runTransaction,
       collection,
       addDoc,
       updateDoc,
@@ -3415,10 +3492,12 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.05.28 — Delivered rollover cleanup fix";
+    const CODE_VERSION = "2026.09.11 — Pickup tracking, searchable history, driver improvements";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
+    let completedRolloverRepairInProgress = false;
+    let completedRolloverRepairAttemptDate = "";
     let geocodeCache = loadGeocodeCache();
     let geocodeRequestChain = Promise.resolve();
     let lastGeocodeRequestAt = 0;
@@ -3630,9 +3709,7 @@
     let outsideViewDate = currentDenverDate;
     let pickupViewDate = currentDenverDate;
     let rolloverInProgress = false;
-    let rolloverCleanupInProgress = false;
     let lastRolloverKey = "";
-    let lastRolloverCleanupKey = "";
 
     const appRoot = document.getElementById("appRoot");
     const scheduleFullscreenArea = document.getElementById("scheduleFullscreenArea");
@@ -4091,6 +4168,17 @@
       }).format(new Date());
     }
 
+    function getDenverDateKeyFromTimestamp(raw) {
+      const millis = getTimestampMillis(raw);
+      if (!millis) return "";
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: DENVER_TZ,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date(millis));
+    }
+
     function getDenverDateTimeLabel() {
       return new Intl.DateTimeFormat("en-US", {
         timeZone: DENVER_TZ,
@@ -4171,7 +4259,8 @@
 
     function normalizeJob(id, data) {
       let deliveryDate = data.deliveryDate;
-      let status = data.status || "active";
+      const rawStatus = typeof data.status === "string" ? data.status.trim() : "";
+      let status = rawStatus || "active";
 
       if (!deliveryDate) {
         if (status === "nextDay") {
@@ -4185,15 +4274,22 @@
         status = "active";
       }
 
-      // Safety fix: older records can sometimes have a deliveredAt time but still say "active".
-      // Treat those as completed so they do not show up as active or roll over again.
-      if (data.deliveredAt && status === "active") {
-        status = data.route === "Customer Pickup" || data.route === "Pickup" ? "pickedUp" : "delivered";
-      }
-
       const normalizedRoute = data.route === "Pickup"
         ? "Customer Pickup"
         : (data.route || "South Run");
+      const completedAt = data.deliveredAt || null;
+      const shouldTreatAsPickup = normalizedRoute === "Customer Pickup" || !!data.isPickup;
+      const loweredStatus = status.toLowerCase();
+
+      if (loweredStatus === "delivered" || loweredStatus === "complete" || loweredStatus === "completed") {
+        status = "delivered";
+      } else if (loweredStatus === "pickedup" || loweredStatus === "picked up" || loweredStatus === "pickup") {
+        status = "pickedUp";
+      }
+
+      if ((status === "active" || !status) && completedAt) {
+        status = shouldTreatAsPickup ? "pickedUp" : "delivered";
+      }
 
       return {
         id,
@@ -4211,8 +4307,9 @@
         rolledFromDate: data.rolledFromDate || "",
         rolledOverAt: data.rolledOverAt || null,
         createdAt: data.createdAt || null,
+        pickupAddedAt: data.pickupAddedAt || null,
         updatedAt: data.updatedAt || null,
-        deliveredAt: data.deliveredAt || null
+        deliveredAt: completedAt
       };
     }
 
@@ -4428,7 +4525,7 @@
     }
 
     function getHistoryCount() {
-      return jobs.filter(job => isWithinLast30Days(job.deliveryDate)).length;
+      return jobs.filter(job => !job.isPickup && isWithinLast30Days(job.deliveryDate)).length;
     }
 
     function updateQuickTotals() {
@@ -4447,6 +4544,14 @@
       completedCount.textContent = completedTotal;
       historyCount.textContent = historyTotal;
 
+      const totalStops = south.length + north.length + local.length;
+      const completedStops = totalStops - activeToday;
+      const progress = document.getElementById("scheduleProgressBar");
+      progress.max = totalStops || 1;
+      progress.value = completedStops;
+      const progressText = totalStops ? `${activeToday} stops left • ${completedStops} of ${totalStops} complete` : "No stops scheduled";
+      document.getElementById("scheduleProgressText").textContent = progressText;
+      progress.setAttribute("aria-valuetext", progressText);
       fsActiveTodayCount.textContent = activeToday;
       fsRushCount.textContent = rushTotal;
       fsOutsideCount.textContent = outsideTotal;
@@ -4454,13 +4559,29 @@
       fsHistoryCount.textContent = historyTotal;
     }
 
+    const pendingDeliveries = new Set();
+    function confirmDelivery(job) {
+      const dialog = document.getElementById("deliveryConfirm");
+      if (dialog.open) return Promise.resolve(false);
+      (document.fullscreenElement || document.webkitFullscreenElement || document.body).appendChild(dialog);
+      document.getElementById("deliveryConfirmCustomer").textContent = `${job.customerName}${job.jobNumber ? ` • Job #${job.jobNumber}` : ""}`;
+      document.getElementById("deliveryConfirmAddress").textContent = job.address;
+      dialog.returnValue = "cancel";
+      return new Promise(resolve => {
+        dialog.addEventListener("close", () => resolve(dialog.returnValue === "confirm"), {once:true});
+        dialog.showModal();
+      });
+    }
     async function markJobDelivered(job) {
+      if (pendingDeliveries.has(job.id) || job.status !== "active") return;
+      pendingDeliveries.add(job.id);
       try {
-        await updateDoc(doc(db, "deliveryJobs", job.id), {
+        if (!await confirmDelivery(job)) return;
+        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
           status: "delivered",
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
-        });
+        }, true);
         await logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`);
         statusMessage.textContent = "Delivery marked complete.";
         setNotification(`${job.customerName} marked completed.`, "success");
@@ -4468,12 +4589,14 @@
         console.error(error);
         statusMessage.textContent = "Could not mark delivery complete.";
         setNotification("Could not mark delivery complete.", "danger");
+      } finally {
+        pendingDeliveries.delete(job.id);
       }
     }
 
     async function markJobPickedUp(job) {
       try {
-        await updateDoc(doc(db, "deliveryJobs", job.id), {
+        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
           status: "pickedUp",
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
@@ -4490,7 +4613,7 @@
 
     async function restoreJobToActive(job) {
       try {
-        await updateDoc(doc(db, "deliveryJobs", job.id), {
+        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
           status: "active",
           updatedAt: serverTimestamp(),
           deliveredAt: null,
@@ -4510,7 +4633,7 @@
       if (!job?.rolledFromDate || job.deliveryDate === job.rolledFromDate) return;
 
       try {
-        await updateDoc(doc(db, "deliveryJobs", job.id), {
+        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
           deliveryDate: job.rolledFromDate,
           updatedAt: serverTimestamp(),
           order: (job.status === "active" && !job.isRush)
@@ -4533,7 +4656,7 @@
         const updates = { isRush: nextRushState, updatedAt: serverTimestamp() };
         updates.order = nextRushState ? -1 : getNextNonRushOrder(job);
 
-        await updateDoc(doc(db, "deliveryJobs", job.id), updates);
+        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), updates);
         await logActivity("rush-toggle", nextRushState ? "Rush added" : "Rush removed", `${job.customerName} ${nextRushState ? "was marked rush" : "had rush removed"} for ${formatDateLabel(job.deliveryDate)}.`);
 
         setNotification(
@@ -4850,7 +4973,7 @@
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
         ${job.poNumber ? `<p><strong>PO #:</strong> ${escapeHtml(job.poNumber)}</p>` : ""}
-        <p><strong>Delivery Date:</strong> ${escapeHtml(formatDateLabel(job.deliveryDate))}</p>
+        <p><strong>${isCustomerPickupRoute(job.route) ? "Customer Pickup" : "Delivery Date"}:</strong> ${escapeHtml(isCustomerPickupRoute(job.route) ? getPickupAddedLabel(job) : formatDateLabel(job.deliveryDate))}</p>
         <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
         ${getNotesHtml(job.notes)}
         <div class="job-actions">
@@ -4858,6 +4981,14 @@
           ${showDeliverButton ? `<button class="small-btn deliver-btn" type="button">${escapeHtml(deliverLabel)}</button>` : ""}
                   </div>
       `;
+
+      if (isCustomerPickupRoute(job.route) && job.status === "active" && getPickupWaitingDays(job) > 7) {
+        card.classList.add("pickup-overdue");
+        const alert = document.createElement("div");
+        alert.className = "pickup-overdue-label";
+        alert.textContent = `Overdue pickup • ${getPickupWaitingDays(job)} days waiting`;
+        card.prepend(alert);
+      }
 
       const actions = card.querySelector(".job-actions");
       if (showEditButton) actions.appendChild(createEditButton(job));
@@ -4957,6 +5088,13 @@
       return card;
     }
 
+    function getPickupAddedLabel(job) {
+      const dateKey = getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt);
+      if (!dateKey) return "Added date unavailable";
+      const days = Math.max(0, Math.round((parseDateKey(currentDenverDate) - parseDateKey(dateKey)) / 86400000));
+      return `Added ${formatDateLabel(dateKey)} • ${days === 0 ? "Today" : `${days} day${days === 1 ? "" : "s"} waiting`}`;
+    }
+
     function createPickupCard(job) {
       const card = document.createElement("div");
       card.className = `completed-card ${job.isRush ? "rush-card" : ""}`;
@@ -4972,10 +5110,18 @@
           </div>
           ${getJobMetaSideHtml(job)}
         </div>
-        <div class="muted">${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
+        <div class="muted">${escapeHtml(getPickupAddedLabel(job))}</div>
         ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions"></div>
       `;
+
+      if (isCustomerPickupRoute(job.route) && job.status === "active" && getPickupWaitingDays(job) > 7) {
+        card.classList.add("pickup-overdue");
+        const alert = document.createElement("div");
+        alert.className = "pickup-overdue-label";
+        alert.textContent = `Overdue pickup • ${getPickupWaitingDays(job)} days waiting`;
+        card.prepend(alert);
+      }
 
       const actions = card.querySelector(".job-actions");
       actions.appendChild(createEditButton(job));
@@ -5126,10 +5272,119 @@
       pickupJobs.forEach(job => pickupList.appendChild(createPickupCard(job)));
     }
 
+    function getPickupWaitingDays(job) {
+      const key = getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt);
+      return key ? Math.max(0, Math.round((parseDateKey(currentDenverDate) - parseDateKey(key)) / 86400000)) : 0;
+    }
+    function validHistoryRange() {
+      const from = document.getElementById("historyFrom").value;
+      const to = document.getElementById("historyTo").value;
+      return !from || !to || from <= to;
+    }
+    function matchesHistoryDateRange(date) {
+      const from = document.getElementById("historyFrom").value;
+      const to = document.getElementById("historyTo").value;
+      return validHistoryRange() && (!from || date >= from) && (!to || date <= to);
+    }
+    function getHistoryRangeLabel() {
+      const from = document.getElementById("historyFrom").value;
+      const to = document.getElementById("historyTo").value;
+      return `${from ? formatDateLabel(from) : "Beginning"} through ${to ? formatDateLabel(to) : "all dates"}`;
+    }
+    function findDuplicates(candidate, excludedId = "") {
+      const clean = value => String(value || "").trim().toLowerCase();
+      return jobs.filter(job => job.id !== excludedId &&
+        ((clean(candidate.jobNumber) && clean(candidate.jobNumber) === clean(job.jobNumber)) ||
+         (clean(candidate.poNumber) && clean(candidate.poNumber) === clean(job.poNumber))));
+    }
+    function confirmDuplicate(candidate, excludedId = "") {
+      const duplicates = findDuplicates(candidate, excludedId);
+      if (!duplicates.length) return true;
+      return window.confirm(`Possible duplicate: ${duplicates.length} existing job(s) share this job number or PO number.\n\n${duplicates.slice(0,5).map(job => `${job.customerName} • Job ${job.jobNumber || "—"} • PO ${job.poNumber || "—"} • ${job.deliveryDate}`).join("\n")}\n\nSave anyway?`);
+    }
+    function csvCell(value) {
+      let text = String(value ?? "");
+      // Keep user text from being interpreted as spreadsheet formulas.
+      if (/^[\s]*[=+\-@]/.test(text) || /^[\t\r\n]/.test(text)) text = "'" + text;
+      return '"' + text.replace(/"/g, '""') + '"';
+    }
+    function buildHistoryCsv(list) {
+      const rows = [["Delivery date", "Customer", "Job number", "PO number", "Address", "Route", "Status", "Rush", "Notes", "Added date", "Completed at (Denver)"]];
+      for (const job of list) rows.push([job.deliveryDate, job.customerName, job.jobNumber, job.poNumber, job.address, job.route, job.status === "pickedUp" ? "Picked Up" : job.status, job.isRush ? "Yes" : "No", job.notes, getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt), getTimestampMillis(job.deliveredAt) ? new Date(getTimestampMillis(job.deliveredAt)).toLocaleString("en-US", {timeZone:DENVER_TZ}) : ""]);
+      return '\uFEFF' + rows.map(row => row.map(csvCell).join(",")).join("\r\n");
+    }
+    function exportHistoryCsv() {
+      if (!validHistoryRange()) return;
+      const blob = new Blob([buildHistoryCsv(getHistoryJobsForReport())], {type:"text/csv;charset=utf-8;"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = `pioneer-history-${currentDenverDate}.csv`;
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    const recentUndoActions = [];
+    let undoBusy = false;
+    function renderUndo() {
+      const panel = document.getElementById("undoPanel");
+      panel.hidden = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const latest = recentUndoActions.at(-1);
+      document.getElementById("undoLabel").textContent = latest ? `${latest.completed ? "Delivered" : "Recent change"}: ${latest.customerName}. Undo is available until this page closes.` : "";
+      document.getElementById("undoRecent").disabled = undoBusy || !latest;
+      document.getElementById("undoRecent").title = latest ? `Undo change to ${latest.customerName}` : "No recent changes to undo";
+      document.getElementById("dismissUndo").hidden = !latest;
+    }
+    async function updateJobWithUndo(reference, updates, requireActive = false) {
+      const token = crypto.randomUUID();
+      const changedAt = new Date();
+      const action = await runTransaction(db, async transaction => {
+        const snapshot = await transaction.get(reference);
+        if (!snapshot.exists()) throw new Error("This job no longer exists.");
+        const previous = snapshot.data();
+        if (requireActive && (previous.status !== "active" || previous.deliveredAt)) throw new Error("This stop has already changed. Refresh its status before completing it.");
+        const before = {};
+        for (const key of Object.keys(updates)) before[key] = previous[key] ?? null;
+        transaction.update(reference, {...updates, updatedAt:changedAt, undoToken:token});
+        return {reference, before, token, changedAt, customerName:previous.customerName || "Job", completed:updates.status === "delivered"};
+      });
+      recentUndoActions.push(action);
+      if (recentUndoActions.length > 10) recentUndoActions.shift();
+      renderUndo();
+    }
+    async function undoRecentAction() {
+      if (undoBusy || !recentUndoActions.length) return;
+      undoBusy = true; renderUndo();
+      const action = recentUndoActions.at(-1);
+      try {
+        await runTransaction(db, async transaction => {
+          const snapshot = await transaction.get(action.reference);
+          if (!snapshot.exists() || snapshot.data().undoToken !== action.token || getTimestampMillis(snapshot.data().updatedAt) !== action.changedAt.getTime()) {
+            throw new Error("This job changed after your action. Undo was not applied; review the current job instead.");
+          }
+          transaction.update(action.reference, {...action.before, updatedAt:serverTimestamp(), undoToken:null});
+        });
+        recentUndoActions.pop();
+        await logActivity("undo", "Recent change undone", `${action.customerName}: previous values restored.`);
+        setNotification(`Undid the recent change to ${action.customerName}.`, "success");
+      } catch (error) {
+        window.alert(error.message || "Could not undo this change. Please try again.");
+      } finally { undoBusy = false; renderUndo(); }
+    }
+
+    function matchesHistorySearch(job) {
+      const terms = (document.getElementById("historySearch")?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const status = job.status === "pickedUp" ? "picked up" : job.status;
+      const text = [job.customerName, job.jobNumber, job.poNumber, job.address, job.notes, job.route, status, job.deliveryDate, formatDateLabel(job.deliveryDate)].join(" ").toLowerCase();
+      return terms.every(term => text.includes(term));
+    }
+
     function renderHistory() {
+      const invalid = !validHistoryRange();
+      document.getElementById("historyRangeError").textContent = invalid ? "From date must be on or before Through date." : "";
+      document.getElementById("exportHistory").disabled = invalid;
+      printHistoryBtn.disabled = invalid;
       historyList.innerHTML = "";
       const historyJobs = jobs
-        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .filter(job => matchesHistoryDateRange(job.deliveryDate) && matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -5143,10 +5398,10 @@
           return (a.order ?? 0) - (b.order ?? 0);
         });
 
-      historySummaryChip.textContent = `${historyJobs.length} job${historyJobs.length === 1 ? "" : "s"} in the last 30 days`;
+      historySummaryChip.textContent = `${historyJobs.length} matching job${historyJobs.length === 1 ? "" : "s"} • ${getHistoryRangeLabel()}`;
 
       if (!historyJobs.length) {
-        historyList.innerHTML = `<div class="empty-state">No shipment history in the last 30 days yet.</div>`;
+        historyList.innerHTML = `<div class="empty-state">No matching shipments. Adjust the dates or clear the search.</div>`;
         return;
       }
 
@@ -5162,6 +5417,7 @@
           const delivered = dayJobs.filter(job => job.status === "delivered").length;
           const group = document.createElement("details");
           group.className = "history-day-group";
+          group.open = !!document.getElementById("historySearch").value.trim();
           group.innerHTML = `
             <summary class="history-day-toggle">
               <div class="history-day-header">
@@ -5498,7 +5754,7 @@
       else newOrderList.splice(targetIndex, 0, draggedJob);
 
       try {
-        await updateDoc(doc(db, "deliveryJobs", draggedJobId), {
+        await updateJobWithUndo(doc(db, "deliveryJobs", draggedJobId), {
           route: targetRoute,
           status: "active",
           deliveryDate: managerViewDate
@@ -5595,7 +5851,7 @@ Thank you.`;
 
     function getHistoryJobsForReport() {
       return jobs
-        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .filter(job => matchesHistoryDateRange(job.deliveryDate) && matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -5669,7 +5925,8 @@ Thank you.`;
           </head>
           <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
             <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
-            <p style="margin:0 0 20px; color:#6b7280;">History Report - Last 30 Days (${getDenverDateTimeLabel()} Denver time)</p>
+            <p style="margin:0 0 20px; color:#6b7280;">History Report - ${escapeHtml(getHistoryRangeLabel())} (${getDenverDateTimeLabel()} Denver time)</p>
+            ${document.getElementById("historySearch").value.trim() ? `<p>Search: ${escapeHtml(document.getElementById("historySearch").value.trim())}</p>` : ""}
 
             <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:24px;">
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">History Jobs</div><div style="font-size:24px; font-weight:bold;">${historyJobs.length}</div></div>
@@ -5677,7 +5934,7 @@ Thank you.`;
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Days Covered</div><div style="font-size:24px; font-weight:bold;">${Object.keys(grouped).length}</div></div>
             </div>
 
-            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No shipment history in the last 30 days yet.</div>`}
+            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No matching shipment history for the selected dates.</div>`}
           </body>
         </html>
       `;
@@ -5785,7 +6042,9 @@ Thank you.`;
       }
     }
 
+    document.addEventListener("webkitfullscreenchange", renderUndo);
     document.addEventListener("fullscreenchange", () => {
+      renderUndo();
       const isFullscreen = !!document.fullscreenElement;
       fullscreenBtn.textContent = isFullscreen ? "Exit Full Screen" : "Full Screen";
 
@@ -5824,6 +6083,7 @@ Thank you.`;
         isPickup: pickupDeliveryInput.checked,
         order: nextOrder,
         createdAt: serverTimestamp(),
+        pickupAddedAt: isCustomerPickupRoute(routeValue) ? serverTimestamp() : null,
         updatedAt: serverTimestamp()
       };
 
@@ -5832,6 +6092,7 @@ Thank you.`;
         return;
       }
 
+      if (!confirmDuplicate(newJob)) { statusMessage.textContent = "Addition canceled."; return; }
       try {
         await addDoc(jobsCollection, newJob);
         await logActivity("added", "New delivery added", `${newJob.customerName} was added to ${newJob.route} for ${formatDateLabel(newJob.deliveryDate)}.`);
@@ -5883,13 +6144,16 @@ Thank you.`;
         const completedAtValue = editDeliveredAtInput?.value || "";
         const completedAtDate = completedAtValue ? new Date(completedAtValue) : null;
 
-        await updateDoc(doc(db, "deliveryJobs", editingJobId), {
+        if (!confirmDuplicate({ jobNumber: editJobNumberInput.value, poNumber: editPoNumberInput.value }, editingJobId)) return;
+        await updateJobWithUndo(doc(db, "deliveryJobs", editingJobId), {
           customerName: editCustomerNameInput.value.trim(),
           jobNumber: editJobNumberInput.value.trim(),
           poNumber: editPoNumberInput.value.trim(),
           address: editAddressInput.value.trim(),
           notes: editDeliveryNotesInput.value.trim(),
           route: selectedRoute,
+          ...(isCustomerPickupRoute(selectedRoute) && !isCustomerPickupRoute(jobs.find(job => job.id === editingJobId)?.route)
+            ? { pickupAddedAt: serverTimestamp() } : {}),
           deliveryDate: selectedDate,
           status: selectedStatus,
           isRush,
@@ -5937,6 +6201,20 @@ Thank you.`;
 
     mainPageBtn.addEventListener("click", showMainPage);
     fullPageBtn.addEventListener("click", showFullPage);
+    document.getElementById("historyFrom").value = addDaysToDateKey(currentDenverDate, -29);
+    document.getElementById("historyTo").value = currentDenverDate;
+    for (const id of ["historyFrom", "historyTo"]) document.getElementById(id).addEventListener("change", renderHistory);
+    document.getElementById("historyAllDates").addEventListener("click", () => { document.getElementById("historyFrom").value = ""; document.getElementById("historyTo").value = ""; renderHistory(); });
+    document.getElementById("history30Days").addEventListener("click", () => { document.getElementById("historyFrom").value = addDaysToDateKey(currentDenverDate, -29); document.getElementById("historyTo").value = currentDenverDate; renderHistory(); });
+    document.getElementById("exportHistory").addEventListener("click", exportHistoryCsv);
+    document.getElementById("dismissUndo").addEventListener("click", () => { if (!undoBusy) { recentUndoActions.pop(); renderUndo(); } });
+    document.getElementById("undoRecent").addEventListener("click", undoRecentAction);
+    document.getElementById("historySearch").addEventListener("input", renderHistory);
+    document.getElementById("clearHistorySearch").addEventListener("click", () => {
+      document.getElementById("historySearch").value = "";
+      renderHistory();
+      document.getElementById("historySearch").focus();
+    });
     historyPageBtn.addEventListener("click", showHistoryPage);
     if (adminPageBtn) adminPageBtn.addEventListener("click", showAdminPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
@@ -6041,77 +6319,61 @@ Thank you.`;
       return job.status === "delivered" || job.status === "pickedUp" || !!job.deliveredAt;
     }
 
-    function getDenverDateKeyFromTimestamp(raw) {
-      const millis = getTimestampMillis(raw);
-      if (!millis) return "";
-      return new Intl.DateTimeFormat("en-CA", {
-        timeZone: DENVER_TZ,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      }).format(new Date(millis));
-    }
-
-    function getCompletedStatusForJob(job) {
-      if (job?.status === "pickedUp") return "pickedUp";
-      if (job?.status === "delivered") return "delivered";
-      return isCustomerPickupRoute(job?.route) ? "pickedUp" : "delivered";
-    }
-
     function shouldAutoRolloverJob(job, todayKey) {
-      if (!job) return false;
-      if (job.status !== "active") return false;
-      if (isJobCompleted(job)) return false;
-      if (job.deliveredAt) return false;
+      if (!job || isJobCompleted(job) || job.status !== "active") return false;
       if (!isRolloverRoute(job)) return false;
       return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
     }
 
-    function getBadCompletedRolloverFix(job, todayKey) {
-      if (!job || !isJobCompleted(job)) return null;
+    function getCompletedRolloverRepairTarget(job, todayKey = currentDenverDate) {
+      if (!job || !isJobCompleted(job) || !job.rolledFromDate) return null;
+      if (job.deliveryDate !== todayKey) return null;
 
-      const completedDate = getDenverDateKeyFromTimestamp(job.deliveredAt);
-      const preferredDate = job.rolledFromDate || completedDate;
-      if (!preferredDate) return null;
-
-      const wasPushedForward = parseDateKey(job.deliveryDate) > parseDateKey(preferredDate);
-      const isCurrentBadRollover = job.rolledFromDate && job.deliveryDate !== job.rolledFromDate;
-      const completedBeforeTodayButShowingToday = completedDate && parseDateKey(completedDate) < parseDateKey(todayKey) && job.deliveryDate === todayKey;
-
-      if (!wasPushedForward && !isCurrentBadRollover && !completedBeforeTodayButShowingToday) return null;
+      const deliveredDateKey = getDenverDateKeyFromTimestamp(job.deliveredAt);
+      if (!deliveredDateKey) return null;
+      if (parseDateKey(deliveredDateKey).getTime() >= parseDateKey(job.deliveryDate).getTime()) return null;
 
       return {
-        deliveryDate: preferredDate,
-        status: getCompletedStatusForJob(job),
-        order: 0,
-        rolledFromDate: "",
-        rolledOverAt: null,
-        updatedAt: serverTimestamp()
+        deliveryDate: deliveredDateKey,
+        rolledFromDate: deliveredDateKey === job.rolledFromDate ? "" : job.rolledFromDate
       };
     }
 
-    async function cleanupBadCompletedRollovers(todayKey = currentDenverDate) {
-      const fixes = jobs
-        .map(job => ({ job, fix: getBadCompletedRolloverFix(job, todayKey) }))
-        .filter(item => item.fix);
+    async function repairCompletedRolledOverJobs(todayKey = currentDenverDate) {
+      if (completedRolloverRepairAttemptDate === todayKey || completedRolloverRepairInProgress) return;
 
-      if (!fixes.length || rolloverCleanupInProgress) return;
+      const repairs = jobs
+        .map(job => ({ job, target: getCompletedRolloverRepairTarget(job, todayKey) }))
+        .filter(entry => entry.target);
 
-      const cleanupKey = `${todayKey}-${fixes.map(item => item.job.id).sort().join("|")}`;
-      if (cleanupKey === lastRolloverCleanupKey) return;
+      completedRolloverRepairInProgress = true;
+      completedRolloverRepairAttemptDate = todayKey;
 
-      rolloverCleanupInProgress = true;
-      lastRolloverCleanupKey = cleanupKey;
+      if (!repairs.length) {
+        completedRolloverRepairInProgress = false;
+        return;
+      }
 
       try {
-        await Promise.all(fixes.map(({ job, fix }) => updateDoc(doc(db, "deliveryJobs", job.id), fix)));
-        await logActivity("rollover-cleanup", "Delivered rollovers fixed", `${fixes.length} completed delivery${fixes.length === 1 ? "" : "ies"} moved back to the correct completed date.`);
-        setNotification(`${fixes.length} completed delivery${fixes.length === 1 ? "" : "ies"} fixed so delivered jobs no longer roll over.`, "success");
+        await Promise.all(repairs.map(({ job, target }) =>
+          updateDoc(doc(db, "deliveryJobs", job.id), {
+            deliveryDate: target.deliveryDate,
+            rolledFromDate: target.rolledFromDate,
+            updatedAt: serverTimestamp()
+          })
+        ));
+
+        await logActivity(
+          "rollover-repair",
+          "Completed deliveries restored",
+          `${repairs.length} completed delivery${repairs.length === 1 ? "" : "ies"} were moved back to their delivered date.`
+        );
+        setNotification(`${repairs.length} completed roll-over job${repairs.length === 1 ? "" : "s"} restored to the correct day.`, "warning");
       } catch (error) {
         console.error(error);
-        setNotification("Could not clean up completed rollovers.", "danger");
+        setNotification("Could not repair completed roll-over deliveries.", "danger");
       } finally {
-        rolloverCleanupInProgress = false;
+        completedRolloverRepairInProgress = false;
       }
     }
 
@@ -6184,7 +6446,6 @@ Thank you.`;
       if (outsideViewDate === oldDate) outsideViewDate = latestDenverDate;
       if (pickupViewDate === oldDate) pickupViewDate = latestDenverDate;
 
-      cleanupBadCompletedRollovers(latestDenverDate);
       rolloverUnfinishedJobsToToday(latestDenverDate);
       renderAll();
       setNotification(`Today's Schedule switched automatically to ${formatDateLabel(latestDenverDate)} using Denver time.`, "warning");
@@ -6242,7 +6503,9 @@ Thank you.`;
         }
 
         renderAll();
-        cleanupBadCompletedRollovers(currentDenverDate);
+        if (!hasLoadedInitialSnapshot) {
+          repairCompletedRolledOverJobs(currentDenverDate);
+        }
         rolloverUnfinishedJobsToToday(currentDenverDate);
         renderLatestAction();
 
