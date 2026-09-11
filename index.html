@@ -2864,11 +2864,7 @@
     #undoPanel { display:inline-flex; align-items:center; gap:8px; }
     #undoPanel[hidden], .is-fullscreen #undoPanel, :fullscreen #undoPanel { display:none !important; }
     #undoLabel { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-    #deliveryConfirm { width:min(420px, calc(100vw - 32px)); box-sizing:border-box; border:0; border-radius:16px; padding:24px; color:#172033; }
-    #deliveryConfirm::backdrop { background:rgb(0 0 0 / 60%); }
-    #deliveryConfirm .confirm-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
-    #deliveryConfirm button, #undoPanel button { min-height:48px; min-width:88px; font-size:16px; }
-    #deliveryConfirmAddress { white-space:pre-wrap; overflow-wrap:anywhere; }
+    #undoPanel button { min-height:48px; min-width:88px; font-size:16px; }
     #scheduleProgress { display:none; flex:1 1 220px; min-width:120px; margin:0; padding:6px 10px; border-radius:10px; background:#eff6ff; color:#172033; }
     .is-fullscreen #scheduleProgress, :fullscreen #scheduleProgress { display:block !important; }
     #scheduleProgressText { display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
@@ -3444,22 +3440,12 @@
     </div>
   </div>
 
-  <dialog id="deliveryConfirm" aria-labelledby="deliveryConfirmTitle" aria-describedby="deliveryConfirmCustomer deliveryConfirmAddress">
-    <h2 id="deliveryConfirmTitle">Mark this stop delivered?</h2>
-    <strong id="deliveryConfirmCustomer"></strong>
-    <p id="deliveryConfirmAddress"></p>
-    <p>Confirm only after the delivery is complete. You can undo afterward.</p>
-    <form method="dialog" class="confirm-actions">
-      <button value="cancel" class="small-btn" autofocus>Not yet</button>
-      <button value="confirm" class="small-btn">Confirm delivered</button>
-    </form>
-  </dialog>
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getFirestore,
-      runTransaction,
+      getDoc,
       collection,
       addDoc,
       updateDoc,
@@ -3492,7 +3478,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.09.11 — Pickup tracking, searchable history, driver improvements";
+    const CODE_VERSION = "2026.09.11 — Delivery and Undo save repair";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let lastActionKey = "";
@@ -4560,35 +4546,24 @@
     }
 
     const pendingDeliveries = new Set();
-    function confirmDelivery(job) {
-      const dialog = document.getElementById("deliveryConfirm");
-      if (dialog.open) return Promise.resolve(false);
-      (document.fullscreenElement || document.webkitFullscreenElement || document.body).appendChild(dialog);
-      document.getElementById("deliveryConfirmCustomer").textContent = `${job.customerName}${job.jobNumber ? ` • Job #${job.jobNumber}` : ""}`;
-      document.getElementById("deliveryConfirmAddress").textContent = job.address;
-      dialog.returnValue = "cancel";
-      return new Promise(resolve => {
-        dialog.addEventListener("close", () => resolve(dialog.returnValue === "confirm"), {once:true});
-        dialog.showModal();
-      });
-    }
     async function markJobDelivered(job) {
       if (pendingDeliveries.has(job.id) || job.status !== "active") return;
       pendingDeliveries.add(job.id);
       try {
-        if (!await confirmDelivery(job)) return;
         await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
           status: "delivered",
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
         }, true);
-        await logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`);
+        void logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`).catch(console.error);
         statusMessage.textContent = "Delivery marked complete.";
         setNotification(`${job.customerName} marked completed.`, "success");
       } catch (error) {
         console.error(error);
-        statusMessage.textContent = "Could not mark delivery complete.";
-        setNotification("Could not mark delivery complete.", "danger");
+        const message = `Could not save ${job.customerName} as delivered. ${error.code || error.message || "Please check your connection and try again."}`;
+        statusMessage.textContent = message;
+        setNotification(message, "danger");
+        window.alert(message);
       } finally {
         pendingDeliveries.delete(job.id);
       }
@@ -5329,44 +5304,69 @@
       panel.hidden = !!(document.fullscreenElement || document.webkitFullscreenElement);
       const latest = recentUndoActions.at(-1);
       document.getElementById("undoLabel").textContent = latest ? `${latest.completed ? "Delivered" : "Recent change"}: ${latest.customerName}. Undo is available until this page closes.` : "";
-      document.getElementById("undoRecent").disabled = undoBusy || !latest;
-      document.getElementById("undoRecent").title = latest ? `Undo change to ${latest.customerName}` : "No recent changes to undo";
+      document.getElementById("undoRecent").disabled = undoBusy || !latest?.ready;
+      document.getElementById("undoRecent").textContent = undoBusy ? "Undoing…" : "Undo";
+      document.getElementById("undoRecent").title = latest ? (latest.ready ? `Undo change to ${latest.customerName}` : "Preparing Undo…") : "No recent changes to undo";
       document.getElementById("dismissUndo").hidden = !latest;
     }
     async function updateJobWithUndo(reference, updates, requireActive = false) {
-      const token = crypto.randomUUID();
-      const changedAt = new Date();
-      const action = await runTransaction(db, async transaction => {
-        const snapshot = await transaction.get(reference);
-        if (!snapshot.exists()) throw new Error("This job no longer exists.");
-        const previous = snapshot.data();
-        if (requireActive && (previous.status !== "active" || previous.deliveredAt)) throw new Error("This stop has already changed. Refresh its status before completing it.");
-        const before = {};
-        for (const key of Object.keys(updates)) before[key] = previous[key] ?? null;
-        transaction.update(reference, {...updates, updatedAt:changedAt, undoToken:token});
-        return {reference, before, token, changedAt, customerName:previous.customerName || "Job", completed:updates.status === "delivered"};
-      });
+      const previous = jobs.find(job => job.id === reference.id);
+      if (requireActive && previous && isJobCompleted(previous)) throw new Error("This stop is already complete.");
+      const before = {};
+      if (previous) for (const key of Object.keys(updates)) before[key] = previous[key] ?? null;
+
+      // Save with the original fields and server timestamps. Undo must never
+      // prevent a delivery update or require an extra field in database rules.
+      await updateDoc(reference, updates);
+      if (!previous) return;
+      const action = {reference, before, customerName:previous.customerName || "Job", completed:updates.status === "delivered", ready:false};
       recentUndoActions.push(action);
       if (recentUndoActions.length > 10) recentUndoActions.shift();
       renderUndo();
+      void prepareUndo(action, updates);
+    }
+    async function prepareUndo(action, updates) {
+      try {
+        const snapshot = await getDoc(action.reference);
+        if (!snapshot.exists() || snapshot.metadata.hasPendingWrites || snapshot.metadata.fromCache) throw new Error("Could not verify the saved version for Undo.");
+        const saved = snapshot.data();
+        for (const [key, value] of Object.entries(updates)) {
+          if (value === null || typeof value !== "object") {
+            if (saved[key] !== value) throw new Error("The job changed before Undo could be prepared.");
+          }
+        }
+        if (!getTimestampMillis(saved.updatedAt)) throw new Error("The saved job has no version timestamp.");
+        action.changedAt = saved.updatedAt;
+        action.ready = true;
+      } catch (error) {
+        console.warn("Change saved, but Undo is unavailable:", error);
+        const index = recentUndoActions.indexOf(action);
+        if (index !== -1) recentUndoActions.splice(index, 1);
+      } finally { renderUndo(); }
     }
     async function undoRecentAction() {
-      if (undoBusy || !recentUndoActions.length) return;
+      if (undoBusy || !recentUndoActions.length || !recentUndoActions.at(-1).ready) return;
       undoBusy = true; renderUndo();
       const action = recentUndoActions.at(-1);
       try {
-        await runTransaction(db, async transaction => {
-          const snapshot = await transaction.get(action.reference);
-          if (!snapshot.exists() || snapshot.data().undoToken !== action.token || getTimestampMillis(snapshot.data().updatedAt) !== action.changedAt.getTime()) {
-            throw new Error("This job changed after your action. Undo was not applied; review the current job instead.");
-          }
-          transaction.update(action.reference, {...action.before, updatedAt:serverTimestamp(), undoToken:null});
-        });
-        recentUndoActions.pop();
-        await logActivity("undo", "Recent change undone", `${action.customerName}: previous values restored.`);
+        // Check the latest version received by the existing live listener.
+        // This catches observed later edits without a transaction read/retry.
+        // It is not an atomic check against simultaneous edits on other devices.
+        const currentJob = jobs.find(job => job.id === action.reference.id);
+        const currentVersion = currentJob?.updatedAt;
+        const sameVersion = currentVersion && (typeof currentVersion.isEqual === "function"
+          ? currentVersion.isEqual(action.changedAt)
+          : getTimestampMillis(currentVersion) === getTimestampMillis(action.changedAt));
+        if (!sameVersion) {
+          throw new Error("This job changed after your action or its latest version has not loaded. Undo was not applied; review the current job instead.");
+        }
+        await updateDoc(action.reference, {...action.before, updatedAt:serverTimestamp()});
+        const actionIndex = recentUndoActions.indexOf(action);
+        if (actionIndex !== -1) recentUndoActions.splice(actionIndex, 1);
+        void logActivity("undo", "Recent change undone", `${action.customerName}: previous values restored.`).catch(console.error);
         setNotification(`Undid the recent change to ${action.customerName}.`, "success");
       } catch (error) {
-        window.alert(error.message || "Could not undo this change. Please try again.");
+        window.alert(`Could not undo this change. ${error.code ? `${error.code}: ` : ""}${error.message || "Please try again."}`);
       } finally { undoBusy = false; renderUndo(); }
     }
 
