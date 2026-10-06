@@ -754,9 +754,6 @@
       min-width: 0;
       height: auto;
       align-self: start;
-      cursor: pointer;
-      -webkit-touch-callout: none;
-      user-select: none;
     }
 
     .schedule-card.rush-card {
@@ -926,6 +923,10 @@
       text-align: center;
       color: #94a3b8;
       font-size: 0.78rem;
+    }
+    .schedule-rollover-btn {
+      width: auto; background: #fff7ed; border: 1px solid #fdba74;
+      color: #9a3412; font-size: 0.8rem; font-weight: bold; padding: 8px;
     }
     @media (pointer: coarse) {
       .schedule-card { -webkit-touch-callout: none; user-select: none; touch-action: pan-y; }
@@ -2947,44 +2948,6 @@
       }
     }
 
-  
-    #scheduleProgress { display:none; flex:1 1 220px; min-width:120px; margin:0; padding:6px 10px; border-radius:10px; background:#eff6ff; color:#172033; }
-    .is-fullscreen #scheduleProgress, :fullscreen #scheduleProgress { display:block !important; }
-    #scheduleProgressText { display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
-    #scheduleProgressBar { display:block; width:100%; height:14px; accent-color:#15803d; border:0; border-radius:8px; overflow:hidden; }
-    #scheduleProgressBar::-webkit-progress-bar { background:#dbe3ec; }
-    #scheduleProgressBar::-webkit-progress-value { background:#15803d; }
-    #scheduleProgressBar::-moz-progress-bar { background:#15803d; }
-    .is-fullscreen .schedule-toolbar {
-      display:flex;
-      flex-direction:row;
-      flex-wrap:nowrap;
-      align-items:center;
-      justify-content:flex-start;
-      gap:8px;
-    }
-    .is-fullscreen .schedule-date-wrap {
-      flex:0 0 185px;
-      width:185px;
-      min-width:0;
-      margin-right:0;
-    }
-    .is-fullscreen #printSheetBtn,
-    .is-fullscreen #fullscreenBtn {
-      flex:0 0 auto;
-      width:auto;
-      white-space:nowrap;
-    }
-    .is-fullscreen #scheduleProgress {
-      flex:1 1 0;
-      min-width:120px;
-      width:auto;
-    }
-    .is-fullscreen #fullscreenTotals {
-      flex:0 0 auto;
-      flex-wrap:nowrap;
-      margin-left:0;
-    }
   </style>
 </head>
 
@@ -3058,10 +3021,6 @@
               </div>
               <button id="printSheetBtn" class="print-btn" type="button">Print Dispatch Sheet</button>
               <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
-              <div id="scheduleProgress">
-                <span id="scheduleProgressText" aria-live="polite">No stops scheduled</span>
-                <progress id="scheduleProgressBar" max="1" value="0" aria-label="Schedule completion"></progress>
-              </div>
               <div class="fullscreen-totals" id="fullscreenTotals">
                 <div class="fullscreen-total-chip">Today <strong id="fsActiveTodayCount">0</strong></div>
                 <div class="fullscreen-total-chip">Rush <strong id="fsRushCount">0</strong></div>
@@ -3425,12 +3384,6 @@
           <button id="verifyEmailBtn" type="button" class="secondary-btn">Send Verification Email</button>
           <button id="refreshAccountBtn" type="button" class="copy-btn">I Verified My Email</button>
         </div>
-        <form id="usernameForm" class="form-grid" style="margin-top:16px;">
-          <label for="accountUsername">Username</label>
-          <input id="accountUsername" required pattern="[A-Za-z0-9._-]{3,24}" autocomplete="username" placeholder="Choose your username" />
-          <button type="submit" class="primary-btn">Save Username</button>
-          <p class="muted">Already have an account? Set your username here to enable username sign-in.</p>
-        </form>
         <p id="accountMessage" role="status" aria-live="polite"></p>
       </div>
       <div id="adminAccessPanel" class="card" style="display:none;">
@@ -3455,12 +3408,8 @@
       </div>
       <form id="authForm" class="auth-grid">
         <div>
-          <label for="authEmail" id="authIdentifierLabel">Email or username</label>
-          <input id="authEmail" type="text" autocomplete="username" required />
-        </div>
-        <div id="signupUsernameWrap" class="is-hidden">
-          <label for="signupUsername">Username</label>
-          <input id="signupUsername" type="text" autocomplete="username" pattern="[A-Za-z0-9._-]{3,24}" placeholder="letters, numbers, . _ or -" />
+          <label for="authEmail" id="authIdentifierLabel">Email</label>
+          <input id="authEmail" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required />
         </div>
         <div>
           <label for="authPassword">Password</label>
@@ -3592,6 +3541,10 @@
           </div>
         </div>
 
+        <label class="checkbox-row">
+          <input id="editClearRollover" type="checkbox" />
+          <span>Clear incorrect rollover label — this delivery was originally scheduled for the selected date</span>
+        </label>
         <div class="summary-actions">
           <button class="primary-btn" type="submit">Save Changes</button>
           <button class="cancel-btn" id="cancelEditBtn" type="button">Cancel</button>
@@ -3654,13 +3607,11 @@
       onAuthStateChanged,
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
-      signInWithCustomToken,
       sendPasswordResetEmail,
       sendEmailVerification,
       reload,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAb0A3o4AAW8mh-FgXmmrzpXZBiFFTd32I",
@@ -3675,9 +3626,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const accountFunctions = getFunctions(app, "us-central1");
-    const claimUsername = httpsCallable(accountFunctions, "claimUsername");
-    const usernameSignIn = httpsCallable(accountFunctions, "usernameSignIn");
     const jobsCollection = collection(db, "deliveryJobs");
     const activityCollection = collection(db, "deliveryActivity");
     const ADMIN_EMAILS = new Set([
@@ -3690,7 +3638,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.10.06 — User settings, admin access, accounts, rollover and delivery action menu with front actions";
+    const CODE_VERSION = "2026.10.06 — Combined features, email login and delivery actions";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let completedRolloverRepairInProgress = false;
@@ -3930,8 +3878,6 @@
     const authPasswordInput = document.getElementById("authPassword");
     const authModalTitle = document.getElementById("authModalTitle");
     const authIdentifierLabel = document.getElementById("authIdentifierLabel");
-    const signupUsernameWrap = document.getElementById("signupUsernameWrap");
-    const signupUsernameInput = document.getElementById("signupUsername");
     const signInBtn = document.getElementById("signInBtn");
     const createAccountBtn = document.getElementById("createAccountBtn");
     const authStatusMessage = document.getElementById("authStatusMessage");
@@ -4042,6 +3988,7 @@
     const deliveryActionMoveBtn = document.getElementById("deliveryActionMoveBtn");
     const deliveryActionDeliverBtn = document.getElementById("deliveryActionDeliverBtn");
     const deliveryActionMapsBtn = document.getElementById("deliveryActionMapsBtn");
+
     const rolloverModalOverlay = document.getElementById("rolloverModalOverlay");
     const rolloverCloseBtn = document.getElementById("rolloverCloseBtn");
     const cancelRolloverBtn = document.getElementById("cancelRolloverBtn");
@@ -4051,7 +3998,6 @@
     if (settingsAdminMount && adminPage) settingsAdminMount.appendChild(adminPage);
 
     let liveAlertTimer = null;
-    let deliveryActionJobId = null;
     let rolloverJobId = null;
     let authMode = "sign-in";
     let tomorrowPreviewDismissedKey = "";
@@ -4480,6 +4426,22 @@
       }
     }
 
+    function isValidDeliveryDate(value) {
+      if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+      const date = new Date(value + "T12:00:00Z");
+      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }
+
+    function getValidRolloverOrigin(data, deliveryDate = data.deliveryDate) {
+      const origin = data.rolledFromDate;
+      if (!isValidDeliveryDate(deliveryDate) || !isValidDeliveryDate(origin) || origin >= deliveryDate) return "";
+      if (isValidDeliveryDate(data.originalDeliveryDate)) {
+        if (data.originalDeliveryDate >= deliveryDate) return "";
+        return origin < data.originalDeliveryDate ? data.originalDeliveryDate : origin;
+      }
+      return origin;
+    }
+
     function normalizeJob(id, data) {
       let deliveryDate = data.deliveryDate;
       const rawStatus = typeof data.status === "string" ? data.status.trim() : "";
@@ -4527,7 +4489,8 @@
         isRush: !!data.isRush,
         isPickup: normalizedRoute === "Customer Pickup" ? false : !!data.isPickup,
         order: typeof data.order === "number" ? data.order : 0,
-        rolledFromDate: data.rolledFromDate || "",
+        originalDeliveryDate: data.originalDeliveryDate || "",
+        rolledFromDate: getValidRolloverOrigin(data, deliveryDate),
         rolledOverAt: data.rolledOverAt || null,
         createdAt: data.createdAt || null,
         updatedAt: data.updatedAt || null,
@@ -4763,18 +4726,6 @@
       completedCount.textContent = completedTotal;
       historyCount.textContent = historyTotal;
 
-      const totalStops = south.length + north.length + local.length;
-      const completedStops = totalStops - activeToday;
-      const progress = document.getElementById("scheduleProgressBar");
-      const progressTextEl = document.getElementById("scheduleProgressText");
-      if (progress && progressTextEl) {
-        progress.max = totalStops || 1;
-        progress.value = completedStops;
-        const progressText = totalStops ? `${activeToday} stops left • ${completedStops} of ${totalStops} complete` : "No stops scheduled";
-        progressTextEl.textContent = progressText;
-        progress.setAttribute("aria-valuetext", progressText);
-      }
-
       fsActiveTodayCount.textContent = activeToday;
       fsRushCount.textContent = rushTotal;
       fsOutsideCount.textContent = outsideTotal;
@@ -4883,7 +4834,9 @@
     }
 
     function openEditDelivery(job) {
-      if (!ensureAdminAccess()) return;
+      if (!ensureSignedIn()) return;
+      deleteEditBtn.hidden = !isCurrentUserAdmin();
+      document.getElementById("editClearRollover").checked = false;
       editingJobId = job.id;
       editCustomerNameInput.value = job.customerName || "";
       editJobNumberInput.value = job.jobNumber || "";
@@ -5145,7 +5098,7 @@
       button.type = "button";
       button.className = "small-btn edit-btn";
       button.textContent = "Edit Delivery";
-      button.hidden = !isCurrentUserAdmin();
+      button.hidden = !currentUser;
       button.addEventListener("click", () => openEditDelivery(job));
       return button;
     }
@@ -5172,50 +5125,34 @@
         "auth/configuration-not-found": "Account registration is not enabled for this site yet. Contact the administrator.",
         "auth/too-many-requests": "Too many attempts. Please wait and try again.",
         "permission-denied": "Your account does not have permission for this action.",
-        "functions/unavailable": "The account service is unavailable. You can still sign in with your email.",
-        "functions/not-found": "The username service needs to be deployed. Please sign in with your email.",
-        "functions/internal": "The account service could not complete this request. Please sign in with your email.",
-        "functions/already-exists": "That username is already taken. Choose another.",
-        "functions/resource-exhausted": "Too many attempts. Please wait and try again.",
-        "functions/unauthenticated": "The username or password is incorrect."
+        "auth/user-disabled": "This account has been disabled. Contact the administrator.",
+        "auth/user-not-found": "The email or password is incorrect.",
+        "auth/wrong-password": "The email or password is incorrect."
       };
       return messages[error?.code] || "Authentication failed. Please try again.";
     }
 
-    function normalizeUsername(value) {
-      return String(value || "").trim().toLowerCase();
-    }
-
-    function isValidUsername(value) {
-      return /^[a-z0-9._-]{3,24}$/.test(value);
-    }
-
-    async function loginWithIdentifier(identifier, password) {
-      const value = String(identifier || "").trim();
-      if (value.includes("@")) return signInWithEmailAndPassword(auth, value, password);
-      const username = normalizeUsername(value);
-      if (!isValidUsername(username)) throw new Error("Enter a valid email address or username.");
-      const result = await usernameSignIn({ username, password });
-      return signInWithCustomToken(auth, result.data.token);
+    async function authenticateAccount(mode, email, password) {
+      const address = String(email || "").trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("Enter a valid email address.");
+      return mode === "create"
+        ? createUserWithEmailAndPassword(auth, address, password)
+        : signInWithEmailAndPassword(auth, address, password);
     }
 
     function setAuthMode(mode) {
       const creating = mode === "create";
       authMode = mode;
       authModalTitle.textContent = creating ? "Create Account" : "Sign In";
-      authIdentifierLabel.textContent = creating ? "Email" : "Email or username";
+      authIdentifierLabel.textContent = "Email";
       signInBtn.textContent = creating ? "Create Account" : "Sign In";
       createAccountBtn.textContent = creating ? "Back to Sign In" : "Create Account";
-      signupUsernameWrap.classList.toggle("is-hidden", !creating);
-      signupUsernameInput.required = creating;
-      signupUsernameInput.disabled = !creating;
-      authEmailInput.type = creating ? "email" : "text";
+      authEmailInput.type = "email";
       authPasswordInput.autocomplete = creating ? "new-password" : "current-password";
       authEmailInput.value = "";
       authPasswordInput.value = "";
-      signupUsernameInput.value = "";
       authStatusMessage.textContent = creating
-        ? "Choose a username you can use to sign in later."
+        ? "Enter your email and a password with at least six characters."
         : "";
     }
 
@@ -5328,7 +5265,6 @@
         if (["google", "waze", "apple"].includes(profile.preferredMapApp)) {
           preferredMapApp = profile.preferredMapApp;
         }
-        document.getElementById("accountUsername").value = profile.username || "";
         document.getElementById("settingsSavedMessage").textContent = "";
         loadMapSettings();
         refreshMapButtons();
@@ -5612,7 +5548,7 @@
           }
           transaction.update(ref, {
             deliveryDate: nextDate,
-            rolledFromDate: snapshot.data().rolledFromDate || job.deliveryDate,
+            rolledFromDate: getValidRolloverOrigin(snapshot.data()) || job.deliveryDate,
             rolledOverAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             order: job.isRush ? -1 : getNextNonRushOrder({ ...job, deliveryDate: nextDate }, job.route, nextDate)
@@ -5626,6 +5562,8 @@
         confirmRolloverBtn.disabled = false;
       }
     }
+
+    let deliveryActionJobId = null;
 
     function openDeliveryActionMenu(job) {
       if (!job || job.status !== "active") return;
@@ -5657,10 +5595,10 @@
         origin = null;
       };
       card.addEventListener("pointerdown", event => {
-        if (job.status !== "active" || event.button !== 0) return;
-        if (event.target.closest("button, a, input, select, textarea")) return;
         clearPress();
         longPressTriggered = false;
+        if (job.status !== "active" || event.button !== 0) return;
+        if (event.target.closest("button, a, input, select, textarea")) return;
         origin = { x: event.clientX, y: event.clientY };
         timer = setTimeout(() => {
           if (!card.isConnected || currentPageView !== "full") return;
@@ -5674,6 +5612,8 @@
       }, { passive: true });
       ["pointerup", "pointercancel", "pointerleave"].forEach(name => card.addEventListener(name, clearPress));
       card.addEventListener("contextmenu", event => {
+        if (event.target.closest("button, a, input, select, textarea") || job.status !== "active" || currentPageView !== "full") return;
+        clearPress();
         event.preventDefault();
         openDeliveryActionMenu(jobs.find(item => item.id === job.id));
       });
@@ -5691,14 +5631,9 @@
       const statusClass = isDelivered ? "delivered-card" : "";
       const compactAddress = compactMultiline(job.address);
       const compactNotes = compactMultiline(job.notes);
-      const actionHtml = !isDelivered ? `
-        <div class="schedule-actions">
-          <button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button>
-          <button class="schedule-deliver-btn" type="button">Mark As Delivered</button>
-        </div>` : `
-        <div class="schedule-actions">
-          <button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button>
-        </div>`;
+      const actionHtml = !isDelivered
+        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button><button class="schedule-deliver-btn" type="button">Mark As Delivered</button></div>`
+        : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button></div>`;
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
@@ -5723,19 +5658,17 @@
         ${actionHtml}
       `;
 
+      addScheduleLongPress(card, job);
+
       const mapsBtn = card.querySelector(".schedule-maps-btn");
-      if (mapsBtn) mapsBtn.addEventListener("click", event => {
-        event.stopPropagation();
-        window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer");
-      });
+      if (mapsBtn) mapsBtn.addEventListener("click", () => window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer"));
 
       const deliverBtn = card.querySelector(".schedule-deliver-btn");
-      if (deliverBtn) deliverBtn.addEventListener("click", async event => {
-        event.stopPropagation();
-        await markJobDelivered(job);
-      });
-
-      addScheduleLongPress(card, job);
+      if (deliverBtn) {
+        deliverBtn.addEventListener("click", async () => {
+          await markJobDelivered(job);
+        });
+      }
       return card;
     }
 
@@ -6514,6 +6447,7 @@ Thank you.`;
         notes: deliveryNotesInput.value.trim(),
         route: routeValue,
         deliveryDate,
+        originalDeliveryDate: deliveryDate,
         status: "active",
         isRush,
         isPickup: pickupDeliveryInput.checked,
@@ -6566,7 +6500,7 @@ Thank you.`;
 
     editJobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!ensureAdminAccess()) return;
+      if (!ensureSignedIn()) return;
       if (!editingJobId) return;
 
       try {
@@ -6595,6 +6529,9 @@ Thank you.`;
           deliveredAt: selectedStatus === "active"
             ? null
             : (completedAtDate && Number.isFinite(completedAtDate.getTime()) ? completedAtDate : new Date(`${selectedDate}T12:00`)),
+          ...(document.getElementById("editClearRollover").checked ? {
+            originalDeliveryDate: selectedDate, rolledFromDate: "", rolledOverAt: null
+          } : {}),
           updatedAt: serverTimestamp()
         });
         await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()} was updated to ${selectedRoute} on ${formatDateLabel(selectedDate)} with status ${selectedStatus}.`);
@@ -6691,30 +6628,15 @@ Thank you.`;
       authBusy = true;
       signInBtn.disabled = createAccountBtn.disabled = true;
       authStatusMessage.textContent = authMode === "create" ? "Creating account…" : "Signing in…";
-      let created = false;
       try {
-        if (authMode === "create") {
-          const email = authEmailInput.value.trim().toLowerCase();
-          const username = normalizeUsername(signupUsernameInput.value);
-          if (!isValidUsername(username)) throw new Error("Username must be 3–24 characters using letters, numbers, . _ or -.");
-          await createUserWithEmailAndPassword(auth, email, authPasswordInput.value);
-          created = true;
-          try {
-            await claimUsername({ username });
-          } catch (usernameError) {
-            console.warn("Username could not be saved during account creation; the account itself is still valid.", usernameError);
-          }
-        } else {
-          await loginWithIdentifier(authEmailInput.value, authPasswordInput.value);
-        }
+        const credential = await authenticateAccount(authMode, authEmailInput.value, authPasswordInput.value);
+        currentUser = credential.user;
         authBusy = false;
         closeAuthModal();
         await loadUserMapPreference(auth.currentUser);
         showSettingsPage();
       } catch (error) {
-        authStatusMessage.textContent = created
-          ? "Your email account was created, but your username could not be saved. " + friendlyAuthError(error) + " Sign in with your email, then save a username in User Settings."
-          : (!error.code ? error.message : friendlyAuthError(error));
+        authStatusMessage.textContent = !error.code ? error.message : friendlyAuthError(error);
         authPasswordInput.value = "";
       } finally {
         authBusy = false;
@@ -6729,27 +6651,13 @@ Thank you.`;
         return;
       }
       setAuthMode("create");
-      signupUsernameInput.focus();
+      authEmailInput.focus();
     });
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       watchAccountRole(user);
       await loadUserMapPreference(user);
-    });
-
-    document.getElementById("usernameForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      if (!currentUser) return;
-      const button = event.currentTarget.querySelector("button");
-      const message = document.getElementById("accountMessage");
-      button.disabled = true;
-      message.textContent = "Saving username…";
-      try {
-        await claimUsername({ username: normalizeUsername(document.getElementById("accountUsername").value) });
-        message.textContent = "Username saved. You can sign in with your email or username.";
-      } catch (error) { message.textContent = friendlyAuthError(error); }
-      finally { button.disabled = false; }
     });
 
     document.getElementById("verifyEmailBtn").addEventListener("click", async event => {
@@ -6911,6 +6819,7 @@ Thank you.`;
     function shouldAutoRolloverJob(job, todayKey) {
       if (!job || isJobCompleted(job) || job.status !== "active") return false;
       if (!isRolloverRoute(job)) return false;
+      if (!isValidDeliveryDate(job.deliveryDate) || !isValidDeliveryDate(todayKey)) return false;
       return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
     }
 
