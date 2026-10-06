@@ -77,6 +77,52 @@
       width: 100%;
     }
 
+    .account-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .account-status {
+      color: #475569;
+      font-size: 0.9rem;
+    }
+
+    .account-btn {
+      width: auto;
+      padding: 9px 14px;
+      background: #334155;
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .auth-actions button {
+      flex: 1 1 180px;
+    }
+
+    .contact-note {
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 0.85rem;
+      line-height: 1.35;
+    }
+
     .card {
       background: #fff;
       border-radius: 16px;
@@ -138,6 +184,46 @@
       grid-template-columns: repeat(5, 1fr);
       gap: 8px;
       margin-bottom: 16px;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .settings-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #dbe3ee;
+      border-radius: 12px;
+      background: #f8fafc;
+      cursor: pointer;
+    }
+
+    .settings-option input {
+      width: auto;
+      margin: 3px 0 0;
+      flex: 0 0 auto;
+    }
+
+    .settings-option strong,
+    .settings-option span {
+      display: block;
+    }
+
+    .settings-option span {
+      margin-top: 3px;
+      color: #64748b;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .settings-saved {
+      min-height: 22px;
+      color: #166534;
+      font-weight: 700;
     }
 
     .tab-btn {
@@ -294,43 +380,6 @@
       font-size: 0.95rem;
       color: #374151;
       min-height: 20px;
-    }
-
-    .notification-box {
-      border-left: 6px solid #2563eb;
-      background: #eff6ff;
-      padding: 14px 16px;
-    }
-
-    .notification-box.success {
-      border-left-color: #16a34a;
-      background: #f0fdf4;
-    }
-
-    .notification-box.warning {
-      border-left-color: #f59e0b;
-      background: #fffbeb;
-    }
-
-    .notification-box.danger {
-      border-left-color: #dc2626;
-      background: #fef2f2;
-    }
-
-    .notification-title {
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .notification-text {
-      margin: 0;
-      color: #374151;
-    }
-
-    .notification-time {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      color: #6b7280;
     }
 
     .totals-grid {
@@ -589,7 +638,6 @@
       gap: 0;
     }
 
-    #notificationBox { order: 1; }
     #quickTotalsCard { order: 2; }
     #fullPage { order: 3; }
 
@@ -822,6 +870,67 @@
     .schedule-maps-btn:hover {
       background: #059669;
     }
+    .delivery-action-menu {
+      width: min(440px, 100%);
+    }
+
+    .delivery-action-menu h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .delivery-action-subtitle {
+      margin: 6px 0 16px;
+      color: #64748b;
+      font-size: 0.92rem;
+    }
+
+    .delivery-action-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .delivery-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .delivery-action-btn:hover {
+      background: #eef2ff;
+      border-color: #94a3b8;
+    }
+
+    .delivery-action-btn.primary-action {
+      background: #fff7ed;
+      color: #9a3412;
+      border-color: #fdba74;
+    }
+
+    .delivery-action-btn.primary-action:hover {
+      background: #ffedd5;
+    }
+
+    .delivery-action-hint {
+      margin-top: 12px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.78rem;
+    }
+    .schedule-rollover-btn {
+      width: auto; background: #fff7ed; border: 1px solid #fdba74;
+      color: #9a3412; font-size: 0.8rem; font-weight: bold; padding: 8px;
+    }
+    @media (pointer: coarse) {
+      .schedule-card { -webkit-touch-callout: none; user-select: none; touch-action: pan-y; }
+    }
 
     .schedule-delivered-badge {
       display: inline-flex;
@@ -1033,23 +1142,6 @@
       width: 100%;
     }
 
-    .is-fullscreen .notification-box {
-      margin-bottom: 8px;
-      padding: 10px 12px;
-    }
-
-    .is-fullscreen .notification-title {
-      font-size: 1rem;
-    }
-
-    .is-fullscreen .notification-text {
-      font-size: 1.05rem;
-    }
-
-    .is-fullscreen .notification-time {
-      font-size: 0.9rem;
-    }
-
     .is-fullscreen #scheduleFullscreenArea {
       width: 100%;
       height: 100vh;
@@ -1161,10 +1253,6 @@
     }
 
 .is-fullscreen #quickTotalsCard {
-      display: none !important;
-    }
-
-    .is-fullscreen #notificationBox {
       display: none !important;
     }
 
@@ -2840,7 +2928,8 @@
 
     @media (min-width: 1600px) {
       .is-fullscreen .schedule-toolbar {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(180px, 240px) auto auto minmax(0, 1fr);
         align-items: center;
       }
 
@@ -2859,50 +2948,7 @@
       }
     }
 
-  .pickup-overdue { border: 2px solid #b45309 !important; background: #fffbeb !important; }
-    .pickup-overdue-label { color:#92400e; font-weight:700; margin:8px 0; }
-    #undoPanel { display:inline-flex; align-items:center; gap:8px; }
-    #undoPanel[hidden], .is-fullscreen #undoPanel, :fullscreen #undoPanel { display:none !important; }
-    #undoLabel { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-    #undoPanel button { min-height:48px; min-width:88px; font-size:16px; }
-    #scheduleProgress { display:none; flex:1 1 220px; min-width:120px; margin:0; padding:6px 10px; border-radius:10px; background:#eff6ff; color:#172033; }
-    .is-fullscreen #scheduleProgress, :fullscreen #scheduleProgress { display:block !important; }
-    #scheduleProgressText { display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
-    #scheduleProgressBar { display:block; width:100%; height:14px; accent-color:#15803d; border:0; border-radius:8px; overflow:hidden; }
-    #scheduleProgressBar::-webkit-progress-bar { background:#dbe3ec; }
-    #scheduleProgressBar::-webkit-progress-value { background:#15803d; }
-    #scheduleProgressBar::-moz-progress-bar { background:#15803d; }
-    .is-fullscreen .schedule-toolbar {
-      display:flex;
-      flex-direction:row;
-      flex-wrap:nowrap;
-      align-items:center;
-      justify-content:flex-start;
-      gap:8px;
-    }
-    .is-fullscreen .schedule-date-wrap {
-      flex:0 0 185px;
-      width:185px;
-      min-width:0;
-      margin-right:0;
-    }
-    .is-fullscreen #printSheetBtn,
-    .is-fullscreen #fullscreenBtn {
-      flex:0 0 auto;
-      width:auto;
-      white-space:nowrap;
-    }
-    .is-fullscreen #scheduleProgress {
-      flex:1 1 0;
-      min-width:120px;
-      width:auto;
-    }
-    .is-fullscreen #fullscreenTotals {
-      flex:0 0 auto;
-      flex-wrap:nowrap;
-      margin-left:0;
-    }
-    </style>
+  </style>
 </head>
 
 <body>
@@ -2912,6 +2958,10 @@
         <div class="header-copy">
           <h1>Pioneer Delivery Tracker</h1>
           <p>Manage routes, view schedule, and mark deliveries complete.</p>
+          <div class="account-actions">
+            <span class="account-status" id="accountStatus">Not signed in</span>
+            <button class="account-btn" id="accountBtn" type="button">Sign In</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2929,18 +2979,12 @@
           <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
           <button class="tab-btn" id="pickupPageBtn" type="button">Customer Pickup</button>
           <button class="tab-btn" id="historyPageBtn" type="button">History</button>
-          <button class="tab-btn" id="adminPageBtn" type="button">Administrator</button>
+          <button class="tab-btn" id="settingsPageBtn" type="button" style="display:none;">User Settings</button>
         </div>
       </div>
     </div>
 
     <div id="scheduleFullscreenArea">
-      <div class="card notification-box" id="notificationBox">
-        <div class="notification-title">Last Action</div>
-        <p class="notification-text" id="notificationText">No recent actions yet.</p>
-        <div class="notification-time" id="notificationTime">Waiting for updates...</div>
-      </div>
-
       <div class="card" id="quickTotalsCard">
         <h2>Quick Totals</h2>
         <div class="totals-grid">
@@ -2976,14 +3020,9 @@
                 <input id="scheduleDate" type="date" />
               </div>
               <button id="printSheetBtn" class="print-btn" type="button">Print Dispatch Sheet</button>
-              <div id="undoPanel" role="status"><span id="undoLabel"></span><button id="undoRecent" type="button" class="small-btn" disabled aria-describedby="undoLabel">Undo</button><button id="dismissUndo" type="button" class="small-btn" hidden>Dismiss</button></div>
               <button id="fullscreenBtn" class="fullscreen-btn" type="button">Full Screen</button>
-              <div id="scheduleProgress">
-                <span id="scheduleProgressText" aria-live="polite">No stops scheduled</span>
-                <progress id="scheduleProgressBar" max="1" value="0" aria-label="Schedule completion"></progress>
-              </div>
               <div class="fullscreen-totals" id="fullscreenTotals">
-                <div class="fullscreen-total-chip" aria-live="polite">Stops left <strong id="fsActiveTodayCount">0</strong></div>
+                <div class="fullscreen-total-chip">Today <strong id="fsActiveTodayCount">0</strong></div>
                 <div class="fullscreen-total-chip">Rush <strong id="fsRushCount">0</strong></div>
                 <div class="fullscreen-total-chip">Outside <strong id="fsOutsideCount">0</strong></div>
                 <div class="fullscreen-total-chip">Done <strong id="fsCompletedCount">0</strong></div>
@@ -3198,26 +3237,12 @@
         <div class="date-toolbar">
           <div>
             <h2 style="margin:0 0 6px;">History</h2>
-            <p class="muted" style="margin:0;">Shipments grouped by delivery day. Choose dates or browse all history.</p>
+            <p class="muted" style="margin:0;">Last 30 days of shipments, grouped by delivery day.</p>
           </div>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-            <div class="history-summary-chip" aria-live="polite" id="historySummaryChip">0 jobs</div>
+            <div class="history-summary-chip" id="historySummaryChip">0 jobs</div>
             <button id="printHistoryBtn" class="print-btn" type="button" style="margin-bottom:0;">Print History Report</button>
           </div>
-        </div>
-        <div style="margin-bottom:16px;">
-          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:12px;">
-            <div><label for="historyFrom">From</label><input id="historyFrom" type="date" /></div>
-            <div><label for="historyTo">Through</label><input id="historyTo" type="date" /></div>
-            <button id="history30Days" class="small-btn" type="button">Last 30 days</button>
-            <button id="historyAllDates" class="small-btn" type="button">All dates</button>
-            <button id="exportHistory" class="small-btn" type="button">Export spreadsheet (CSV)</button>
-          </div>
-          <p id="historyRangeError" role="alert" style="color:#b91c1c;"></p>
-          <label for="historySearch">Search History</label>
-          <input id="historySearch" type="search" placeholder="Customer, job #, PO #, address, route, status, date or notes" aria-describedby="historySearchHelp" />
-          <p id="historySearchHelp" class="muted">Search the selected dates. Print and spreadsheet exports include only matching jobs.</p>
-          <button id="clearHistorySearch" class="small-btn" type="button">Clear search</button>
         </div>
         <div id="historyList"></div>
       </div>
@@ -3227,8 +3252,8 @@
       <div class="card">
         <div class="date-toolbar">
           <div>
-            <h2 style="margin:0 0 6px;">Administrator</h2>
-            <p class="muted" style="margin:0;">Search history, pull up a delivery, then use Edit to correct the delivered date, time, and other details.</p>
+            <h2 style="margin:0 0 6px;">Admin Tools</h2>
+            <p class="muted" style="margin:0;">Admin tools are available here because this signed-in account has administrator rights.</p>
           </div>
         </div>
         <form id="adminSearchForm" class="admin-search-form">
@@ -3311,6 +3336,121 @@
           </div>
         </div>
         <div class="job-list" id="pickupList"></div>
+      </div>
+    </div>
+
+    <div id="settingsPage" style="display:none;">
+      <div class="card">
+        <div class="date-toolbar">
+          <div>
+            <h2 style="margin:0 0 6px;">User Settings</h2>
+            <p class="muted" style="margin:0;">Your navigation preference follows your account when you sign in.</p>
+          </div>
+        </div>
+
+        <div class="settings-grid" role="radiogroup" aria-label="Preferred navigation app">
+          <label class="settings-option">
+            <input type="radio" name="preferredMapApp" value="google" />
+            <div>
+              <strong>Google Maps</strong>
+              <span>Works on most phones and computers. This is the default option.</span>
+            </div>
+          </label>
+
+          <label class="settings-option">
+            <input type="radio" name="preferredMapApp" value="waze" />
+            <div>
+              <strong>Waze</strong>
+              <span>Best for live traffic, incidents, and driver-focused navigation.</span>
+            </div>
+          </label>
+
+          <label class="settings-option">
+            <input type="radio" name="preferredMapApp" value="apple" />
+            <div>
+              <strong>Apple Maps</strong>
+              <span>Uses Apple Maps on iPhone, iPad, and Mac when supported.</span>
+            </div>
+          </label>
+        </div>
+
+        <p id="settingsSavedMessage" class="settings-saved" aria-live="polite"></p>
+      </div>
+      <div id="settingsAdminMount"></div>
+      <div class="card">
+        <h3>Account</h3>
+        <p id="verificationStatus" role="status"></p>
+        <div class="summary-actions">
+          <button id="verifyEmailBtn" type="button" class="secondary-btn">Send Verification Email</button>
+          <button id="refreshAccountBtn" type="button" class="copy-btn">I Verified My Email</button>
+        </div>
+        <p id="accountMessage" role="status" aria-live="polite"></p>
+      </div>
+      <div id="adminAccessPanel" class="card" style="display:none;">
+        <h3>Manage Admin Access</h3>
+        <p>Justin and Cristina are permanent admins after verifying their email. Additional admins can be granted or removed below.</p>
+        <form id="adminAccessForm" class="form-grid">
+          <label for="adminAccessEmail">User email</label>
+          <input id="adminAccessEmail" type="email" required autocomplete="off" />
+          <button class="primary-btn" type="submit">Grant Admin Access</button>
+        </form>
+        <p id="adminAccessMessage" role="status"></p>
+        <div id="adminAccessList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="authModalOverlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <div class="modal-header">
+        <h2 id="authModalTitle">Sign In</h2>
+        <button class="modal-close-btn" id="authModalCloseBtn" type="button">Close</button>
+      </div>
+      <form id="authForm" class="auth-grid">
+        <div>
+          <label for="authEmail" id="authIdentifierLabel">Email</label>
+          <input id="authEmail" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required />
+        </div>
+        <div>
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required />
+        </div>
+        <div class="auth-actions">
+          <button class="primary-btn" id="signInBtn" type="submit">Sign In</button>
+          <button class="secondary-btn" id="createAccountBtn" type="button">Create Account</button>
+        </div>
+        <div class="status-message" id="authStatusMessage" aria-live="polite"></div>
+        <button type="button" id="resetPasswordBtn" class="copy-btn">Forgot Password? (enter your email)</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="deliveryActionMenuOverlay">
+    <div class="modal-card delivery-action-menu" role="dialog" aria-modal="true" aria-labelledby="deliveryActionMenuTitle">
+      <div class="modal-header">
+        <h2 id="deliveryActionMenuTitle">Delivery Actions</h2>
+        <button class="modal-close-btn" id="deliveryActionMenuCloseBtn" type="button">Close</button>
+      </div>
+      <div id="deliveryActionMenuSubtitle" class="delivery-action-subtitle">Choose an action for this delivery.</div>
+      <div class="delivery-action-list">
+        <button class="delivery-action-btn primary-action" id="deliveryActionMoveBtn" type="button">Move to Next Day <span>›</span></button>
+        <button class="delivery-action-btn" id="deliveryActionDeliverBtn" type="button">Mark As Delivered <span>›</span></button>
+        <button class="delivery-action-btn" id="deliveryActionMapsBtn" type="button">Open in Maps <span>›</span></button>
+      </div>
+      <div class="delivery-action-hint">Press and hold a delivery to open this menu.</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="rolloverModalOverlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rolloverTitle">
+      <div class="modal-header">
+        <h2 id="rolloverTitle">Move Delivery to Next Day</h2>
+        <button class="modal-close-btn" id="rolloverCloseBtn" type="button">Cancel</button>
+      </div>
+      <p id="rolloverMessage" class="muted">Move this delivery to the next delivery date?</p>
+      <div class="summary-actions">
+        <button class="primary-btn" id="confirmRolloverBtn" type="button">Move to Next Day</button>
+        <button class="cancel-btn" id="cancelRolloverBtn" type="button">Cancel</button>
       </div>
     </div>
   </div>
@@ -3401,6 +3541,10 @@
           </div>
         </div>
 
+        <label class="checkbox-row">
+          <input id="editClearRollover" type="checkbox" />
+          <span>Clear incorrect rollover label — this delivery was originally scheduled for the selected date</span>
+        </label>
         <div class="summary-actions">
           <button class="primary-btn" type="submit">Save Changes</button>
           <button class="cancel-btn" id="cancelEditBtn" type="button">Cancel</button>
@@ -3440,23 +3584,34 @@
     </div>
   </div>
 
-  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getFirestore,
-      getDoc,
       collection,
       addDoc,
       updateDoc,
       deleteDoc,
       doc,
+      getDoc,
       onSnapshot,
       query,
       orderBy,
       limit,
-      serverTimestamp
+      serverTimestamp,
+      runTransaction,
+      setDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      sendPasswordResetEmail,
+      sendEmailVerification,
+      reload,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAb0A3o4AAW8mh-FgXmmrzpXZBiFFTd32I",
@@ -3470,18 +3625,22 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
     const jobsCollection = collection(db, "deliveryJobs");
     const activityCollection = collection(db, "deliveryActivity");
-    const ADMIN_PASSWORD = "2965";
-    const ADMIN_SESSION_KEY = "pioneer-admin-unlocked";
+    const ADMIN_EMAILS = new Set([
+      "justin@pioneerpresscolorado.com",
+      "cristina@pioneerpresscolorado.com"
+    ]);
+    const DEFAULT_MAP_APP = "google";
+    const USER_PROFILE_COLLECTION = "userProfiles";
 
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.09.11 — Delivery and Undo save repair";
+    const CODE_VERSION = "2026.10.06 — Combined features, email login and delivery actions";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
-    let lastActionKey = "";
     let completedRolloverRepairInProgress = false;
     let completedRolloverRepairAttemptDate = "";
     let geocodeCache = loadGeocodeCache();
@@ -3659,24 +3818,14 @@
       return Number.isFinite(parsed) ? parsed : 0;
     }
 
-    function renderLatestAction() {
-      const latestJob = [...jobs].sort((a, b) => getActionTimeValue(b) - getActionTimeValue(a))[0];
-      if (!latestJob) {
-        notificationText.textContent = "No recent actions yet.";
-        notificationTime.textContent = "Waiting for updates...";
-        return;
-      }
-
-      const actionLabel = latestJob.updatedAt ? "Updated" : "Added";
-      const actionTime = getActionTimeValue(latestJob);
-      const nextKey = `${latestJob.id}-${actionTime}`;
-      notificationText.textContent = `${actionLabel}: ${latestJob.customerName} • ${latestJob.route} • ${formatDateLabel(latestJob.deliveryDate)}`;
-      notificationTime.textContent = `${actionLabel} ${new Date(actionTime || Date.now()).toLocaleString()}`;
-
-      lastActionKey = nextKey;
-    }
-
     let jobs = [];
+    let currentUser = null;
+    let grantedAdmin = false;
+    let roleSubscription = null;
+    let adminListSubscription = null;
+    let activitySubscription = null;
+    let authBusy = false;
+    let preferredMapApp = DEFAULT_MAP_APP;
     let currentRoute = "South Run";
     let draggedJobId = null;
     let dragTargetIndex = null;
@@ -3690,7 +3839,6 @@
     let adminCompanyFilter = "";
     let adminPushedOnly = false;
     let adminHasSearched = false;
-    let adminUnlocked = window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
     let activityEntries = [];
     let outsideViewDate = currentDenverDate;
     let pickupViewDate = currentDenverDate;
@@ -3703,21 +3851,36 @@
     const fullPage = document.getElementById("fullPage");
     const historyPage = document.getElementById("historyPage");
     const adminPage = document.getElementById("adminPage");
+    const settingsAdminMount = document.getElementById("settingsAdminMount");
     const outsidePage = document.getElementById("outsidePage");
     const pickupPage = document.getElementById("pickupPage");
+    const settingsPage = document.getElementById("settingsPage");
     const quickTotalsCard = document.getElementById("quickTotalsCard");
     const fullGrid = document.getElementById("fullGrid");
 
     const mainPageBtn = document.getElementById("mainPageBtn");
     const fullPageBtn = document.getElementById("fullPageBtn");
     const historyPageBtn = document.getElementById("historyPageBtn");
-    const adminPageBtn = document.getElementById("adminPageBtn");
     const outsidePageBtn = document.getElementById("outsidePageBtn");
     const pickupPageBtn = document.getElementById("pickupPageBtn");
+    const settingsPageBtn = document.getElementById("settingsPageBtn");
+    const accountBtn = document.getElementById("accountBtn");
+    const accountStatus = document.getElementById("accountStatus");
 
     const topNav = document.getElementById("topNav");
     const menuToggleBtn = document.getElementById("menuToggleBtn");
     const mobileNavTitle = document.getElementById("mobileNavTitle");
+    const settingsSavedMessage = document.getElementById("settingsSavedMessage");
+    const authModalOverlay = document.getElementById("authModalOverlay");
+    const authModalCloseBtn = document.getElementById("authModalCloseBtn");
+    const authForm = document.getElementById("authForm");
+    const authEmailInput = document.getElementById("authEmail");
+    const authPasswordInput = document.getElementById("authPassword");
+    const authModalTitle = document.getElementById("authModalTitle");
+    const authIdentifierLabel = document.getElementById("authIdentifierLabel");
+    const signInBtn = document.getElementById("signInBtn");
+    const createAccountBtn = document.getElementById("createAccountBtn");
+    const authStatusMessage = document.getElementById("authStatusMessage");
 
     const jobForm = document.getElementById("jobForm");
     const jobList = document.getElementById("jobList");
@@ -3791,9 +3954,6 @@
     const summaryDateLabel = document.getElementById("summaryDateLabel");
     const scheduleDateInput = document.getElementById("scheduleDate");
 
-    const notificationBox = document.getElementById("notificationBox");
-    const notificationText = document.getElementById("notificationText");
-    const notificationTime = document.getElementById("notificationTime");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
     const printSheetBtn = document.getElementById("printSheetBtn");
     const printHistoryBtn = document.getElementById("printHistoryBtn");
@@ -3821,8 +3981,25 @@
     const tomorrowPreviewRoutes = document.getElementById("tomorrowPreviewRoutes");
     const tomorrowPreviewSubtitle = document.getElementById("tomorrowPreviewSubtitle");
     const tomorrowPreviewCloseBtn = document.getElementById("tomorrowPreviewCloseBtn");
+    const deliveryActionMenuOverlay = document.getElementById("deliveryActionMenuOverlay");
+    const deliveryActionMenuCloseBtn = document.getElementById("deliveryActionMenuCloseBtn");
+    const deliveryActionMenuTitle = document.getElementById("deliveryActionMenuTitle");
+    const deliveryActionMenuSubtitle = document.getElementById("deliveryActionMenuSubtitle");
+    const deliveryActionMoveBtn = document.getElementById("deliveryActionMoveBtn");
+    const deliveryActionDeliverBtn = document.getElementById("deliveryActionDeliverBtn");
+    const deliveryActionMapsBtn = document.getElementById("deliveryActionMapsBtn");
+
+    const rolloverModalOverlay = document.getElementById("rolloverModalOverlay");
+    const rolloverCloseBtn = document.getElementById("rolloverCloseBtn");
+    const cancelRolloverBtn = document.getElementById("cancelRolloverBtn");
+    const confirmRolloverBtn = document.getElementById("confirmRolloverBtn");
+    const rolloverMessage = document.getElementById("rolloverMessage");
+
+    if (settingsAdminMount && adminPage) settingsAdminMount.appendChild(adminPage);
 
     let liveAlertTimer = null;
+    let rolloverJobId = null;
+    let authMode = "sign-in";
     let tomorrowPreviewDismissedKey = "";
     let tomorrowPreviewLastReadyKey = "";
 
@@ -3911,11 +4088,13 @@
     }
 
     async function logActivity(type, title, details) {
+      if (!currentUser) return;
       try {
         await addDoc(activityCollection, {
           type,
           title,
           details,
+          actorUid: currentUser.uid,
           createdAt: serverTimestamp()
         });
       } catch (error) {
@@ -3923,17 +4102,21 @@
       }
     }
 
+    function isCurrentUserAdmin() {
+      return !!currentUser?.emailVerified && (grantedAdmin || ADMIN_EMAILS.has(String(currentUser.email || "").toLowerCase()));
+    }
+
     function ensureAdminAccess() {
-      if (adminUnlocked) return true;
-      const entered = window.prompt("Enter Administrator password");
-      if (entered === null) return false;
-      if (entered !== ADMIN_PASSWORD) {
-        setNotification("Incorrect Administrator password.", "danger");
-        return false;
-      }
-      adminUnlocked = true;
-      window.sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
-      return true;
+      if (isCurrentUserAdmin()) return true;
+      setNotification("Admin tools are available only to approved administrator accounts.", "danger");
+      return false;
+    }
+
+    function ensureSignedIn() {
+      if (currentUser) return true;
+      openAuthModal();
+      authStatusMessage.textContent = "Sign in to make changes to deliveries.";
+      return false;
     }
 
     liveAlertCloseBtn.addEventListener("click", hideLiveAlert);
@@ -4243,6 +4426,22 @@
       }
     }
 
+    function isValidDeliveryDate(value) {
+      if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+      const date = new Date(value + "T12:00:00Z");
+      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }
+
+    function getValidRolloverOrigin(data, deliveryDate = data.deliveryDate) {
+      const origin = data.rolledFromDate;
+      if (!isValidDeliveryDate(deliveryDate) || !isValidDeliveryDate(origin) || origin >= deliveryDate) return "";
+      if (isValidDeliveryDate(data.originalDeliveryDate)) {
+        if (data.originalDeliveryDate >= deliveryDate) return "";
+        return origin < data.originalDeliveryDate ? data.originalDeliveryDate : origin;
+      }
+      return origin;
+    }
+
     function normalizeJob(id, data) {
       let deliveryDate = data.deliveryDate;
       const rawStatus = typeof data.status === "string" ? data.status.trim() : "";
@@ -4290,10 +4489,10 @@
         isRush: !!data.isRush,
         isPickup: normalizedRoute === "Customer Pickup" ? false : !!data.isPickup,
         order: typeof data.order === "number" ? data.order : 0,
-        rolledFromDate: data.rolledFromDate || "",
+        originalDeliveryDate: data.originalDeliveryDate || "",
+        rolledFromDate: getValidRolloverOrigin(data, deliveryDate),
         rolledOverAt: data.rolledOverAt || null,
         createdAt: data.createdAt || null,
-        pickupAddedAt: data.pickupAddedAt || null,
         updatedAt: data.updatedAt || null,
         deliveredAt: completedAt
       };
@@ -4304,13 +4503,10 @@
         statusMessage.textContent = message || "";
       }
       console.log(`[${type}] ${message}`);
-      requestAnimationFrame(() => renderLatestAction(false));
     }
 
     function updateQuickTotalsVisibility() {
       const isFullscreen = !!document.fullscreenElement;
-      notificationBox.style.display = currentPageView === "main" ? "block" : "none";
-
       if (currentPageView === "main" || currentPageView === "full") {
         quickTotalsCard.style.display = isFullscreen ? "none" : "block";
       } else {
@@ -4511,7 +4707,7 @@
     }
 
     function getHistoryCount() {
-      return jobs.filter(job => !job.isPickup && isWithinLast30Days(job.deliveryDate)).length;
+      return jobs.filter(job => isWithinLast30Days(job.deliveryDate)).length;
     }
 
     function updateQuickTotals() {
@@ -4530,14 +4726,6 @@
       completedCount.textContent = completedTotal;
       historyCount.textContent = historyTotal;
 
-      const totalStops = south.length + north.length + local.length;
-      const completedStops = totalStops - activeToday;
-      const progress = document.getElementById("scheduleProgressBar");
-      progress.max = totalStops || 1;
-      progress.value = completedStops;
-      const progressText = totalStops ? `${activeToday} stops left • ${completedStops} of ${totalStops} complete` : "No stops scheduled";
-      document.getElementById("scheduleProgressText").textContent = progressText;
-      progress.setAttribute("aria-valuetext", progressText);
       fsActiveTodayCount.textContent = activeToday;
       fsRushCount.textContent = rushTotal;
       fsOutsideCount.textContent = outsideTotal;
@@ -4545,33 +4733,29 @@
       fsHistoryCount.textContent = historyTotal;
     }
 
-    const pendingDeliveries = new Set();
     async function markJobDelivered(job) {
-      if (pendingDeliveries.has(job.id) || job.status !== "active") return;
-      pendingDeliveries.add(job.id);
+      if (!ensureSignedIn()) return;
       try {
-        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
           status: "delivered",
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
-        }, true);
-        void logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`).catch(console.error);
+        });
+        await logActivity("delivered", "Delivery marked delivered", `${job.customerName} was marked delivered for ${formatDateLabel(job.deliveryDate)}.`);
         statusMessage.textContent = "Delivery marked complete.";
         setNotification(`${job.customerName} marked completed.`, "success");
       } catch (error) {
         console.error(error);
-        const message = `Could not save ${job.customerName} as delivered. ${error.code || error.message || "Please check your connection and try again."}`;
-        statusMessage.textContent = message;
-        setNotification(message, "danger");
-        window.alert(message);
-      } finally {
-        pendingDeliveries.delete(job.id);
+        statusMessage.textContent = "Could not mark delivery complete.";
+        setNotification("Could not mark delivery complete.", "danger");
       }
     }
 
+
     async function markJobPickedUp(job) {
+      if (!ensureSignedIn()) return;
       try {
-        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
           status: "pickedUp",
           updatedAt: serverTimestamp(),
           deliveredAt: serverTimestamp()
@@ -4587,8 +4771,9 @@
     }
 
     async function restoreJobToActive(job) {
+      if (!ensureSignedIn()) return;
       try {
-        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
           status: "active",
           updatedAt: serverTimestamp(),
           deliveredAt: null,
@@ -4605,10 +4790,11 @@
     }
 
     async function moveJobBackToRolledDate(job) {
+      if (!ensureAdminAccess()) return;
       if (!job?.rolledFromDate || job.deliveryDate === job.rolledFromDate) return;
 
       try {
-        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), {
+        await updateDoc(doc(db, "deliveryJobs", job.id), {
           deliveryDate: job.rolledFromDate,
           updatedAt: serverTimestamp(),
           order: (job.status === "active" && !job.isRush)
@@ -4626,12 +4812,13 @@
     }
 
     async function toggleRushStatus(job) {
+      if (!ensureSignedIn()) return;
       try {
         const nextRushState = !job.isRush;
         const updates = { isRush: nextRushState, updatedAt: serverTimestamp() };
         updates.order = nextRushState ? -1 : getNextNonRushOrder(job);
 
-        await updateJobWithUndo(doc(db, "deliveryJobs", job.id), updates);
+        await updateDoc(doc(db, "deliveryJobs", job.id), updates);
         await logActivity("rush-toggle", nextRushState ? "Rush added" : "Rush removed", `${job.customerName} ${nextRushState ? "was marked rush" : "had rush removed"} for ${formatDateLabel(job.deliveryDate)}.`);
 
         setNotification(
@@ -4647,6 +4834,8 @@
     }
 
     function openEditDelivery(job) {
+      if (!ensureAdminAccess()) return;
+      document.getElementById("editClearRollover").checked = false;
       editingJobId = job.id;
       editCustomerNameInput.value = job.customerName || "";
       editJobNumberInput.value = job.jobNumber || "";
@@ -4908,6 +5097,7 @@
       button.type = "button";
       button.className = "small-btn edit-btn";
       button.textContent = "Edit Delivery";
+      button.hidden = !isCurrentUserAdmin();
       button.addEventListener("click", () => openEditDelivery(job));
       return button;
     }
@@ -4923,6 +5113,219 @@
       return button;
     }
 
+    function friendlyAuthError(error) {
+      const messages = {
+        "auth/invalid-credential": "The email or password is incorrect.",
+        "auth/email-already-in-use": "That email already has an account.",
+        "auth/weak-password": "Use a password with at least six characters.",
+        "auth/invalid-email": "Enter a valid email address.",
+        "auth/operation-not-allowed": "Email/password sign-in is not enabled in Firebase Authentication yet.",
+        "auth/network-request-failed": "Network error. Check your connection and try again.",
+        "auth/configuration-not-found": "Account registration is not enabled for this site yet. Contact the administrator.",
+        "auth/too-many-requests": "Too many attempts. Please wait and try again.",
+        "permission-denied": "Your account does not have permission for this action.",
+        "auth/user-disabled": "This account has been disabled. Contact the administrator.",
+        "auth/user-not-found": "The email or password is incorrect.",
+        "auth/wrong-password": "The email or password is incorrect."
+      };
+      return messages[error?.code] || "Authentication failed. Please try again.";
+    }
+
+    async function authenticateAccount(mode, email, password) {
+      const address = String(email || "").trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("Enter a valid email address.");
+      return mode === "create"
+        ? createUserWithEmailAndPassword(auth, address, password)
+        : signInWithEmailAndPassword(auth, address, password);
+    }
+
+    function setAuthMode(mode) {
+      const creating = mode === "create";
+      authMode = mode;
+      authModalTitle.textContent = creating ? "Create Account" : "Sign In";
+      authIdentifierLabel.textContent = "Email";
+      signInBtn.textContent = creating ? "Create Account" : "Sign In";
+      createAccountBtn.textContent = creating ? "Back to Sign In" : "Create Account";
+      authEmailInput.type = "email";
+      authPasswordInput.autocomplete = creating ? "new-password" : "current-password";
+      authEmailInput.value = "";
+      authPasswordInput.value = "";
+      authStatusMessage.textContent = creating
+        ? "Enter your email and a password with at least six characters."
+        : "";
+    }
+
+    function openAuthModal() {
+      setAuthMode("sign-in");
+      authStatusMessage.textContent = "";
+      authModalOverlay.classList.add("show");
+      authEmailInput.focus();
+    }
+
+    function closeAuthModal() {
+      if (authBusy) return;
+      authPasswordInput.value = "";
+      authModalOverlay.classList.remove("show");
+      authStatusMessage.textContent = "";
+    }
+
+    function updateAccountUi(user) {
+      const signedIn = !!user;
+      accountStatus.textContent = signedIn ? `Signed in as ${user.email || "user"}` : "Not signed in";
+      accountBtn.textContent = signedIn ? "Sign Out" : "Sign In";
+      settingsPageBtn.style.display = signedIn ? "block" : "none";
+      document.getElementById("verificationStatus").textContent = !user ? "" :
+        user.emailVerified ? "Email verified." : "Verify your email to unlock admin access if approved.";
+      document.getElementById("verifyEmailBtn").hidden = !user || user.emailVerified;
+      document.getElementById("refreshAccountBtn").hidden = !user || user.emailVerified;
+      syncAdminUi();
+      if (!signedIn && currentPageView === "settings") showMainPage();
+    }
+
+    function syncAdminUi() {
+      const admin = isCurrentUserAdmin();
+      adminPage.style.display = admin && currentPageView === "settings" ? "block" : "none";
+      document.getElementById("adminAccessPanel").style.display = admin ? "block" : "none";
+      if (!admin) {
+        adminList.replaceChildren();
+        adminActionHistory.replaceChildren();
+        closeEditDelivery();
+      }
+      if (adminListSubscription) { adminListSubscription(); adminListSubscription = null; }
+      if (activitySubscription) { activitySubscription(); activitySubscription = null; }
+      activityEntries = [];
+      if (admin) {
+        activitySubscription = onSnapshot(query(activityCollection, orderBy("createdAt", "desc"), limit(20)), snapshot => {
+          activityEntries = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+          renderAdminActionHistory();
+        }, () => {
+          adminActionHistory.textContent = "Action history could not be loaded.";
+        });
+        adminListSubscription = onSnapshot(collection(db, "adminAccess"), snapshot => {
+          const list = document.getElementById("adminAccessList");
+          list.replaceChildren();
+          snapshot.forEach(entry => {
+            const row = document.createElement("p");
+            const label = document.createElement("span");
+            label.textContent = entry.id + " ";
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "delete-btn";
+            remove.style.width = "auto";
+            remove.textContent = "Remove Admin";
+            remove.addEventListener("click", async () => {
+              if (!ensureAdminAccess() || !confirm(`Remove admin access for ${entry.id}?`)) return;
+              remove.disabled = true;
+              try { await deleteDoc(entry.ref); }
+              catch (error) {
+                document.getElementById("adminAccessMessage").textContent = friendlyAuthError(error);
+                remove.disabled = false;
+              }
+            });
+            row.append(label, remove);
+            list.appendChild(row);
+          });
+        }, () => {
+          document.getElementById("adminAccessMessage").textContent = "Admin access could not be loaded. Check the deployed access rules.";
+        });
+      }
+      renderJobs();
+      renderCompleted();
+      renderOutside();
+      renderPickup();
+      renderAdmin();
+      renderAdminActionHistory();
+    }
+
+    function watchAccountRole(user) {
+      if (roleSubscription) { roleSubscription(); roleSubscription = null; }
+      grantedAdmin = false;
+      updateAccountUi(user);
+      if (!user?.emailVerified) return;
+      const email = user.email.toLowerCase();
+      roleSubscription = onSnapshot(doc(db, "adminAccess", email), snapshot => {
+        if (currentUser?.uid !== user.uid) return;
+        grantedAdmin = snapshot.exists();
+        syncAdminUi();
+      }, () => {
+        grantedAdmin = false;
+        syncAdminUi();
+      });
+    }
+
+    async function loadUserMapPreference(user) {
+      preferredMapApp = DEFAULT_MAP_APP;
+      if (!user) { refreshMapButtons(); return; }
+      const uid = user.uid;
+      try {
+        const snapshot = await getDoc(doc(db, USER_PROFILE_COLLECTION, uid));
+        if (currentUser?.uid !== uid) return;
+        const profile = snapshot.exists() ? snapshot.data() : {};
+        if (["google", "waze", "apple"].includes(profile.preferredMapApp)) {
+          preferredMapApp = profile.preferredMapApp;
+        }
+        document.getElementById("settingsSavedMessage").textContent = "";
+        loadMapSettings();
+        refreshMapButtons();
+      } catch (error) {
+        if (currentUser?.uid !== uid) return;
+        document.getElementById("settingsSavedMessage").textContent = "Account settings could not be loaded. Google Maps is being used for now.";
+      }
+    }
+
+    function getPreferredMapApp() {
+      return preferredMapApp;
+    }
+
+    function refreshMapButtons() {
+      document.querySelectorAll(".maps-btn, .schedule-maps-btn").forEach(button => {
+        button.textContent = getMapsButtonLabel();
+      });
+    }
+
+    function getMapAppLabel(app = getPreferredMapApp()) {
+      return {
+        google: "Google Maps",
+        waze: "Waze",
+        apple: "Apple Maps"
+      }[app] || "Google Maps";
+    }
+
+    function getMapsLink(address, app = getPreferredMapApp()) {
+      const encodedAddress = encodeURIComponent(String(address || ""));
+      if (app === "waze") return `https://waze.com/ul?q=${encodedAddress}&navigate=yes`;
+      if (app === "apple") return `https://maps.apple.com/?address=${encodedAddress}`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    }
+
+    function getMapsButtonLabel() {
+      return `Open in ${getMapAppLabel()}`;
+    }
+
+    function loadMapSettings() {
+      const selected = getPreferredMapApp();
+      document.querySelectorAll('input[name="preferredMapApp"]').forEach(input => {
+        input.checked = input.value === selected;
+      });
+    }
+
+    async function saveMapSetting(app) {
+      if (!["google", "waze", "apple"].includes(app)) return;
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      preferredMapApp = app;
+      refreshMapButtons();
+      const inputs = [...document.querySelectorAll('input[name="preferredMapApp"]')];
+      inputs.forEach(input => input.disabled = true);
+      settingsSavedMessage.textContent = "Saving…";
+      try {
+        await setDoc(doc(db, USER_PROFILE_COLLECTION, uid), { preferredMapApp: app, updatedAt: serverTimestamp() }, { merge: true });
+        if (currentUser?.uid === uid) settingsSavedMessage.textContent = `Saved to your account: ${getMapAppLabel(app)}.`;
+      } catch (error) {
+        if (currentUser?.uid === uid) settingsSavedMessage.textContent = "Used for this session, but could not save to your account. Please try again.";
+      } finally { inputs.forEach(input => input.disabled = false); }
+    }
+
     function createJobCard(job, options = {}) {
       const {
         showMaps = false,
@@ -4934,7 +5337,6 @@
         onDeliver = null
       } = options;
 
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
       const card = document.createElement("div");
       card.className = `job-card ${job.isRush ? "rush-card" : ""}`;
       card.draggable = showDeliverButton && !isOutsideRoute(job.route) && !isCustomerPickupRoute(job.route);
@@ -4948,29 +5350,21 @@
         <h3>${escapeHtml(job.customerName)}</h3>
         ${job.jobNumber ? `<p><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</p>` : ""}
         ${job.poNumber ? `<p><strong>PO #:</strong> ${escapeHtml(job.poNumber)}</p>` : ""}
-        <p><strong>${isCustomerPickupRoute(job.route) ? "Customer Pickup" : "Delivery Date"}:</strong> ${escapeHtml(isCustomerPickupRoute(job.route) ? getPickupAddedLabel(job) : formatDateLabel(job.deliveryDate))}</p>
+        <p><strong>Delivery Date:</strong> ${escapeHtml(formatDateLabel(job.deliveryDate))}</p>
         <p><strong>Address:</strong> ${escapeHtml(job.address)}</p>
         ${getNotesHtml(job.notes)}
         <div class="job-actions">
-          ${showMaps ? `<button class="small-btn maps-btn" type="button">Open in Maps</button>` : ""}
+          ${showMaps ? `<button class="small-btn maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button>` : ""}
           ${showDeliverButton ? `<button class="small-btn deliver-btn" type="button">${escapeHtml(deliverLabel)}</button>` : ""}
                   </div>
       `;
-
-      if (isCustomerPickupRoute(job.route) && job.status === "active" && getPickupWaitingDays(job) > 7) {
-        card.classList.add("pickup-overdue");
-        const alert = document.createElement("div");
-        alert.className = "pickup-overdue-label";
-        alert.textContent = `Overdue pickup • ${getPickupWaitingDays(job)} days waiting`;
-        card.prepend(alert);
-      }
 
       const actions = card.querySelector(".job-actions");
       if (showEditButton) actions.appendChild(createEditButton(job));
       if (showRushButton) actions.appendChild(createRushToggleButton(job));
 
       const mapsBtn = card.querySelector(".maps-btn");
-      if (mapsBtn) mapsBtn.addEventListener("click", () => window.open(mapsLink, "_blank"));
+      if (mapsBtn) mapsBtn.addEventListener("click", () => window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer"));
 
       const deliverBtn = card.querySelector(".deliver-btn");
       if (deliverBtn) {
@@ -5050,7 +5444,7 @@
         <div class="muted">${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
         ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions">
-          <button class="small-btn maps-btn" type="button">Open in Maps</button>
+          <button class="small-btn maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button>
         </div>
       `;
 
@@ -5058,16 +5452,8 @@
       actions.appendChild(createEditButton(job));
       actions.appendChild(createRushToggleButton(job));
 
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`;
-      card.querySelector(".maps-btn").addEventListener("click", () => window.open(mapsLink, "_blank"));
+      card.querySelector(".maps-btn").addEventListener("click", () => window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer"));
       return card;
-    }
-
-    function getPickupAddedLabel(job) {
-      const dateKey = getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt);
-      if (!dateKey) return "Added date unavailable";
-      const days = Math.max(0, Math.round((parseDateKey(currentDenverDate) - parseDateKey(dateKey)) / 86400000));
-      return `Added ${formatDateLabel(dateKey)} • ${days === 0 ? "Today" : `${days} day${days === 1 ? "" : "s"} waiting`}`;
     }
 
     function createPickupCard(job) {
@@ -5085,18 +5471,10 @@
           </div>
           ${getJobMetaSideHtml(job)}
         </div>
-        <div class="muted">${escapeHtml(getPickupAddedLabel(job))}</div>
+        <div class="muted">${escapeHtml(formatDateLabel(job.deliveryDate))}</div>
         ${job.notes ? `<div class="notes-box"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
         <div class="job-actions"></div>
       `;
-
-      if (isCustomerPickupRoute(job.route) && job.status === "active" && getPickupWaitingDays(job) > 7) {
-        card.classList.add("pickup-overdue");
-        const alert = document.createElement("div");
-        alert.className = "pickup-overdue-label";
-        alert.textContent = `Overdue pickup • ${getPickupWaitingDays(job)} days waiting`;
-        card.prepend(alert);
-      }
 
       const actions = card.querySelector(".job-actions");
       actions.appendChild(createEditButton(job));
@@ -5136,15 +5514,125 @@
       return card;
     }
 
+    function openRolloverModal(job) {
+      if (!job || job.status !== "active") return;
+      if (!ensureSignedIn()) return;
+      rolloverJobId = job.id;
+      rolloverMessage.textContent = `Move ${job.customerName} from ${formatDateLabel(job.deliveryDate)} to ${formatDateLabel(addDaysToDateKey(job.deliveryDate, 1))}?`;
+      rolloverModalOverlay.classList.add("show");
+      confirmRolloverBtn.focus();
+    }
+
+    function closeRolloverModal() {
+      rolloverJobId = null;
+      rolloverModalOverlay.classList.remove("show");
+    }
+
+    async function confirmRollover() {
+      const job = jobs.find(item => item.id === rolloverJobId);
+      if (!job || job.status !== "active") {
+        rolloverMessage.textContent = "This delivery is no longer active. Close this window and check the schedule.";
+        return;
+      }
+      if (confirmRolloverBtn.disabled) return;
+      const nextDate = addDaysToDateKey(job.deliveryDate, 1);
+      confirmRolloverBtn.disabled = true;
+      try {
+        await runTransaction(db, async transaction => {
+          const ref = doc(db, "deliveryJobs", job.id);
+          const snapshot = await transaction.get(ref);
+          if (!snapshot.exists() || snapshot.data().status !== "active" ||
+              snapshot.data().deliveryDate !== job.deliveryDate || snapshot.data().deliveredAt) {
+            throw new Error("This delivery changed. Close this window and check the schedule before moving it.");
+          }
+          transaction.update(ref, {
+            deliveryDate: nextDate,
+            rolledFromDate: getValidRolloverOrigin(snapshot.data()) || job.deliveryDate,
+            rolledOverAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            order: job.isRush ? -1 : getNextNonRushOrder({ ...job, deliveryDate: nextDate }, job.route, nextDate)
+          });
+        });
+        await logActivity("rollover", "Delivery moved to next day", `${job.customerName} moved from ${job.deliveryDate} to ${nextDate}.`);
+        closeRolloverModal();
+      } catch (error) {
+        rolloverMessage.textContent = error.code ? friendlyAuthError(error) : error.message;
+      } finally {
+        confirmRolloverBtn.disabled = false;
+      }
+    }
+
+    let deliveryActionJobId = null;
+
+    function openDeliveryActionMenu(job) {
+      if (!job || job.status !== "active") return;
+      if (!ensureSignedIn()) return;
+      deliveryActionJobId = job.id;
+      deliveryActionMenuTitle.textContent = "Delivery Actions";
+      deliveryActionMenuSubtitle.textContent = `${job.customerName} • ${formatDateLabel(job.deliveryDate)}`;
+      deliveryActionMenuOverlay.classList.add("show");
+      deliveryActionMoveBtn?.focus();
+    }
+
+    function closeDeliveryActionMenu() {
+      deliveryActionJobId = null;
+      deliveryActionMenuOverlay.classList.remove("show");
+    }
+
+    function getDeliveryActionJob() {
+      const job = jobs.find(item => item.id === deliveryActionJobId);
+      return job && job.status === "active" ? job : null;
+    }
+
+    function addScheduleLongPress(card, job) {
+      let timer = null;
+      let origin = null;
+      let longPressTriggered = false;
+      const clearPress = () => {
+        clearTimeout(timer);
+        timer = null;
+        origin = null;
+      };
+      card.addEventListener("pointerdown", event => {
+        clearPress();
+        longPressTriggered = false;
+        if (job.status !== "active" || event.button !== 0) return;
+        if (event.target.closest("button, a, input, select, textarea")) return;
+        origin = { x: event.clientX, y: event.clientY };
+        timer = setTimeout(() => {
+          if (!card.isConnected || currentPageView !== "full") return;
+          longPressTriggered = true;
+          openDeliveryActionMenu(jobs.find(item => item.id === job.id));
+          clearPress();
+        }, 700);
+      }, { passive: true });
+      card.addEventListener("pointermove", event => {
+        if (origin && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > 10) clearPress();
+      }, { passive: true });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(name => card.addEventListener(name, clearPress));
+      card.addEventListener("contextmenu", event => {
+        if (event.target.closest("button, a, input, select, textarea") || job.status !== "active" || currentPageView !== "full") return;
+        clearPress();
+        event.preventDefault();
+        openDeliveryActionMenu(jobs.find(item => item.id === job.id));
+      });
+      card.addEventListener("click", event => {
+        if (longPressTriggered) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          longPressTriggered = false;
+        }
+      }, true);
+    }
+
     function createScheduleCard(job, accentClass) {
       const isDelivered = job.status === "delivered";
       const statusClass = isDelivered ? "delivered-card" : "";
       const compactAddress = compactMultiline(job.address);
       const compactNotes = compactMultiline(job.notes);
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(compactAddress)}`;
       const actionHtml = !isDelivered
-        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">Open in Maps</button><button class="schedule-deliver-btn" type="button">Mark As Delivered</button></div>`
-        : "";
+        ? `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button><button class="schedule-deliver-btn" type="button">Mark As Delivered</button></div>`
+        : `<div class="schedule-actions"><button class="schedule-maps-btn" type="button">${escapeHtml(getMapsButtonLabel())}</button></div>`;
       const metaParts = [];
       if (job.jobNumber) metaParts.push(`<strong>Job #:</strong> ${escapeHtml(job.jobNumber)}`);
       if (job.poNumber) metaParts.push(`<strong>PO #:</strong> ${escapeHtml(job.poNumber)}`);
@@ -5169,8 +5657,10 @@
         ${actionHtml}
       `;
 
+      addScheduleLongPress(card, job);
+
       const mapsBtn = card.querySelector(".schedule-maps-btn");
-      if (mapsBtn) mapsBtn.addEventListener("click", () => window.open(mapsLink, "_blank"));
+      if (mapsBtn) mapsBtn.addEventListener("click", () => window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer"));
 
       const deliverBtn = card.querySelector(".schedule-deliver-btn");
       if (deliverBtn) {
@@ -5247,144 +5737,10 @@
       pickupJobs.forEach(job => pickupList.appendChild(createPickupCard(job)));
     }
 
-    function getPickupWaitingDays(job) {
-      const key = getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt);
-      return key ? Math.max(0, Math.round((parseDateKey(currentDenverDate) - parseDateKey(key)) / 86400000)) : 0;
-    }
-    function validHistoryRange() {
-      const from = document.getElementById("historyFrom").value;
-      const to = document.getElementById("historyTo").value;
-      return !from || !to || from <= to;
-    }
-    function matchesHistoryDateRange(date) {
-      const from = document.getElementById("historyFrom").value;
-      const to = document.getElementById("historyTo").value;
-      return validHistoryRange() && (!from || date >= from) && (!to || date <= to);
-    }
-    function getHistoryRangeLabel() {
-      const from = document.getElementById("historyFrom").value;
-      const to = document.getElementById("historyTo").value;
-      return `${from ? formatDateLabel(from) : "Beginning"} through ${to ? formatDateLabel(to) : "all dates"}`;
-    }
-    function findDuplicates(candidate, excludedId = "") {
-      const clean = value => String(value || "").trim().toLowerCase();
-      return jobs.filter(job => job.id !== excludedId &&
-        ((clean(candidate.jobNumber) && clean(candidate.jobNumber) === clean(job.jobNumber)) ||
-         (clean(candidate.poNumber) && clean(candidate.poNumber) === clean(job.poNumber))));
-    }
-    function confirmDuplicate(candidate, excludedId = "") {
-      const duplicates = findDuplicates(candidate, excludedId);
-      if (!duplicates.length) return true;
-      return window.confirm(`Possible duplicate: ${duplicates.length} existing job(s) share this job number or PO number.\n\n${duplicates.slice(0,5).map(job => `${job.customerName} • Job ${job.jobNumber || "—"} • PO ${job.poNumber || "—"} • ${job.deliveryDate}`).join("\n")}\n\nSave anyway?`);
-    }
-    function csvCell(value) {
-      let text = String(value ?? "");
-      // Keep user text from being interpreted as spreadsheet formulas.
-      if (/^[\s]*[=+\-@]/.test(text) || /^[\t\r\n]/.test(text)) text = "'" + text;
-      return '"' + text.replace(/"/g, '""') + '"';
-    }
-    function buildHistoryCsv(list) {
-      const rows = [["Delivery date", "Customer", "Job number", "PO number", "Address", "Route", "Status", "Rush", "Notes", "Added date", "Completed at (Denver)"]];
-      for (const job of list) rows.push([job.deliveryDate, job.customerName, job.jobNumber, job.poNumber, job.address, job.route, job.status === "pickedUp" ? "Picked Up" : job.status, job.isRush ? "Yes" : "No", job.notes, getDenverDateKeyFromTimestamp(job.pickupAddedAt || job.createdAt), getTimestampMillis(job.deliveredAt) ? new Date(getTimestampMillis(job.deliveredAt)).toLocaleString("en-US", {timeZone:DENVER_TZ}) : ""]);
-      return '\uFEFF' + rows.map(row => row.map(csvCell).join(",")).join("\r\n");
-    }
-    function exportHistoryCsv() {
-      if (!validHistoryRange()) return;
-      const blob = new Blob([buildHistoryCsv(getHistoryJobsForReport())], {type:"text/csv;charset=utf-8;"});
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url; link.download = `pioneer-history-${currentDenverDate}.csv`;
-      document.body.appendChild(link); link.click(); link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-    const recentUndoActions = [];
-    let undoBusy = false;
-    function renderUndo() {
-      const panel = document.getElementById("undoPanel");
-      panel.hidden = !!(document.fullscreenElement || document.webkitFullscreenElement);
-      const latest = recentUndoActions.at(-1);
-      document.getElementById("undoLabel").textContent = latest ? `${latest.completed ? "Delivered" : "Recent change"}: ${latest.customerName}. Undo is available until this page closes.` : "";
-      document.getElementById("undoRecent").disabled = undoBusy || !latest?.ready;
-      document.getElementById("undoRecent").textContent = undoBusy ? "Undoing…" : "Undo";
-      document.getElementById("undoRecent").title = latest ? (latest.ready ? `Undo change to ${latest.customerName}` : "Preparing Undo…") : "No recent changes to undo";
-      document.getElementById("dismissUndo").hidden = !latest;
-    }
-    async function updateJobWithUndo(reference, updates, requireActive = false) {
-      const previous = jobs.find(job => job.id === reference.id);
-      if (requireActive && previous && isJobCompleted(previous)) throw new Error("This stop is already complete.");
-      const before = {};
-      if (previous) for (const key of Object.keys(updates)) before[key] = previous[key] ?? null;
-
-      // Save with the original fields and server timestamps. Undo must never
-      // prevent a delivery update or require an extra field in database rules.
-      await updateDoc(reference, updates);
-      if (!previous) return;
-      const action = {reference, before, customerName:previous.customerName || "Job", completed:updates.status === "delivered", ready:false};
-      recentUndoActions.push(action);
-      if (recentUndoActions.length > 10) recentUndoActions.shift();
-      renderUndo();
-      void prepareUndo(action, updates);
-    }
-    async function prepareUndo(action, updates) {
-      try {
-        const snapshot = await getDoc(action.reference);
-        if (!snapshot.exists() || snapshot.metadata.hasPendingWrites || snapshot.metadata.fromCache) throw new Error("Could not verify the saved version for Undo.");
-        const saved = snapshot.data();
-        for (const [key, value] of Object.entries(updates)) {
-          if (value === null || typeof value !== "object") {
-            if (saved[key] !== value) throw new Error("The job changed before Undo could be prepared.");
-          }
-        }
-        if (!getTimestampMillis(saved.updatedAt)) throw new Error("The saved job has no version timestamp.");
-        action.changedAt = saved.updatedAt;
-        action.ready = true;
-      } catch (error) {
-        console.warn("Change saved, but Undo is unavailable:", error);
-        const index = recentUndoActions.indexOf(action);
-        if (index !== -1) recentUndoActions.splice(index, 1);
-      } finally { renderUndo(); }
-    }
-    async function undoRecentAction() {
-      if (undoBusy || !recentUndoActions.length || !recentUndoActions.at(-1).ready) return;
-      undoBusy = true; renderUndo();
-      const action = recentUndoActions.at(-1);
-      try {
-        // Check the latest version received by the existing live listener.
-        // This catches observed later edits without a transaction read/retry.
-        // It is not an atomic check against simultaneous edits on other devices.
-        const currentJob = jobs.find(job => job.id === action.reference.id);
-        const currentVersion = currentJob?.updatedAt;
-        const sameVersion = currentVersion && (typeof currentVersion.isEqual === "function"
-          ? currentVersion.isEqual(action.changedAt)
-          : getTimestampMillis(currentVersion) === getTimestampMillis(action.changedAt));
-        if (!sameVersion) {
-          throw new Error("This job changed after your action or its latest version has not loaded. Undo was not applied; review the current job instead.");
-        }
-        await updateDoc(action.reference, {...action.before, updatedAt:serverTimestamp()});
-        const actionIndex = recentUndoActions.indexOf(action);
-        if (actionIndex !== -1) recentUndoActions.splice(actionIndex, 1);
-        void logActivity("undo", "Recent change undone", `${action.customerName}: previous values restored.`).catch(console.error);
-        setNotification(`Undid the recent change to ${action.customerName}.`, "success");
-      } catch (error) {
-        window.alert(`Could not undo this change. ${error.code ? `${error.code}: ` : ""}${error.message || "Please try again."}`);
-      } finally { undoBusy = false; renderUndo(); }
-    }
-
-    function matchesHistorySearch(job) {
-      const terms = (document.getElementById("historySearch")?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-      const status = job.status === "pickedUp" ? "picked up" : job.status;
-      const text = [job.customerName, job.jobNumber, job.poNumber, job.address, job.notes, job.route, status, job.deliveryDate, formatDateLabel(job.deliveryDate)].join(" ").toLowerCase();
-      return terms.every(term => text.includes(term));
-    }
-
     function renderHistory() {
-      const invalid = !validHistoryRange();
-      document.getElementById("historyRangeError").textContent = invalid ? "From date must be on or before Through date." : "";
-      document.getElementById("exportHistory").disabled = invalid;
-      printHistoryBtn.disabled = invalid;
       historyList.innerHTML = "";
       const historyJobs = jobs
-        .filter(job => matchesHistoryDateRange(job.deliveryDate) && matchesHistorySearch(job))
+        .filter(job => isWithinLast30Days(job.deliveryDate))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -5398,10 +5754,10 @@
           return (a.order ?? 0) - (b.order ?? 0);
         });
 
-      historySummaryChip.textContent = `${historyJobs.length} matching job${historyJobs.length === 1 ? "" : "s"} • ${getHistoryRangeLabel()}`;
+      historySummaryChip.textContent = `${historyJobs.length} job${historyJobs.length === 1 ? "" : "s"} in the last 30 days`;
 
       if (!historyJobs.length) {
-        historyList.innerHTML = `<div class="empty-state">No matching shipments. Adjust the dates or clear the search.</div>`;
+        historyList.innerHTML = `<div class="empty-state">No shipment history in the last 30 days yet.</div>`;
         return;
       }
 
@@ -5417,7 +5773,6 @@
           const delivered = dayJobs.filter(job => job.status === "delivered").length;
           const group = document.createElement("details");
           group.className = "history-day-group";
-          group.open = !!document.getElementById("historySearch").value.trim();
           group.innerHTML = `
             <summary class="history-day-toggle">
               <div class="history-day-header">
@@ -5517,6 +5872,7 @@
 
     function renderAdmin() {
       if (!adminList || !adminSummary) return;
+      if (!isCurrentUserAdmin()) { adminList.replaceChildren(); adminSummary.replaceChildren(); return; }
 
       adminList.innerHTML = "";
       if (!adminHasSearched) {
@@ -5547,6 +5903,7 @@
 
     function renderAdminActionHistory() {
       if (!adminActionHistory) return;
+      if (!isCurrentUserAdmin()) { adminActionHistory.replaceChildren(); return; }
 
       if (!activityEntries.length) {
         adminActionHistory.innerHTML = `<div class="admin-search-empty">No action history has been logged yet. New adds, edits, moves, roll-over actions, and status changes will start showing here.</div>`;
@@ -5632,9 +5989,9 @@
       mainPageBtn.classList.remove("active");
       fullPageBtn.classList.remove("active");
       historyPageBtn.classList.remove("active");
-      adminPageBtn.classList.remove("active");
       outsidePageBtn.classList.remove("active");
       pickupPageBtn.classList.remove("active");
+      settingsPageBtn.classList.remove("active");
     }
 
     function showMainPage() {
@@ -5645,6 +6002,7 @@
       adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
+      settingsPage.style.display = "none";
       resetTopTabs();
       mainPageBtn.classList.add("active");
       updateMobileNavTitle("Delivery Manager");
@@ -5663,6 +6021,7 @@
       adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
+      settingsPage.style.display = "none";
       resetTopTabs();
       fullPageBtn.classList.add("active");
       updateMobileNavTitle("Today's Schedule");
@@ -5680,31 +6039,13 @@
       adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "none";
+      settingsPage.style.display = "none";
       resetTopTabs();
       historyPageBtn.classList.add("active");
       updateMobileNavTitle("History");
       closeMobileMenu();
       document.body.classList.remove("no-scroll");
       renderHistory();
-      updateQuickTotalsVisibility();
-    }
-
-    function showAdminPage() {
-      if (!ensureAdminAccess()) return;
-      currentPageView = "admin";
-      mainPage.style.display = "none";
-      fullPage.style.display = "none";
-      historyPage.style.display = "none";
-      adminPage.style.display = "block";
-      outsidePage.style.display = "none";
-      pickupPage.style.display = "none";
-      resetTopTabs();
-      adminPageBtn.classList.add("active");
-      updateMobileNavTitle("Administrator");
-      closeMobileMenu();
-      document.body.classList.remove("no-scroll");
-      renderAdmin();
-      renderAdminActionHistory();
       updateQuickTotalsVisibility();
     }
 
@@ -5716,6 +6057,7 @@
       adminPage.style.display = "none";
       outsidePage.style.display = "block";
       pickupPage.style.display = "none";
+      settingsPage.style.display = "none";
       resetTopTabs();
       outsidePageBtn.classList.add("active");
       updateMobileNavTitle("Outside Shipments");
@@ -5733,6 +6075,7 @@
       adminPage.style.display = "none";
       outsidePage.style.display = "none";
       pickupPage.style.display = "block";
+      settingsPage.style.display = "none";
       resetTopTabs();
       pickupPageBtn.classList.add("active");
       updateMobileNavTitle("Customer Pickup");
@@ -5742,7 +6085,34 @@
       updateQuickTotalsVisibility();
     }
 
+    function showSettingsPage() {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+      currentPageView = "settings";
+      mainPage.style.display = "none";
+      fullPage.style.display = "none";
+      historyPage.style.display = "none";
+      adminPage.style.display = isCurrentUserAdmin() ? "block" : "none";
+      outsidePage.style.display = "none";
+      pickupPage.style.display = "none";
+      settingsPage.style.display = "block";
+      resetTopTabs();
+      settingsPageBtn.classList.add("active");
+      updateMobileNavTitle(isCurrentUserAdmin() ? "User Settings · Admin" : "User Settings");
+      closeMobileMenu();
+      document.body.classList.remove("no-scroll");
+      loadMapSettings();
+      if (isCurrentUserAdmin()) {
+        renderAdmin();
+        renderAdminActionHistory();
+      }
+      updateQuickTotalsVisibility();
+    }
+
     async function moveDraggedJobToRoute(targetRoute, targetIndex = null) {
+      if (!ensureSignedIn()) return;
       if (!draggedJobId) return;
       const draggedJob = jobs.find(job => job.id === draggedJobId);
       if (!draggedJob || isOutsideRoute(targetRoute) || isCustomerPickupRoute(targetRoute)) return;
@@ -5754,7 +6124,7 @@
       else newOrderList.splice(targetIndex, 0, draggedJob);
 
       try {
-        await updateJobWithUndo(doc(db, "deliveryJobs", draggedJobId), {
+        await updateDoc(doc(db, "deliveryJobs", draggedJobId), {
           route: targetRoute,
           status: "active",
           deliveryDate: managerViewDate
@@ -5851,7 +6221,7 @@ Thank you.`;
 
     function getHistoryJobsForReport() {
       return jobs
-        .filter(job => matchesHistoryDateRange(job.deliveryDate) && matchesHistorySearch(job))
+        .filter(job => isWithinLast30Days(job.deliveryDate))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -5925,8 +6295,7 @@ Thank you.`;
           </head>
           <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
             <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
-            <p style="margin:0 0 20px; color:#6b7280;">History Report - ${escapeHtml(getHistoryRangeLabel())} (${getDenverDateTimeLabel()} Denver time)</p>
-            ${document.getElementById("historySearch").value.trim() ? `<p>Search: ${escapeHtml(document.getElementById("historySearch").value.trim())}</p>` : ""}
+            <p style="margin:0 0 20px; color:#6b7280;">History Report - Last 30 Days (${getDenverDateTimeLabel()} Denver time)</p>
 
             <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:24px;">
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">History Jobs</div><div style="font-size:24px; font-weight:bold;">${historyJobs.length}</div></div>
@@ -5934,7 +6303,7 @@ Thank you.`;
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Days Covered</div><div style="font-size:24px; font-weight:bold;">${Object.keys(grouped).length}</div></div>
             </div>
 
-            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No matching shipment history for the selected dates.</div>`}
+            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No shipment history in the last 30 days yet.</div>`}
           </body>
         </html>
       `;
@@ -6042,9 +6411,7 @@ Thank you.`;
       }
     }
 
-    document.addEventListener("webkitfullscreenchange", renderUndo);
     document.addEventListener("fullscreenchange", () => {
-      renderUndo();
       const isFullscreen = !!document.fullscreenElement;
       fullscreenBtn.textContent = isFullscreen ? "Exit Full Screen" : "Full Screen";
 
@@ -6063,6 +6430,7 @@ Thank you.`;
 
     jobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!ensureSignedIn()) return;
       statusMessage.textContent = "Adding delivery...";
 
       const routeValue = routeInput.value;
@@ -6078,12 +6446,12 @@ Thank you.`;
         notes: deliveryNotesInput.value.trim(),
         route: routeValue,
         deliveryDate,
+        originalDeliveryDate: deliveryDate,
         status: "active",
         isRush,
         isPickup: pickupDeliveryInput.checked,
         order: nextOrder,
         createdAt: serverTimestamp(),
-        pickupAddedAt: isCustomerPickupRoute(routeValue) ? serverTimestamp() : null,
         updatedAt: serverTimestamp()
       };
 
@@ -6092,7 +6460,6 @@ Thank you.`;
         return;
       }
 
-      if (!confirmDuplicate(newJob)) { statusMessage.textContent = "Addition canceled."; return; }
       try {
         await addDoc(jobsCollection, newJob);
         await logActivity("added", "New delivery added", `${newJob.customerName} was added to ${newJob.route} for ${formatDateLabel(newJob.deliveryDate)}.`);
@@ -6110,6 +6477,7 @@ Thank you.`;
     });
 
     async function deleteEditingJob() {
+      if (!ensureAdminAccess()) return;
       if (!editingJobId) return;
       const jobToDelete = jobs.find(job => job.id === editingJobId);
       const customerLabel = jobToDelete?.customerName || "This delivery";
@@ -6131,6 +6499,7 @@ Thank you.`;
 
     editJobForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (!ensureAdminAccess()) return;
       if (!editingJobId) return;
 
       try {
@@ -6144,16 +6513,13 @@ Thank you.`;
         const completedAtValue = editDeliveredAtInput?.value || "";
         const completedAtDate = completedAtValue ? new Date(completedAtValue) : null;
 
-        if (!confirmDuplicate({ jobNumber: editJobNumberInput.value, poNumber: editPoNumberInput.value }, editingJobId)) return;
-        await updateJobWithUndo(doc(db, "deliveryJobs", editingJobId), {
+        await updateDoc(doc(db, "deliveryJobs", editingJobId), {
           customerName: editCustomerNameInput.value.trim(),
           jobNumber: editJobNumberInput.value.trim(),
           poNumber: editPoNumberInput.value.trim(),
           address: editAddressInput.value.trim(),
           notes: editDeliveryNotesInput.value.trim(),
           route: selectedRoute,
-          ...(isCustomerPickupRoute(selectedRoute) && !isCustomerPickupRoute(jobs.find(job => job.id === editingJobId)?.route)
-            ? { pickupAddedAt: serverTimestamp() } : {}),
           deliveryDate: selectedDate,
           status: selectedStatus,
           isRush,
@@ -6162,6 +6528,9 @@ Thank you.`;
           deliveredAt: selectedStatus === "active"
             ? null
             : (completedAtDate && Number.isFinite(completedAtDate.getTime()) ? completedAtDate : new Date(`${selectedDate}T12:00`)),
+          ...(document.getElementById("editClearRollover").checked ? {
+            originalDeliveryDate: selectedDate, rolledFromDate: "", rolledOverAt: null
+          } : {}),
           updatedAt: serverTimestamp()
         });
         await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()} was updated to ${selectedRoute} on ${formatDateLabel(selectedDate)} with status ${selectedStatus}.`);
@@ -6195,30 +6564,157 @@ Thank you.`;
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && editModalOverlay.classList.contains("show")) closeEditDelivery();
+      if (e.key === "Escape" && deliveryActionMenuOverlay.classList.contains("show")) closeDeliveryActionMenu();
+      if (e.key === "Escape" && rolloverModalOverlay.classList.contains("show")) closeRolloverModal();
+      if (e.key === "Escape" && authModalOverlay.classList.contains("show")) closeAuthModal();
+      if (e.key === "Tab") {
+        const modal = [authModalOverlay, deliveryActionMenuOverlay, rolloverModalOverlay, editModalOverlay].find(item => item.classList.contains("show"));
+        if (!modal) return;
+        const focusable = [...modal.querySelectorAll('button, input, select, textarea, [tabindex="0"]')]
+          .filter(item => !item.disabled && item.getClientRects().length);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     });
 
     menuToggleBtn.addEventListener("click", toggleMobileMenu);
 
+    accountBtn.addEventListener("click", async () => {
+      if (currentUser) {
+        try { await signOut(auth); }
+        catch (error) { accountStatus.textContent = friendlyAuthError(error); }
+      } else {
+        openAuthModal();
+      }
+    });
+
+    authModalCloseBtn.addEventListener("click", closeAuthModal);
+    authModalOverlay.addEventListener("click", (event) => {
+      if (event.target === authModalOverlay) closeAuthModal();
+    });
+
+    deliveryActionMenuCloseBtn.addEventListener("click", closeDeliveryActionMenu);
+    deliveryActionMoveBtn.addEventListener("click", () => {
+      const job = getDeliveryActionJob();
+      closeDeliveryActionMenu();
+      if (job) openRolloverModal(job);
+    });
+    deliveryActionDeliverBtn.addEventListener("click", async () => {
+      const job = getDeliveryActionJob();
+      closeDeliveryActionMenu();
+      if (job) await markJobDelivered(job);
+    });
+    deliveryActionMapsBtn.addEventListener("click", () => {
+      const job = getDeliveryActionJob();
+      closeDeliveryActionMenu();
+      if (job) window.open(getMapsLink(job.address), "_blank", "noopener,noreferrer");
+    });
+    deliveryActionMenuOverlay.addEventListener("click", (event) => {
+      if (event.target === deliveryActionMenuOverlay) closeDeliveryActionMenu();
+    });
+
+    rolloverCloseBtn.addEventListener("click", closeRolloverModal);
+    cancelRolloverBtn.addEventListener("click", closeRolloverModal);
+    confirmRolloverBtn.addEventListener("click", confirmRollover);
+    rolloverModalOverlay.addEventListener("click", (event) => {
+      if (event.target === rolloverModalOverlay) closeRolloverModal();
+    });
+
+    authForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (authBusy || !authForm.reportValidity()) return;
+      authBusy = true;
+      signInBtn.disabled = createAccountBtn.disabled = true;
+      authStatusMessage.textContent = authMode === "create" ? "Creating account…" : "Signing in…";
+      try {
+        const credential = await authenticateAccount(authMode, authEmailInput.value, authPasswordInput.value);
+        currentUser = credential.user;
+        authBusy = false;
+        closeAuthModal();
+        await loadUserMapPreference(auth.currentUser);
+        showSettingsPage();
+      } catch (error) {
+        authStatusMessage.textContent = !error.code ? error.message : friendlyAuthError(error);
+        authPasswordInput.value = "";
+      } finally {
+        authBusy = false;
+        signInBtn.disabled = createAccountBtn.disabled = false;
+      }
+    });
+
+    createAccountBtn.addEventListener("click", async () => {
+      if (authMode === "create") {
+        setAuthMode("sign-in");
+        authEmailInput.focus();
+        return;
+      }
+      setAuthMode("create");
+      authEmailInput.focus();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      watchAccountRole(user);
+      await loadUserMapPreference(user);
+    });
+
+    document.getElementById("verifyEmailBtn").addEventListener("click", async event => {
+      if (!currentUser) return;
+      event.target.disabled = true;
+      try {
+        await sendEmailVerification(currentUser);
+        document.getElementById("accountMessage").textContent = "Verification email sent. Open its link, then choose ‘I Verified My Email’.";
+      } catch (error) { document.getElementById("accountMessage").textContent = friendlyAuthError(error); }
+      finally { event.target.disabled = false; }
+    });
+    document.getElementById("refreshAccountBtn").addEventListener("click", async () => {
+      try {
+        if (!auth.currentUser) return;
+        await reload(auth.currentUser);
+        await auth.currentUser.getIdToken(true);
+        currentUser = auth.currentUser;
+        watchAccountRole(currentUser);
+      } catch (error) { document.getElementById("accountMessage").textContent = friendlyAuthError(error); }
+    });
+    document.getElementById("resetPasswordBtn").addEventListener("click", async event => {
+      const email = authEmailInput.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        authStatusMessage.textContent = "Enter your email address above to reset your password.";
+        return;
+      }
+      event.target.disabled = true;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        authStatusMessage.textContent = "If this email has an account, check your inbox for the reset link.";
+      } catch (error) { authStatusMessage.textContent = friendlyAuthError(error); }
+      finally { event.target.disabled = false; }
+    });
+    document.getElementById("adminAccessForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!ensureAdminAccess()) return;
+      const email = document.getElementById("adminAccessEmail").value.trim().toLowerCase();
+      const message = document.getElementById("adminAccessMessage");
+      if (ADMIN_EMAILS.has(email)) { message.textContent = "This email is already a permanent admin."; return; }
+      const button = event.currentTarget.querySelector("button");
+      button.disabled = true;
+      try {
+        await setDoc(doc(db, "adminAccess", email), { grantedBy: currentUser.uid, createdAt: serverTimestamp() });
+        message.textContent = `Admin access granted to ${email}. They must sign in and verify that email.`;
+        document.getElementById("adminAccessEmail").value = "";
+      } catch (error) { message.textContent = friendlyAuthError(error); }
+      finally { button.disabled = false; }
+    });
+
     mainPageBtn.addEventListener("click", showMainPage);
     fullPageBtn.addEventListener("click", showFullPage);
-    document.getElementById("historyFrom").value = addDaysToDateKey(currentDenverDate, -29);
-    document.getElementById("historyTo").value = currentDenverDate;
-    for (const id of ["historyFrom", "historyTo"]) document.getElementById(id).addEventListener("change", renderHistory);
-    document.getElementById("historyAllDates").addEventListener("click", () => { document.getElementById("historyFrom").value = ""; document.getElementById("historyTo").value = ""; renderHistory(); });
-    document.getElementById("history30Days").addEventListener("click", () => { document.getElementById("historyFrom").value = addDaysToDateKey(currentDenverDate, -29); document.getElementById("historyTo").value = currentDenverDate; renderHistory(); });
-    document.getElementById("exportHistory").addEventListener("click", exportHistoryCsv);
-    document.getElementById("dismissUndo").addEventListener("click", () => { if (!undoBusy) { recentUndoActions.pop(); renderUndo(); } });
-    document.getElementById("undoRecent").addEventListener("click", undoRecentAction);
-    document.getElementById("historySearch").addEventListener("input", renderHistory);
-    document.getElementById("clearHistorySearch").addEventListener("click", () => {
-      document.getElementById("historySearch").value = "";
-      renderHistory();
-      document.getElementById("historySearch").focus();
-    });
     historyPageBtn.addEventListener("click", showHistoryPage);
-    if (adminPageBtn) adminPageBtn.addEventListener("click", showAdminPage);
     outsidePageBtn.addEventListener("click", showOutsidePage);
     pickupPageBtn.addEventListener("click", showPickupPage);
+    settingsPageBtn.addEventListener("click", showSettingsPage);
+    document.querySelectorAll('input[name="preferredMapApp"]').forEach(input => {
+      input.addEventListener("change", () => saveMapSetting(input.value));
+    });
     fullscreenBtn.addEventListener("click", toggleFullScreen);
     printSheetBtn.addEventListener("click", printDispatchSheet);
     if (printHistoryBtn) printHistoryBtn.addEventListener("click", printHistoryReport);
@@ -6322,6 +6818,7 @@ Thank you.`;
     function shouldAutoRolloverJob(job, todayKey) {
       if (!job || isJobCompleted(job) || job.status !== "active") return false;
       if (!isRolloverRoute(job)) return false;
+      if (!isValidDeliveryDate(job.deliveryDate) || !isValidDeliveryDate(todayKey)) return false;
       return parseDateKey(job.deliveryDate) < parseDateKey(todayKey);
     }
 
@@ -6340,6 +6837,7 @@ Thank you.`;
     }
 
     async function repairCompletedRolledOverJobs(todayKey = currentDenverDate) {
+      if (!isCurrentUserAdmin()) return;
       if (completedRolloverRepairAttemptDate === todayKey || completedRolloverRepairInProgress) return;
 
       const repairs = jobs
@@ -6378,6 +6876,7 @@ Thank you.`;
     }
 
     async function rolloverUnfinishedJobsToToday(todayKey = currentDenverDate) {
+      if (!currentUser) return;
       const rolloverJobs = jobs.filter(job => shouldAutoRolloverJob(job, todayKey));
       if (!rolloverJobs.length || rolloverInProgress) return;
 
@@ -6388,17 +6887,20 @@ Thank you.`;
       lastRolloverKey = rolloverKey;
 
       try {
-        await Promise.all(rolloverJobs.map(job => {
-          const nextOrder = job.isRush ? -1 : getNextNonRushOrder({ ...job, deliveryDate: todayKey, status: "active" }, job.route, todayKey);
-          return updateDoc(doc(db, "deliveryJobs", job.id), {
+        await Promise.all(rolloverJobs.map(job => runTransaction(db, async transaction => {
+          const ref = doc(db, "deliveryJobs", job.id);
+          const snapshot = await transaction.get(ref);
+          if (!snapshot.exists()) return;
+          const fresh = normalizeJob(snapshot.id, snapshot.data());
+          if (!shouldAutoRolloverJob(fresh, todayKey)) return;
+          transaction.update(ref, {
             deliveryDate: todayKey,
-            status: "active",
-            order: nextOrder,
-            rolledFromDate: job.deliveryDate,
+            order: fresh.isRush ? -1 : getNextNonRushOrder({ ...fresh, deliveryDate: todayKey }, fresh.route, todayKey),
+            rolledFromDate: fresh.rolledFromDate || fresh.deliveryDate,
             rolledOverAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });
-        }));
+        })));
 
         await logActivity("rollover", "Unfinished deliveries rolled over", `${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "ies"} rolled over to ${formatDateLabel(todayKey)}.`);
         setNotification(`${rolloverJobs.length} unfinished delivery${rolloverJobs.length === 1 ? "" : "ies"} rolled over to ${formatDateLabel(todayKey)}.`, "warning");
@@ -6422,7 +6924,6 @@ Thank you.`;
       renderFullSchedule();
       updateQuickTotals();
       updateQuickTotalsVisibility();
-      renderLatestAction(false);
       updateTomorrowPreview();
       if (isScheduleFullscreenActive() && window.innerWidth > 700) {
         requestAnimationFrame(() => applyFullscreenFit());
@@ -6452,21 +6953,6 @@ Thank you.`;
     }
 
     const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
-    const activityQuery = query(activityCollection, orderBy("createdAt", "desc"), limit(20));
-
-    onSnapshot(
-      activityQuery,
-      (snapshot) => {
-        activityEntries = snapshot.docs.map(docItem => ({
-          id: docItem.id,
-          ...docItem.data()
-        }));
-        renderAdminActionHistory();
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
 
     onSnapshot(
       jobsQuery,
@@ -6507,7 +6993,6 @@ Thank you.`;
           repairCompletedRolledOverJobs(currentDenverDate);
         }
         rolloverUnfinishedJobsToToday(currentDenverDate);
-        renderLatestAction();
 
         if (latestLiveAlert) {
           showLiveAlert(latestLiveAlert.kind, latestLiveAlert.job);
