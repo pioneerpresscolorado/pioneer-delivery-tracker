@@ -2952,6 +2952,9 @@
 </head>
 
 <body>
+  <div id="activityLogWarning" role="alert" hidden style="padding:12px;background:#fff7ed;color:#9a3412;border:1px solid #fdba74;">
+    A change was saved, but its history entry could not be recorded. Check your connection and Firebase activity permissions. Refreshing will dismiss this warning.
+  </div>
   <div class="app" id="appRoot">
     <div class="header">
       <div class="header-bar">
@@ -3293,15 +3296,12 @@
         </form>
         <div class="admin-summary" id="adminSummary"></div>
         <div id="adminList" class="admin-list"></div>
-        <div class="card admin-history-card">
-          <div class="date-toolbar" style="margin-bottom:10px;">
-            <div>
-              <h3 style="margin:0 0 6px;">Action History</h3>
-              <p class="muted" style="margin:0;">Last 20 tracked changes on the site.</p>
-            </div>
-          </div>
+        <details class="card admin-history-card" id="userHistorySection">
+          <summary style="cursor:pointer;font-weight:700;font-size:1.15rem;">User History</summary>
+          <p class="muted">Latest 100 recorded changes, newest first. Names use the part of the person's email before @. Older entries may not have a saved name.</p>
+          <p id="userHistoryLatest" class="muted" aria-live="polite"></p>
           <div id="adminActionHistory" class="admin-action-history"></div>
-        </div>
+        </details>
       </div>
     </div>
 
@@ -4095,11 +4095,18 @@
           title,
           details,
           actorUid: currentUser.uid,
+          actorEmail: currentUser.email || "",
           createdAt: serverTimestamp()
         });
       } catch (error) {
         console.error("Could not log activity.", error);
+        document.getElementById("activityLogWarning").hidden = false;
       }
+    }
+
+    function getActivityUserLabel(entry) {
+      const email = String(entry.actorEmail || "");
+      return email.includes("@") ? email.split("@")[0] : "Unknown user (older record)";
     }
 
     function isCurrentUserAdmin() {
@@ -4790,7 +4797,7 @@
     }
 
     async function moveJobBackToRolledDate(job) {
-      if (!ensureAdminAccess()) return;
+      if (!ensureSignedIn()) return;
       if (!job?.rolledFromDate || job.deliveryDate === job.rolledFromDate) return;
 
       try {
@@ -4835,7 +4842,7 @@
 
     function openEditDelivery(job) {
       if (!ensureSignedIn()) return;
-      deleteEditBtn.hidden = !isCurrentUserAdmin();
+      deleteEditBtn.hidden = !currentUser;
       document.getElementById("editClearRollover").checked = false;
       editingJobId = job.id;
       editCustomerNameInput.value = job.customerName || "";
@@ -5196,11 +5203,12 @@
       if (activitySubscription) { activitySubscription(); activitySubscription = null; }
       activityEntries = [];
       if (admin) {
-        activitySubscription = onSnapshot(query(activityCollection, orderBy("createdAt", "desc"), limit(20)), snapshot => {
+        activitySubscription = onSnapshot(query(activityCollection, orderBy("createdAt", "desc"), limit(100)), snapshot => {
           activityEntries = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
           renderAdminActionHistory();
         }, () => {
-          adminActionHistory.textContent = "Action history could not be loaded.";
+          document.getElementById("userHistoryLatest").textContent = "";
+          adminActionHistory.textContent = "User history could not be loaded. Check Firebase permissions.";
         });
         adminListSubscription = onSnapshot(collection(db, "adminAccess"), snapshot => {
           const list = document.getElementById("adminAccessList");
@@ -5217,7 +5225,10 @@
             remove.addEventListener("click", async () => {
               if (!ensureAdminAccess() || !confirm(`Remove admin access for ${entry.id}?`)) return;
               remove.disabled = true;
-              try { await deleteDoc(entry.ref); }
+              try {
+                await deleteDoc(entry.ref);
+                await logActivity("admin-revoked", "Admin access removed", `Admin access removed for ${entry.id.split("@")[0]}.`);
+              }
               catch (error) {
                 document.getElementById("adminAccessMessage").textContent = friendlyAuthError(error);
                 remove.disabled = false;
@@ -5904,7 +5915,11 @@
 
     function renderAdminActionHistory() {
       if (!adminActionHistory) return;
-      if (!isCurrentUserAdmin()) { adminActionHistory.replaceChildren(); return; }
+      const latest = document.getElementById("userHistoryLatest");
+      if (!isCurrentUserAdmin()) { adminActionHistory.replaceChildren(); latest.textContent = ""; return; }
+      latest.textContent = activityEntries.length
+        ? `Last recorded update: ${getActivityUserLabel(activityEntries[0])} — ${activityEntries[0].title || "Site action"} — ${formatActionTimestamp(activityEntries[0].createdAt)}`
+        : "No recorded updates yet.";
 
       if (!activityEntries.length) {
         adminActionHistory.innerHTML = `<div class="admin-search-empty">No action history has been logged yet. New adds, edits, moves, roll-over actions, and status changes will start showing here.</div>`;
@@ -5914,7 +5929,7 @@
       adminActionHistory.innerHTML = activityEntries.map(entry => `
         <div class="admin-action-item">
           <div class="admin-action-top">
-            <h4 class="admin-action-title">${escapeHtml(entry.title || "Site action")}</h4>
+            <h4 class="admin-action-title">${escapeHtml(getActivityUserLabel(entry))} — ${escapeHtml(entry.title || "Site action")}</h4>
             <div class="admin-action-time">${escapeHtml(formatActionTimestamp(entry.createdAt))}</div>
           </div>
           <div class="admin-action-text">${escapeHtml(entry.details || "No details available.")}</div>
@@ -6128,11 +6143,12 @@
         await updateDoc(doc(db, "deliveryJobs", draggedJobId), {
           route: targetRoute,
           status: "active",
-          deliveryDate: managerViewDate
+          deliveryDate: managerViewDate,
+          updatedAt: serverTimestamp()
         });
 
         const updates = newOrderList.map((job, index) =>
-          updateDoc(doc(db, "deliveryJobs", job.id), { order: index })
+          updateDoc(doc(db, "deliveryJobs", job.id), { order: index, updatedAt: serverTimestamp() })
         );
         await Promise.all(updates);
 
@@ -6478,7 +6494,7 @@ Thank you.`;
     });
 
     async function deleteEditingJob() {
-      if (!ensureAdminAccess()) return;
+      if (!ensureSignedIn()) return;
       if (!editingJobId) return;
       const jobToDelete = jobs.find(job => job.id === editingJobId);
       const customerLabel = jobToDelete?.customerName || "This delivery";
@@ -6514,7 +6530,8 @@ Thank you.`;
         const completedAtValue = editDeliveredAtInput?.value || "";
         const completedAtDate = completedAtValue ? new Date(completedAtValue) : null;
 
-        await updateDoc(doc(db, "deliveryJobs", editingJobId), {
+        const previousJob = jobs.find(job => job.id === editingJobId);
+        const editUpdates = {
           customerName: editCustomerNameInput.value.trim(),
           jobNumber: editJobNumberInput.value.trim(),
           poNumber: editPoNumberInput.value.trim(),
@@ -6533,8 +6550,16 @@ Thank you.`;
             originalDeliveryDate: selectedDate, rolledFromDate: "", rolledOverAt: null
           } : {}),
           updatedAt: serverTimestamp()
-        });
-        await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()} was updated to ${selectedRoute} on ${formatDateLabel(selectedDate)} with status ${selectedStatus}.`);
+        };
+        const changedFields = [
+          ["customerName", "customer"], ["jobNumber", "job number"], ["poNumber", "PO number"],
+          ["address", "address"], ["notes", "notes"], ["route", "route"],
+          ["deliveryDate", "delivery date"], ["status", "status"],
+          ["isRush", "rush"], ["isPickup", "pickup"]
+        ].filter(([key]) => previousJob?.[key] !== editUpdates[key]).map(([, label]) => label);
+        if (document.getElementById("editClearRollover").checked) changedFields.push("rollover correction");
+        await updateDoc(doc(db, "deliveryJobs", editingJobId), editUpdates);
+        await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()}: ${changedFields.length ? "changed " + changedFields.join(", ") : "saved delivery details/completion time"}. Route: ${selectedRoute}; date: ${selectedDate}; status: ${selectedStatus}.`);
 
         closeEditDelivery();
         statusMessage.textContent = "Delivery updated.";
@@ -6701,6 +6726,7 @@ Thank you.`;
       button.disabled = true;
       try {
         await setDoc(doc(db, "adminAccess", email), { grantedBy: currentUser.uid, createdAt: serverTimestamp() });
+        await logActivity("admin-granted", "Admin access granted", `Admin access granted to ${email.split("@")[0]}.`);
         message.textContent = `Admin access granted to ${email}. They must sign in and verify that email.`;
         document.getElementById("adminAccessEmail").value = "";
       } catch (error) { message.textContent = friendlyAuthError(error); }
