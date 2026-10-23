@@ -171,7 +171,7 @@
 
     .top-nav {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(7, 1fr);
       gap: 8px;
     }
 
@@ -2948,7 +2948,59 @@
       }
     }
 
-  </style>
+  
+    .driver-routes-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+    .driver-route-section {min-width:0}
+    .driver-route-controls {display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:end}
+    .driver-route-controls > * {flex:1 1 150px;min-width:0;width:auto}
+    .driver-route-controls button {min-height:44px}
+    .driver-trip {border-top:2px solid #cbd5e1;margin-top:20px;padding-top:16px}
+    .driver-stop {padding:12px;margin-bottom:12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;overflow-wrap:anywhere}
+    .driver-stop.completed {background:#f0fdf4;border-color:#16a34a}
+    .driver-map-links a {display:block;padding:12px 0;overflow-wrap:anywhere}
+    #routesDate {max-width:240px}
+    @media(max-width:950px){.driver-routes-grid{grid-template-columns:1fr}}
+  
+    .history-search-tools {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:16px 0}
+    .history-search-tools label,.history-search-tools p {grid-column:1/-1;margin:0}
+    .history-search-tools button {width:auto}
+    .schedule-card .schedule-due-date {font-size:1.05rem;line-height:1.2;margin-top:2px;color:inherit}
+    .is-fullscreen .schedule-card .schedule-due-date {font-size:var(--fs-address);line-height:1.1}
+    .is-fullscreen .schedule-card.delivered-card .schedule-due-date {display:none!important}
+    @media(max-width:700px){.history-search-tools{grid-template-columns:minmax(0,1fr)}.history-search-tools button{justify-self:start}}
+  
+    .route-picker {grid-column:1/-1}
+    .route-driver-picker {display:flex;gap:10px;margin:12px 0}
+    .route-driver-picker button {flex:1;min-height:50px}
+    .route-driver-picker button[aria-pressed="true"] {background:#1d4ed8;color:white;border:2px solid #1e3a8a}
+    .route-run-picker {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+    .route-run {min-width:0;padding:12px;border:1px solid #cbd5e1;border-radius:12px}
+    .route-delivery-choice {display:flex;flex-direction:column;gap:5px;text-align:left;white-space:normal;overflow-wrap:anywhere;margin-top:10px;min-height:64px}
+    .route-delivery-choice span,.route-delivery-choice small {font-weight:normal}
+    .schedule-card,.schedule-card * {-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+    .schedule-card {touch-action:pan-y pinch-zoom}
+    .schedule-card .schedule-due-date,.is-fullscreen .schedule-card .schedule-due-date {font-size:12px;line-height:1.1;margin-top:2px}
+    @media(max-width:700px){.route-run-picker{grid-template-columns:1fr}.route-picker{padding:12px}.route-picker select{min-height:44px}.history-search-tools{grid-template-columns:1fr 1fr}.history-search-tools input[type=search],.history-search-tools p{grid-column:1/-1}.history-search-tools label{grid-column:auto}.history-search-tools input[type=date]{min-width:0;width:100%}}
+    
+    .route-run.driver-ricardo {border:2px solid #2563eb;background:#eff6ff}
+    .route-run.driver-kevin {border:2px solid #ea580c;background:#fff7ed}
+    .route-driver-picker .driver-ricardo,.route-delivery-choice.driver-ricardo {background:#dbeafe;color:#172554;border:2px solid #2563eb}
+    .route-driver-picker .driver-kevin,.route-delivery-choice.driver-kevin {background:#ffedd5;color:#7c2d12;border:2px solid #ea580c}
+    .route-delivery-choice:disabled {opacity:1}
+    .route-driver-picker button.driver-ricardo[aria-pressed="true"] {background:#dbeafe;color:#172554;border-color:#2563eb}
+    .route-driver-picker button.driver-kevin[aria-pressed="true"] {background:#ffedd5;color:#7c2d12;border-color:#ea580c}
+    .route-driver-picker button[aria-pressed="true"] {box-shadow:0 0 0 3px #0f172a; font-weight:800}
+    .driver-route-section.driver-ricardo {border-top:5px solid #2563eb}
+    .driver-route-section.driver-kevin {border-top:5px solid #ea580c}
+    .address-ac-wrap {position:relative}
+    .address-ac-list {position:absolute;left:0;right:0;top:100%;z-index:10010;margin:4px 0 0;padding:4px;list-style:none;background:#fff;border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 12px 30px rgba(15,23,42,.18);max-height:300px;overflow-y:auto}
+    .address-ac-list[hidden] {display:none}
+    .address-ac-item {padding:10px 12px;border-radius:8px;cursor:pointer;line-height:1.25}
+    .address-ac-item strong {display:block;color:#0f172a}
+    .address-ac-item span {display:block;color:#64748b;font-size:.88rem}
+    .address-ac-item[aria-selected="true"],.address-ac-item:hover {background:#eff6ff}
+    .address-ac-credit {padding:4px 12px 2px;text-align:right;color:#94a3b8;font-size:.72rem}
+    </style>
 </head>
 
 <body>
@@ -2979,6 +3031,7 @@
         <div class="top-nav" id="topNav">
           <button class="tab-btn active" id="mainPageBtn" type="button">Delivery Manager</button>
           <button class="tab-btn" id="fullPageBtn" type="button">Schedule</button>
+          <button class="tab-btn" id="routesPageBtn" type="button">Routes</button>
           <button class="tab-btn" id="outsidePageBtn" type="button">Outside Shipments</button>
           <button class="tab-btn" id="pickupPageBtn" type="button">Customer Pickup</button>
           <button class="tab-btn" id="historyPageBtn" type="button">History</button>
@@ -2987,6 +3040,12 @@
       </div>
     </div>
 
+    <section id="routesPage" style="display:none" aria-label="Driver routes">
+      <div class="card"><h2>Routes</h2><label for="routesDate">Delivery date</label><input type="date" id="routesDate">
+      <p>Return destination: Pioneer Press · 2965 S 27th Ave, Greeley, CO 80631.</p>
+      <p>Choose a driver below, then tap deliveries or add a whole run. New stops are placed in the fastest order from Pioneer and back; drivers can still move them. Export opens the trip in the map app chosen in your User Settings and returns to Pioneer. Each driver has one current route. Delivered stops clear automatically.</p></div>
+      <p id="routesStatus" role="status" aria-live="polite"></p><div id="driverRoutes" class="driver-routes-grid"></div>
+    </section>
     <div id="scheduleFullscreenArea">
       <div class="card" id="quickTotalsCard">
         <h2>Quick Totals</h2>
@@ -3110,6 +3169,11 @@
                   <div>
                     <label for="deliveryDate">Delivery Date</label>
                     <input id="deliveryDate" type="date" required />
+                  </div>
+                  <div>
+                    <label for="dueDate">Due Date (optional)</label>
+                    <input id="dueDate" type="date" />
+                    <p class="contact-note">Job deadline. Stays the same if delivery is rescheduled.</p>
                   </div>
                 </div>
 
@@ -3240,13 +3304,21 @@
         <div class="date-toolbar">
           <div>
             <h2 style="margin:0 0 6px;">History</h2>
-            <p class="muted" style="margin:0;">Last 30 days of shipments, grouped by delivery day.</p>
+            <p class="muted" style="margin:0;">Search shipments by delivery date, grouped by day.</p>
           </div>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-            <div class="history-summary-chip" id="historySummaryChip">0 jobs</div>
+            <div class="history-summary-chip" id="historySummaryChip" role="status" aria-live="polite">0 jobs</div>
             <button id="printHistoryBtn" class="print-btn" type="button" style="margin-bottom:0;">Print History Report</button>
           </div>
         </div>
+        <form id="historySearchForm" class="history-search-tools">
+          <label for="historySearch">Search history</label>
+          <input id="historySearch" type="search" placeholder="Customer, job #, PO #, address, route, date or notes" aria-describedby="historySearchHint" />
+          <label for="historyFrom">From</label><input id="historyFrom" type="date" required />
+          <label for="historyTo">Through</label><input id="historyTo" type="date" required />
+          <button type="submit">Search</button><button id="clearHistorySearch" type="button">Clear search</button>
+          <p id="historySearchHint" class="muted">Choose delivery dates and press Search to load results. Printing uses the last submitted search.</p>
+        </form>
         <div id="historyList"></div>
       </div>
     </div>
@@ -3374,7 +3446,11 @@
           </label>
         </div>
 
-        <p id="settingsSavedMessage" class="settings-saved" aria-live="polite"></p>
+        <label for="locationPreference">Use my current location for routing</label>
+      <select id="locationPreference"><option value="ask">On (default)</option><option value="on">On</option><option value="off">Off — start route trips from Pioneer Press</option></select>
+      <p class="contact-note">Saved to your account. When on, route trips start from wherever you are — your map app finds your location itself, so this site never asks for it.</p>
+      <p id="locationSettingsMessage" role="status"></p>
+      <p id="settingsSavedMessage" class="settings-saved" aria-live="polite"></p>
       </div>
       <div id="settingsAdminMount"></div>
       <div class="card">
@@ -3387,7 +3463,7 @@
         <p id="accountMessage" role="status" aria-live="polite"></p>
       </div>
       <div id="adminAccessPanel" class="card" style="display:none;">
-        <h3>Manage Admin Access</h3>
+        <h3>Manage Admin Access</h3><p><a href="https://console.firebase.google.com/project/pioneer-delivery/authentication/users" target="_blank" rel="noopener noreferrer">View registered accounts in Firebase</a></p><p class="contact-note">Project owners can see registered email addresses and last sign-in dates here. Use this list to identify driver accounts; it does not automatically grant routing or admin access.</p>
         <p>Justin and Cristina are permanent admins after verifying their email. Additional admins can be granted or removed below.</p>
         <form id="adminAccessForm" class="form-grid">
           <label for="adminAccessEmail">User email</label>
@@ -3512,6 +3588,11 @@
             <label for="editDeliveryDate">Delivery Date</label>
             <input id="editDeliveryDate" type="date" required />
           </div>
+          <div>
+            <label for="editDueDate">Due Date (optional)</label>
+            <input id="editDueDate" type="date" />
+            <p class="contact-note">Job deadline. Stays the same if delivery is rescheduled.</p>
+          </div>
         </div>
 
         <div class="checkbox-row-wrap">
@@ -3600,7 +3681,8 @@
       limit,
       serverTimestamp,
       runTransaction,
-      setDoc
+      setDoc,
+      deleteField
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
       getAuth,
@@ -3629,7 +3711,7 @@
     const jobsCollection = collection(db, "deliveryJobs");
     const activityCollection = collection(db, "deliveryActivity");
     const ADMIN_EMAILS = new Set([
-      "justin@pioneerpresscolorado.com",
+      "jsorelle@pioneerpresscolorado.com",
       "cristina@pioneerpresscolorado.com"
     ]);
     const DEFAULT_MAP_APP = "google";
@@ -3638,7 +3720,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.10.06 — Combined features, email login and delivery actions";
+    const CODE_VERSION = "2026.10.23 — Fastest-route ordering with Google live traffic";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let completedRolloverRepairInProgress = false;
@@ -4485,6 +4567,8 @@
 
       return {
         id,
+        dueDate: isValidDeliveryDate(data.dueDate) ? data.dueDate : "",
+        driverTrip: data.driverTrip || null,
         customerName: data.customerName || "",
         jobNumber: data.jobNumber || "",
         poNumber: data.poNumber || "",
@@ -4505,7 +4589,19 @@
       };
     }
 
+    function describeSaveError(error, fallback) {
+      if (error?.code === "permission-denied") {
+        return currentUser && !currentUser.emailVerified
+          ? "Not saved: verify your email in User Settings first, then try again."
+          : "Not saved: the database rules haven't been updated for this feature yet. Your other data is unchanged.";
+      }
+      if (error?.code === "unavailable") return "Not saved: you appear to be offline. Check your connection and try again.";
+      return fallback;
+    }
+
     function setNotification(message, type = "success") {
+      const routeStatus = document.getElementById("routesStatus");
+      if (routeStatus) routeStatus.textContent = message || "";
       if (statusMessage) {
         statusMessage.textContent = message || "";
       }
@@ -4845,6 +4941,7 @@
       deleteEditBtn.hidden = !currentUser;
       document.getElementById("editClearRollover").checked = false;
       editingJobId = job.id;
+      document.getElementById("editDueDate").value = job.dueDate || "";
       editCustomerNameInput.value = job.customerName || "";
       editJobNumberInput.value = job.jobNumber || "";
       editPoNumberInput.value = job.poNumber || "";
@@ -5191,6 +5288,7 @@
     }
 
     function syncAdminUi() {
+      renderRoutes();
       const admin = isCurrentUserAdmin();
       adminPage.style.display = admin && currentPageView === "settings" ? "block" : "none";
       document.getElementById("adminAccessPanel").style.display = admin ? "block" : "none";
@@ -5267,12 +5365,16 @@
 
     async function loadUserMapPreference(user) {
       preferredMapApp = DEFAULT_MAP_APP;
+      locationPreference = localLocationPreference();
       if (!user) { refreshMapButtons(); return; }
       const uid = user.uid;
       try {
         const snapshot = await getDoc(doc(db, USER_PROFILE_COLLECTION, uid));
         if (currentUser?.uid !== uid) return;
         const profile = snapshot.exists() ? snapshot.data() : {};
+        if(['ask','on','off'].includes(profile.locationPreference))locationPreference=profile.locationPreference;
+        try{localStorage.setItem(locationStorageKey(),locationPreference);}catch{}
+        document.getElementById('locationPreference').value=locationPreference;
         if (["google", "waze", "apple"].includes(profile.preferredMapApp)) {
           preferredMapApp = profile.preferredMapApp;
         }
@@ -5284,6 +5386,28 @@
         document.getElementById("settingsSavedMessage").textContent = "Account settings could not be loaded. Google Maps is being used for now.";
       }
     }
+
+    let locationPreference='ask';
+    function locationStorageKey(){return 'pioneer-location-'+(currentUser?.uid||'guest');}
+    function localLocationPreference(){try{return localStorage.getItem(locationStorageKey())||'ask';}catch{return 'ask';}}
+    async function saveLocationPreference(value){
+      locationPreference=value;
+      try{localStorage.setItem(locationStorageKey(),value);}catch{}
+      document.getElementById('locationPreference').value=value;
+      const uid=currentUser?.uid;
+      if(!uid)return;
+      try{
+        await setDoc(doc(db,USER_PROFILE_COLLECTION,uid),{locationPreference:value,preferredMapApp:getPreferredMapApp(),updatedAt:serverTimestamp()},{merge:true});
+        if(currentUser?.uid===uid)document.getElementById('locationSettingsMessage').textContent='Location preference saved.';
+      }catch{
+        if(currentUser?.uid===uid)document.getElementById('locationSettingsMessage').textContent='Saved on this device. Account sync failed; try changing this setting again when connected.';
+      }
+    }
+    function chooseLocationPreference(){
+      // No pop-up and no browser location request: the map app finds the driver's location itself.
+      return locationPreference!=='off';
+    }
+    document.getElementById('locationPreference').addEventListener('change',event=>{void saveLocationPreference(event.target.value);});
 
     function getPreferredMapApp() {
       return preferredMapApp;
@@ -5303,8 +5427,134 @@
       }[app] || "Google Maps";
     }
 
+    // People often type notes into the Address box. Keep only the address lines
+    // (up to the line with the ZIP code) so map apps get a clean destination.
+    function mapAddress(raw) {
+      const lines = String(raw || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const zipIndex = lines.findIndex(l => /\b\d{5}(-\d{4})?$/.test(l));
+      if (zipIndex >= 0) {
+        let first = 0;
+        // Skip leading note lines before the street line (a line starting with a house number)
+        for (let i = 0; i <= zipIndex; i++) { if (/^\d+[A-Za-z]?\s+\S/.test(lines[i])) { first = i; break; } }
+        return lines.slice(first, zipIndex + 1).join(", ");
+      }
+      const street = lines.find(l => /^\d+[A-Za-z]?\s+[A-Za-z]/.test(l));
+      return street || "";
+    }
+
+    // ---------- Google address autocomplete (Places API, New) ----------
+    // Browser key: restricted in Google Cloud to this website and the Places API only.
+    const PLACES_API_KEY = "AIzaSyAFL9gz6k2YJqv2HzYt4toLWdOZGOT7J_g";
+    const AC_BIAS = {rectangle:{low:{latitude:39.3,longitude:-105.7},high:{latitude:41.3,longitude:-103.8}}}; // Front Range, CO
+    function setupAddressAutocomplete(box) {
+      if(!PLACES_API_KEY || !box) return;
+      const wrap=document.createElement('div'); wrap.className='address-ac-wrap';
+      box.parentNode.insertBefore(wrap,box); wrap.appendChild(box);
+      const list=document.createElement('ul'); list.className='address-ac-list'; list.hidden=true;
+      list.id=box.id+'Suggestions'; list.setAttribute('role','listbox');
+      wrap.appendChild(list);
+      box.setAttribute('role','combobox'); box.setAttribute('aria-autocomplete','list');
+      box.setAttribute('aria-controls',list.id); box.setAttribute('aria-expanded','false');
+      box.setAttribute('autocomplete','off');
+      let session=null, timer=null, items=[], active=-1, requestNo=0;
+      const newSession=()=>{ session=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()); };
+      const close=()=>{ list.hidden=true; box.setAttribute('aria-expanded','false'); box.removeAttribute('aria-activedescendant'); active=-1; };
+      const highlight=i=>{
+        active=i;
+        [...list.querySelectorAll('.address-ac-item')].forEach((li,n)=>li.setAttribute('aria-selected',String(n===i)));
+        if(i>=0) box.setAttribute('aria-activedescendant',`${list.id}-${i}`); else box.removeAttribute('aria-activedescendant');
+      };
+      const firstLine=()=>box.value.split('\n')[0];
+      async function lookup() {
+        const text=firstLine().trim();
+        if(text.length<3){close();return;}
+        if(!session) newSession();
+        const mine=++requestNo;
+        try {
+          const r=await fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',
+            headers:{'Content-Type':'application/json','X-Goog-Api-Key':PLACES_API_KEY},
+            body:JSON.stringify({input:text,sessionToken:session,includedRegionCodes:['us'],locationBias:AC_BIAS})});
+          if(!r.ok) throw new Error('Places '+r.status);
+          const data=await r.json();
+          if(mine!==requestNo) return;
+          items=(data.suggestions||[]).map(x=>x.placePrediction).filter(Boolean).slice(0,6);
+          list.replaceChildren();
+          if(!items.length){close();return;}
+          items.forEach((pr,i)=>{
+            const li=document.createElement('li'); li.className='address-ac-item'; li.id=`${list.id}-${i}`;
+            li.setAttribute('role','option'); li.setAttribute('aria-selected','false');
+            const main=document.createElement('strong'); main.textContent=pr.structuredFormat?.mainText?.text||pr.text?.text||'';
+            const sub=document.createElement('span'); sub.textContent=pr.structuredFormat?.secondaryText?.text||'';
+            li.append(main,sub);
+            li.addEventListener('mousedown',e=>{e.preventDefault();choose(i);});
+            list.appendChild(li);
+          });
+          const credit=document.createElement('li'); credit.className='address-ac-credit'; credit.setAttribute('role','presentation'); credit.textContent='Powered by Google';
+          list.appendChild(credit);
+          list.hidden=false; box.setAttribute('aria-expanded','true'); highlight(-1);
+        } catch(e) { console.warn('Address suggestions unavailable.', e.message); close(); }
+      }
+      async function choose(i) {
+        const pr=items[i]; if(!pr) return;
+        close();
+        try {
+          const r=await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(pr.placeId)}?sessionToken=${encodeURIComponent(session)}`,
+            {headers:{'X-Goog-Api-Key':PLACES_API_KEY,'X-Goog-FieldMask':'formattedAddress'}});
+          if(!r.ok) throw new Error('Place details '+r.status);
+          const place=await r.json();
+          const formatted=String(place.formattedAddress||'').replace(/,\s*(USA|United States)$/,'');
+          const cut=formatted.indexOf(',');
+          const nice=cut>0?formatted.slice(0,cut)+'\n'+formatted.slice(cut+1).trim():formatted;
+          box.value=nice;
+          box.dataset.verified=box.value;
+          box.dispatchEvent(new Event('input',{bubbles:true}));
+          box.focus();
+        } catch(e) { console.warn('Could not fill address.', e.message); }
+        session=null;
+      }
+      box.addEventListener('input',e=>{
+        if(box.dataset.verified && box.value!==box.dataset.verified) delete box.dataset.verified;
+        if(!e.isTrusted) return;
+        clearTimeout(timer);
+        const onFirstLine=box.value.slice(0,box.selectionStart).indexOf('\n')===-1;
+        if(!onFirstLine){close();return;}
+        timer=setTimeout(lookup,250);
+      });
+      box.addEventListener('keydown',e=>{
+        if(list.hidden) return;
+        const n=items.length;
+        if(e.key==='ArrowDown'){e.preventDefault();highlight((active+1)%n);}
+        else if(e.key==='ArrowUp'){e.preventDefault();highlight(active<=0?n-1:active-1);}
+        else if(e.key==='Enter' && active>=0){e.preventDefault();choose(active);}
+        else if(e.key==='Escape'){e.preventDefault();close();}
+      });
+      box.addEventListener('blur',()=>setTimeout(close,150));
+    }
+    setupAddressAutocomplete(document.getElementById('address'));
+    setupAddressAutocomplete(document.getElementById('editAddress'));
+
+    [["address"],["editAddress"]].forEach(([id])=>{
+      const box=document.getElementById(id); if(!box) return;
+      const hint=document.createElement('p'); hint.className='contact-note'; hint.setAttribute('role','status'); (box.closest('.address-ac-wrap')||box).after(hint);
+      const check=()=>{
+        const clean=mapAddress(box.value);
+        hint.style.color=box.value.trim()&&!clean?'#b91c1c':'';
+        hint.textContent=!box.value.trim()?'':box.dataset.verified===box.value?`✓ Verified by Google: ${clean||box.value.replace(/\n/g,', ')}`:clean?`Maps will use: ${clean}${PLACES_API_KEY?' — tip: pick from the Google list to verify it':''}`:'⚠ No street address with ZIP found. Put the street, city and ZIP on their own lines — notes go in the Notes box — or this stop can’t be routed.';
+      };
+      box.addEventListener('input',check); box.addEventListener('focus',check);
+    });
+
+    document.addEventListener('submit',event=>{
+      const id=event.target?.id==='jobForm'?'address':event.target?.id==='editJobForm'?'editAddress':'';
+      if(!id) return;
+      const box=document.getElementById(id);
+      if(box.value.trim() && !mapAddress(box.value) && !confirm('This address has no street and ZIP code, so it can’t be routed or mapped. Save it anyway?')) {
+        event.preventDefault(); event.stopImmediatePropagation(); box.focus();
+      }
+    },true);
+
     function getMapsLink(address, app = getPreferredMapApp()) {
-      const encodedAddress = encodeURIComponent(String(address || ""));
+      const encodedAddress = encodeURIComponent(mapAddress(address) || String(address || ""));
       if (app === "waze") return `https://waze.com/ul?q=${encodedAddress}&navigate=yes`;
       if (app === "apple") return `https://maps.apple.com/?address=${encodedAddress}`;
       return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
@@ -5315,6 +5565,7 @@
     }
 
     function loadMapSettings() {
+      document.getElementById("locationPreference").value=locationPreference;
       const selected = getPreferredMapApp();
       document.querySelectorAll('input[name="preferredMapApp"]').forEach(input => {
         input.checked = input.value === selected;
@@ -5605,6 +5856,7 @@
         timer = null;
         origin = null;
       };
+      card.addEventListener("selectstart", event => event.preventDefault());
       card.addEventListener("pointerdown", event => {
         clearPress();
         longPressTriggered = false;
@@ -5613,10 +5865,11 @@
         origin = { x: event.clientX, y: event.clientY };
         timer = setTimeout(() => {
           if (!card.isConnected || currentPageView !== "full") return;
+          window.getSelection()?.removeAllRanges();
           longPressTriggered = true;
           openDeliveryActionMenu(jobs.find(item => item.id === job.id));
           clearPress();
-        }, 700);
+        }, 550);
       }, { passive: true });
       card.addEventListener("pointermove", event => {
         if (origin && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) > 10) clearPress();
@@ -5665,6 +5918,7 @@
         <h4>${escapeHtml(job.customerName)}</h4>
         ${(metaParts.length || deliveredTimeHtml) ? `<div class="schedule-meta-row">${metaParts.length ? `<div class="schedule-inline-meta">${metaParts.join(", ")}</div>` : `<div class="schedule-inline-meta"></div>`}${deliveredTimeHtml}</div>` : ""}
         <div class="address">${escapeHtml(compactAddress)}</div>
+        ${job.dueDate ? `<div class="schedule-due-date" title="Due date">Due: ${escapeHtml(formatDueDate(job.dueDate))}</div>` : ""}
         ${compactNotes ? `<div class="notes-mini"><strong>Notes:</strong> ${escapeHtml(compactNotes)}</div>` : ""}
         ${actionHtml}
       `;
@@ -5749,10 +6003,37 @@
       pickupJobs.forEach(job => pickupList.appendChild(createPickupCard(job)));
     }
 
+    function formatDueDate(value) {
+      if (!isValidDeliveryDate(value)) return '';
+      const [,month,day]=value.split('-'); return `${Number(month)}/${Number(day)}`;
+    }
+    let historyCriteria=null;
+    const historyToday=getDenverTodayString();
+    document.getElementById('historyTo').value=historyToday;
+    const historyStart=new Date(historyToday+'T12:00:00');historyStart.setDate(historyStart.getDate()-29);
+    document.getElementById('historyFrom').value=`${historyStart.getFullYear()}-${String(historyStart.getMonth()+1).padStart(2,'0')}-${String(historyStart.getDate()).padStart(2,'0')}`;
+    function matchesHistorySearch(job) {
+      if(!historyCriteria || job.deliveryDate<historyCriteria.from || job.deliveryDate>historyCriteria.to) return false;
+      const text=[job.customerName,job.jobNumber,job.poNumber,job.address,job.notes,job.route,job.deliveryDate,formatDateLabel(job.deliveryDate),formatDueDate(job.deliveryDate),job.dueDate,formatDueDate(job.dueDate),job.status].join(' ').toLowerCase();
+      return historyCriteria.text.split(/\s+/).filter(Boolean).every(token=>text.includes(token));
+    }
+    document.getElementById('historySearchForm').addEventListener('submit',event=>{
+      event.preventDefault();
+      const from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
+      if(!isValidDeliveryDate(from)||!isValidDeliveryDate(to)||from>to){historySummaryChip.textContent='Choose a valid date range: From must be on or before Through.';return;}
+      historyCriteria={from,to,text:document.getElementById('historySearch').value.trim().toLowerCase()};renderHistory();
+    });
+    document.getElementById('clearHistorySearch').addEventListener('click',()=>{
+      document.getElementById('historySearch').value='';historyCriteria=null;renderHistory();
+    });
+
     function renderHistory() {
       historyList.innerHTML = "";
+      printHistoryBtn.disabled=!historyCriteria;
+      if(!historyCriteria){historySummaryChip.textContent='Choose a date range and press Search.';return;}
+      const searching = true;
       const historyJobs = jobs
-        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .filter(job => matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -5766,10 +6047,10 @@
           return (a.order ?? 0) - (b.order ?? 0);
         });
 
-      historySummaryChip.textContent = `${historyJobs.length} job${historyJobs.length === 1 ? "" : "s"} in the last 30 days`;
+      historySummaryChip.textContent = `${historyJobs.length} ${searching ? "matching " : ""}job${historyJobs.length === 1 ? "" : "s"} from ${historyCriteria.from} through ${historyCriteria.to}`;
 
       if (!historyJobs.length) {
-        historyList.innerHTML = `<div class="empty-state">No shipment history in the last 30 days yet.</div>`;
+        historyList.innerHTML = `<div class="empty-state">${searching ? "No matching shipments. Try another search or clear it." : "No shipments match this date range."}</div>`;
         return;
       }
 
@@ -5785,6 +6066,7 @@
           const delivered = dayJobs.filter(job => job.status === "delivered").length;
           const group = document.createElement("details");
           group.className = "history-day-group";
+          group.open = searching;
           group.innerHTML = `
             <summary class="history-day-toggle">
               <div class="history-day-header">
@@ -6001,7 +6283,514 @@
       menuToggleBtn.textContent = topNav.classList.contains("mobile-open") ? "Close" : "Menu";
     }
 
+    // Routes V1: additive metadata on deliveryJobs; never changes schedule order or route.
+    const ROUTE_HOME = '2965 S 27th Ave, Greeley, CO 80631';
+    const ROUTE_DRIVERS = ['Ricardo', 'Kevin'];
+    const ROUTE_TYPES = ['South', 'North/West', 'Local', 'Extra'];
+    function canManageRoutes() {
+      return !!currentUser?.emailVerified && (isCurrentUserAdmin() ||
+        ['ricardoruiz7908@gmail.com','kevrazy@yahoo.com'].includes(String(currentUser.email || '').toLowerCase()));
+    }
+    function requireRouteAccess() {
+      if (canManageRoutes()) return true;
+      setNotification('Only Ricardo, Kevin, and admins with verified accounts can edit or optimize routes.', 'danger');
+      return false;
+    }
+    let routesDate = getDenverTodayString();
+    let selectedRouteDriver = '';
+
+    let routeBusy = false;
+    const optimizedExports = new Map();
+    const optimizingTrips = new Set();
+    function routeFingerprint(stops) {
+      return JSON.stringify(stops.map(j => [j.id,j.address,j.deliveryDate,j.driverTrip,j.status,!!j.deliveredAt]));
+    }
+    function routeLocation() {
+      if (!chooseLocationPreference()) return Promise.reject(new Error('Location is off. Turn it on in Settings or choose Pioneer Press as the start.'));
+      return new Promise((resolve,reject)=>{
+        if(!navigator.geolocation) {reject(new Error('Location is unavailable. Choose Pioneer Press as the start.'));return;}
+        navigator.geolocation.getCurrentPosition(p=>resolve({latitude:p.coords.latitude,longitude:p.coords.longitude}),
+          ()=>reject(new Error('Location permission is needed for this start. Allow location or choose Pioneer Press.')),
+          {enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+      });
+    }
+    async function callRouteOptimizer(payload) {
+      // Lazy import keeps existing tracker features available if the routing service is not deployed.
+      const {getFunctions,httpsCallable}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js');
+      return (await httpsCallable(getFunctions(app,'us-central1'),'optimizeDeliveryTrip',{timeout:60000})(payload)).data;
+    }
+    const routesPage = document.getElementById('routesPage');
+    const routesPageBtn = document.getElementById('routesPageBtn');
+    function validTrip(job) {
+      const t = job.driverTrip;
+      return t && t.date === job.deliveryDate && ROUTE_DRIVERS.includes(t.driver)
+        && ROUTE_TYPES.includes(t.kind) && Number.isInteger(t.run) && t.run > 0 && t.run <= 999
+        && Number.isFinite(t.position) ? t : null;
+    }
+    function tripSig(t) { return t ? JSON.stringify([t.date ?? null, t.driver ?? null, t.run ?? null, t.kind ?? null, t.position ?? null]) : 'none'; }
+    function tripKey(t) { return JSON.stringify([t.date, t.driver]); }
+    function tripLabel(t) { return `${t.driver}’s route`; }
+    function routeJobs() { return jobs.filter(j => j.deliveryDate === routesDate && isLocalRoute(j.route) && !isJobCompleted(j)); }
+    function tripStops(t) {
+      return routeJobs().filter(j => validTrip(j) && tripKey(validTrip(j)) === tripKey(t))
+        .sort((a,b) => a.driverTrip.position - b.driverTrip.position || a.id.localeCompare(b.id));
+    }
+    function routeElement(tag, text, className) {
+      const e = document.createElement(tag); if (text !== undefined) e.textContent = text;
+      if (className) e.className = className; return e;
+    }
+    function routeButton(text, action, disabled = false) {
+      const b = routeElement('button', text); b.type = 'button';
+      b.disabled = disabled || routeBusy || !canManageRoutes(); b.addEventListener('click', action); return b;
+    }
+    function routeSelect(labelText, entries, value) {
+      const wrap = routeElement('label', labelText); const select = document.createElement('select');
+      entries.forEach(([v, label]) => { const o = routeElement('option', label); o.value = v; select.append(o); });
+      if (value !== undefined) select.value = value; wrap.append(select); return {wrap, select};
+    }
+    async function routeMutation(action, announce = true) {
+      if (routeBusy || !requireRouteAccess()) return;
+      routeBusy = true; renderRoutes();
+      try { await action(); if (announce) setNotification('Route saved.', 'success'); }
+      catch (e) { console.error(e); setNotification(e.code ? describeSaveError(e, 'Could not save route. Please retry.') : (e.message || 'Could not save route. Please retry.'), 'danger'); }
+      finally { routeBusy = false; renderRoutes(); }
+    }
+    async function updateTripAssignment(job, assignment) {
+      if (!requireRouteAccess()) return;
+      const expected = tripSig(job.driverTrip);
+      await runTransaction(db, async tx => {
+        const ref = doc(db, 'deliveryJobs', job.id), snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error('This delivery was deleted. Refresh Routes.');
+        const fresh = normalizeJob(snap.id, snap.data());
+        if (fresh.deliveryDate !== job.deliveryDate || !isLocalRoute(fresh.route)
+          || tripSig(fresh.driverTrip) !== expected)
+          throw new Error('This delivery changed on another screen. Review it and try again.');
+        // Removing deletes the field outright; database rules may reject an empty value.
+        tx.update(ref, {driverTrip: assignment || deleteField(), updatedAt: serverTimestamp()});
+      });
+    }
+    async function shiftTripStop(job, direction) {
+      if (!requireRouteAccess()) return;
+      const list = tripStops(validTrip(job)), index = list.findIndex(j => j.id === job.id);
+      const target = index + direction;
+      if (target < 0 || target >= list.length) return;
+      // Read all affected records before writing, so simultaneous reorder/rollover retries safely.
+      await runTransaction(db, async tx => {
+        const refs = list.map(j => doc(db, 'deliveryJobs', j.id));
+        const snapshots = await Promise.all(refs.map(ref => tx.get(ref)));
+        snapshots.forEach((snap, i) => {
+          if (!snap.exists() || snap.data().deliveryDate !== list[i].deliveryDate
+            || tripSig(snap.data().driverTrip) !== tripSig(list[i].driverTrip))
+            throw new Error('Trip changed on another screen. Please retry.');
+        });
+        const reordered = [...list]; [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+        reordered.forEach((j, position) => tx.update(doc(db, 'deliveryJobs', j.id), {
+          driverTrip: {...j.driverTrip, position}, updatedAt: serverTimestamp()
+        }));
+      });
+    }
+    function singleRouteLink(address, provider) {
+      if (provider === 'waze') return 'https://waze.com/ul?' + new URLSearchParams({q: address});
+      if (provider === 'apple') return 'https://maps.apple.com/?' + new URLSearchParams({daddr: address, dirflg: 'd'});
+      return 'https://www.google.com/maps/dir/?' + new URLSearchParams({api:'1', destination: address, travelmode:'driving'});
+    }
+    function googleTripLinks(addresses, fromHome, explicitOrigin = ROUTE_HOME) {
+      const remaining = [...addresses, ROUTE_HOME], links = [];
+      let origin = fromHome ? explicitOrigin : '';
+      while (remaining.length) {
+        let count = Math.min(4, remaining.length), url;
+        do {
+          const chunk = remaining.slice(0,count);
+          const params = new URLSearchParams({api:'1',destination:chunk[chunk.length-1],travelmode:'driving'});
+          if (origin) params.set('origin',origin);
+          if (chunk.length > 1) params.set('waypoints',chunk.slice(0,-1).join('|'));
+          url = 'https://www.google.com/maps/dir/?' + params;
+          if (url.length <= 2048) break;
+          count--;
+        } while(count > 0);
+        if (!count) throw new Error('An address is too long for Google Maps. Shorten it before exporting.');
+        links.push(url); origin = remaining[count-1]; remaining.splice(0,count);
+      }
+      return links;
+    }
+    function appendRouteLink(parent, text, href) {
+      const a = routeElement('a', text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; parent.append(a);
+    }
+    // Same building typed two ways ("2275 W. Midway Blvd." / "2275 West Midway Blvd") = one stop.
+    function stopKey(address) {
+      const num=(address.match(/^\s*(\d+)/)||[])[1]||'';
+      const zip=(address.match(/(\d{5})(-\d{4})?\s*$/)||[])[1]||'';
+      return num&&zip ? num+'|'+zip : address.toLowerCase().replace(/[^a-z0-9]/g,'');
+    }
+    const GOOGLE_MAX_PLACES = 10; // Google Maps: destination + up to 9 stops in one link
+    function googleRouteLink(addresses, fromPioneer) {
+      const params=new URLSearchParams({api:'1',travelmode:'driving',destination:addresses[addresses.length-1]});
+      if(fromPioneer) params.set('origin',ROUTE_HOME);
+      if(addresses.length>1) params.set('waypoints',addresses.slice(0,-1).join('|'));
+      return 'https://www.google.com/maps/dir/?'+params;
+    }
+    function buildTripExport(stops, start, mapApp) {
+      const remaining=stops.filter(j=>!isJobCompleted(j));
+      const missing=remaining.filter(j=>!mapAddress(j.address));
+      const ordered=remaining.filter(j=>mapAddress(j.address));
+      const seen=new Set(), addresses=[];
+      ordered.forEach(j=>{const a=mapAddress(j.address), k=stopKey(a); if(!seen.has(k)){seen.add(k);addresses.push(a);}});
+      const fromPioneer=start==='home';
+      const links=[]; let returnSeparate=false;
+      if(mapApp==='google' && addresses.length){
+        if(addresses.length+1<=GOOGLE_MAX_PLACES) links.push(googleRouteLink([...addresses,ROUTE_HOME],fromPioneer));
+        else if(addresses.length<=GOOGLE_MAX_PLACES) {links.push(googleRouteLink(addresses,fromPioneer));returnSeparate=true;}
+        else {
+          // More than Google allows in one link: split into as few parts as possible.
+          const all=[...addresses,ROUTE_HOME];
+          for(let i=0, origin=fromPioneer?ROUTE_HOME:''; i<all.length; i+=GOOGLE_MAX_PLACES){
+            const chunk=all.slice(i,i+GOOGLE_MAX_PLACES);
+            const params=new URLSearchParams({api:'1',travelmode:'driving',destination:chunk[chunk.length-1]});
+            if(origin) params.set('origin',origin);
+            if(chunk.length>1) params.set('waypoints',chunk.slice(0,-1).join('|'));
+            links.push('https://www.google.com/maps/dir/?'+params); origin=chunk[chunk.length-1];
+          }
+        }
+      }
+      return {ordered,missing,addresses,links,returnSeparate,start,mapApp};
+    }
+    function renderTripExport(parent, stops) {
+      const t=validTrip(stops[0]), key=tripKey(t), signature=routeFingerprint(stops);
+      const mapApp=getPreferredMapApp();
+      let saved=optimizedExports.get(key);
+      if(saved && (saved.signature!==signature || saved.mapApp!==mapApp)) {optimizedExports.delete(key);saved=null;}
+      const controls=routeElement('div',undefined,'driver-route-controls');
+      const start=routeSelect('Start',[['current','Where I am'],['home','Pioneer Press']],saved?.start || (locationPreference==='off'?'home':'current'));
+      const result=routeElement('div',undefined,'driver-map-links'); result.setAttribute('aria-live','polite');
+      function show(exp) {
+        result.replaceChildren();
+        if(exp.missing.length){
+          const warn=routeElement('p',`Not in the trip — no street address found: ${exp.missing.map(j=>j.customerName).join(', ')}. Open Edit Delivery and put the street address on its own lines (notes go in the Notes box).`);
+          warn.style.color='#b91c1c';warn.style.fontWeight='700';result.append(warn);
+        }
+        if(exp.mapApp==='google'){
+          exp.links.forEach((url,i,all)=>appendRouteLink(result,all.length>1?`Open trip in Google Maps · Part ${i+1} of ${all.length}`:`Open trip in Google Maps again (${exp.addresses.length} stop${exp.addresses.length===1?'':'s'}${exp.returnSeparate?'':' + back to Pioneer'})`,url));
+          if(exp.links.length>1) result.append(routeElement('p',`Google Maps allows ${GOOGLE_MAX_PLACES} places per route, so this ${exp.addresses.length}-stop trip is split. Open Part 2 when you finish Part 1.`));
+          if(exp.returnSeparate) appendRouteLink(result,'After the last stop: Return to Pioneer Press',singleRouteLink(ROUTE_HOME,'google'));
+        } else {
+          result.append(routeElement('p',`${getMapAppLabel(exp.mapApp)} can only take one destination at a time, so it opened your first stop. Tap each stop below in order. To get every stop in one route, choose Google Maps in User Settings.`));
+          exp.ordered.forEach((j,i)=>appendRouteLink(result,`${i+1}. ${j.customerName} — ${mapAddress(j.address)}`,singleRouteLink(mapAddress(j.address),exp.mapApp)));
+          appendRouteLink(result,'Return to Pioneer Press',singleRouteLink(ROUTE_HOME,exp.mapApp));
+        }
+      }
+      const exportBtn=routeButton(`Export to ${getMapAppLabel(mapApp)}`,()=>{
+        if(!requireRouteAccess()) return;
+        const exp=buildTripExport(stops,start.select.value,mapApp);
+        if(!exp.addresses.length){show(exp);return;}
+        // Open right away (inside the click) so the browser doesn't block the new tab.
+        const first=exp.mapApp==='google'?exp.links[0]:singleRouteLink(exp.addresses[0],exp.mapApp);
+        window.open(first,'_blank','noopener,noreferrer');
+        optimizedExports.set(key,{signature,mapApp,start:exp.start});
+        show(exp);
+      });
+      exportBtn.classList.add('secondary-btn');
+      start.select.addEventListener('change',()=>{const s2=optimizedExports.get(key); if(s2){s2.start=start.select.value;show(buildTripExport(stops,s2.start,mapApp));}});
+      const note=routeElement('small',`Map app: ${getMapAppLabel(mapApp)} — change it in User Settings. Stops go in the order listed above; use Move up / Move down to change it.`);
+      controls.append(start.wrap,exportBtn);parent.append(controls,note,result);
+      if(saved) show(buildTripExport(stops,saved.start,mapApp));
+    }
+    // ---------- Fastest-route ordering ----------
+    // Finds each stop on the map, gets drive times between every pair of stops, then
+    // picks the stop order with the shortest total drive: Pioneer -> all stops -> Pioneer.
+    const UNIT_RE=/,?\s*\b(unit|suite|ste\.?|apt\.?|bldg\.?|building|#)\s*[\w-]+/ig;
+    async function locateStop(addr) {
+      if(!addr) return null;
+      let c=await geocodeAddress(addr.replace(UNIT_RE,'').replace(/\s+,/g,',').trim());
+      if(!c) {
+        const zip=(addr.match(/(\d{5})(-\d{4})?\s*$/)||[])[1];
+        const street=addr.split(',')[0].replace(UNIT_RE,'').trim();
+        if(zip && street) c=await geocodeAddress(`${street} ${zip}`);
+      }
+      return c;
+    }
+    async function travelMatrix(coords) {
+      try {
+        const path=coords.map(c=>`${c.lng.toFixed(6)},${c.lat.toFixed(6)}`).join(';');
+        const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),10000);
+        const r=await fetch(`https://router.project-osrm.org/table/v1/driving/${path}?annotations=duration`,{signal:ctrl.signal});
+        clearTimeout(timer);
+        const data=await r.json();
+        if(data.code==='Ok' && data.durations?.length===coords.length && data.durations.every(row=>row.length===coords.length&&row.every(Number.isFinite)))
+          return {m:data.durations, roads:true};
+      } catch(e) { console.info('Road drive times unavailable; using distance.', e?.message); }
+      // Fallback: straight-line distance with a typical road detour factor.
+      return {m:coords.map(a=>coords.map(b=>haversineMiles(a.lat,a.lng,b.lat,b.lng)*1.3)), roads:false};
+    }
+    function loopCost(m, seq){ let c=0, prev=0; for(const n of seq){c+=m[prev][n];prev=n;} return c+m[prev][0]; }
+    function bestLoop(m, nodes) {
+      const k=nodes.length;
+      if(k<=1) return [...nodes];
+      if(k<=13) { // exact: checks every possible order
+        const N=1<<k, dp=new Float64Array(N*k).fill(Infinity), par=new Int8Array(N*k).fill(-1);
+        for(let j=0;j<k;j++) dp[(1<<j)*k+j]=m[0][nodes[j]];
+        for(let mask=1;mask<N;mask++) for(let j=0;j<k;j++){
+          if(!(mask&(1<<j))) continue; const cur=dp[mask*k+j]; if(cur===Infinity) continue;
+          for(let x=0;x<k;x++){ if(mask&(1<<x)) continue; const nm=mask|(1<<x), v=cur+m[nodes[j]][nodes[x]];
+            if(v<dp[nm*k+x]){dp[nm*k+x]=v;par[nm*k+x]=j;} }
+        }
+        let mask=N-1, best=Infinity, last=0;
+        for(let j=0;j<k;j++){const v=dp[mask*k+j]+m[nodes[j]][0]; if(v<best){best=v;last=j;}}
+        const order=[]; let j=last;
+        while(j>=0){order.push(nodes[j]); const pj=par[mask*k+j]; mask^=(1<<j); j=pj;}
+        return order.reverse();
+      }
+      // Large routes: nearest-next start, then keep swapping segments while it gets faster.
+      let left=[...nodes], seq=[], cur=0;
+      while(left.length){ let bi=0; left.forEach((n,i)=>{if(m[cur][n]<m[cur][left[bi]])bi=i;}); cur=left.splice(bi,1)[0]; seq.push(cur); }
+      let improved=true;
+      while(improved){ improved=false;
+        for(let i=0;i<seq.length-1;i++) for(let j=i+1;j<seq.length;j++){
+          const cand=[...seq.slice(0,i),...seq.slice(i,j+1).reverse(),...seq.slice(j+1)];
+          if(loopCost(m,cand)<loopCost(m,seq)-1e-9){seq=cand;improved=true;}
+        }
+      }
+      return seq;
+    }
+    async function planTripOrder(existingJobs, newJobs, mode) {
+      const all=[...existingJobs,...newJobs];
+      const home=await locateStop(ROUTE_HOME);
+      const located=[], unlocated=[];
+      for(const j of all){ const c=home?await locateStop(mapAddress(j.address)):null; (c?located:unlocated).push({job:j,c}); }
+      if(!located.length) return {order:all, roads:false, unlocated:unlocated.map(x=>x.job)};
+      const {m,roads}=await travelMatrix([home,...located.map(x=>x.c)]);
+      const idx=new Map(located.map((x,i)=>[x.job.id,i+1]));
+      const oldNodes=existingJobs.filter(j=>idx.has(j.id)).map(j=>idx.get(j.id));
+      const newNodes=newJobs.filter(j=>idx.has(j.id)).map(j=>idx.get(j.id));
+      let seq;
+      if(mode==='full' || !oldNodes.length) seq=bestLoop(m,[...oldNodes,...newNodes]);
+      else {
+        // Keep the driver's existing order; slot each new stop where it adds the least drive time.
+        seq=[...oldNodes];
+        [...newNodes].sort((x,y)=>m[0][y]-m[0][x]).forEach(x=>{
+          let bestP=0, bestAdd=Infinity;
+          for(let p=0;p<=seq.length;p++){ const prev=p?seq[p-1]:0, next=p<seq.length?seq[p]:0;
+            const add=m[prev][x]+m[x][next]-m[prev][next]; if(add<bestAdd){bestAdd=add;bestP=p;} }
+          seq.splice(bestP,0,x);
+        });
+      }
+      return {order:[...seq.map(n=>located[n-1].job),...unlocated.map(x=>x.job)], roads, unlocated:unlocated.map(x=>x.job)};
+    }
+    async function saveTripOrder(t, ordered, before) {
+      await runTransaction(db,async tx=>{
+        const snaps=await Promise.all(ordered.map(j=>tx.get(doc(db,'deliveryJobs',j.id))));
+        snaps.forEach((snap,i)=>{
+          const old=before.get(ordered[i].id), fresh=snap.exists()?normalizeJob(snap.id,snap.data()):null;
+          if(!fresh || fresh.status!=='active' || fresh.deliveryDate!==old.deliveryDate || fresh.route!==old.route || tripSig(snap.data().driverTrip)!==tripSig(old.driverTrip))
+            throw new Error('A delivery changed on another screen. Please try again.');
+        });
+        ordered.forEach((j,i)=>{
+          const inTrip=validTrip(j) && tripKey(j.driverTrip)===tripKey(t);
+          if(inTrip && j.driverTrip.position===i) return;
+          tx.update(doc(db,'deliveryJobs',j.id),{driverTrip:{...(inTrip?j.driverTrip:t),position:i},updatedAt:serverTimestamp()});
+        });
+      });
+    }
+    // After stops are saved, ask Google (live traffic, up to 25 stops) for the best order.
+    // If Google is unavailable, the order already saved stays as is.
+    async function refineWithGoogle(t, plan, justSaved=true) {
+      const saved=!justSaved ? [...plan.order] : plan.order.map((j,i)=>{
+        const inTrip=validTrip(j) && tripKey(j.driverTrip)===tripKey(t);
+        const trip=inTrip?j.driverTrip:{...t,position:i};
+        return {...j, driverTrip:(inTrip && j.driverTrip.position===i)?trip:{...trip,position:i}};
+      });
+      const mappable=saved.filter(j=>mapAddress(j.address));
+      if(mappable.length<2) return {ok:false,reason:'few'};
+      if(mappable.length>25) return {ok:false,reason:'many'};
+      try {
+        const response=await Promise.race([
+          callRouteOptimizer({start:'home',location:null,stops:mappable.map(j=>({id:j.id,address:j.address,date:j.deliveryDate,
+            trip:{date:j.driverTrip.date,driver:j.driverTrip.driver,kind:j.driverTrip.kind,run:j.driverTrip.run}}))}),
+          new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),30000))
+        ]);
+        const ids=response?.stopIds;
+        if(!Array.isArray(ids)||ids.length!==mappable.length||new Set(ids).size!==ids.length||!ids.every(id=>mappable.some(j=>j.id===id))) return {ok:false,reason:'bad'};
+        const byId=new Map(saved.map(j=>[j.id,j]));
+        const order=[...ids.map(id=>byId.get(id)),...saved.filter(j=>!mapAddress(j.address))];
+        await saveTripOrder(t,order,byId);
+        plan.order=order; plan.google=true;
+        return {ok:true};
+      } catch(e) {
+        console.info('Google route sort unavailable; keeping current order.', e?.code || e?.message);
+        return {ok:false,reason:e?.code==='functions/resource-exhausted'?'wait':e?.code==='functions/permission-denied'||e?.code==='functions/unauthenticated'?'access':'down'};
+      }
+    }
+    function googleSortMessage(result, driver, count) {
+      if(result.ok) return `${driver}’s route is sorted in the fastest order using Google with live traffic${count?` (${count} stops)`:''}.`;
+      return {
+        few:`${driver}’s route saved.`,
+        many:'Google can sort up to 25 stops at a time. Remove some stops or split the route, then tap Re-sort fastest route.',
+        wait:'Saved. Google allows one sort every 10 seconds — wait a moment, then tap Re-sort fastest route.',
+        access:'Saved. Sorting needs a verified driver or admin account — verify your email in User Settings, then tap Re-sort fastest route.',
+        bad:'Saved, but Google couldn’t sort this route. Check the addresses, then tap Re-sort fastest route.',
+        down:'Saved, but Google couldn’t be reached. Stops are in the order added — tap Re-sort fastest route to try again.'
+      }[result.reason] || 'Saved.';
+    }
+    function announcePlan(plan, lead) {
+      let msg=`${lead} in the fastest order${plan.google?' using Google with live traffic':plan.roads?' using road drive times':' by distance (road drive times were unavailable — use Re-sort later)'}.`;
+      if(plan.unlocated.length) msg+=` Couldn't find on the map: ${plan.unlocated.map(j=>j.customerName).join(', ')} — placed at the end. Fix their addresses, then tap Re-sort fastest route.`;
+      setNotification(msg, plan.unlocated.length?'warning':'success');
+    }
+    async function addPickedDeliveries(list, kind) {
+      if (!selectedRouteDriver || !requireRouteAccess()) return;
+      const driver=selectedRouteDriver;
+      const t={date:routesDate,driver,run:1,kind:'Extra'};
+      const adding=list.filter(j=>!(validTrip(j) && tripKey(j.driverTrip)===tripKey(t)));
+      if(!adding.length) return;
+      const moving=adding.filter(j=>validTrip(j));
+      if(moving.length && !confirm(`Move ${moving.length} assigned deliveries to ${driver}'s route?`)) return;
+      const existing=tripStops(t);
+      const added=`Added ${adding.length} deliver${adding.length===1?'y':'ies'} to ${driver}’s route`;
+      if(getPreferredMapApp()==='google') {
+        // Google Maps users: save instantly; Google sorts a new route in the background.
+        const plan={order:[...existing,...adding],roads:false,unlocated:[]};
+        let saved=false;
+        await routeMutation(async()=>{
+          await saveTripOrder(t,plan.order,new Map(plan.order.map(j=>[j.id,j])));
+          saved=true;
+          setNotification(existing.length?`${added} at the end. Tap Re-sort fastest route to re-order with Google.`:`${added}. Sorting with Google live traffic…`,'success');
+        },false);
+        if(saved && !existing.length) setNotification(googleSortMessage(await refineWithGoogle(t,plan),driver,plan.order.length),'success');
+        return;
+      }
+      await routeMutation(async()=>{
+        setNotification('Finding the fastest order… this can take a few seconds.','info');
+        const plan=await planTripOrder(existing,adding,'insert');
+        await saveTripOrder(t,plan.order,new Map([...existing,...adding].map(j=>[j.id,j])));
+        if(!existing.length) { setNotification('Checking live traffic with Google…','info'); await refineWithGoogle(t,plan); }
+        announcePlan(plan,added);
+      },false);
+    }
+    async function clearTrip(t) {
+      const stops=tripStops(t);
+      if(!stops.length || !requireRouteAccess()) return;
+      if(!confirm(`Clear ${t.driver}’s route? This takes all ${stops.length} remaining stop${stops.length===1?'':'s'} off the route. The deliveries stay on the schedule and can be picked again.`)) return;
+      await routeMutation(async()=>{
+        // One step for the whole route; stops re-check that nobody changed them meanwhile.
+        await runTransaction(db,async tx=>{
+          const snaps=await Promise.all(stops.map(j=>tx.get(doc(db,'deliveryJobs',j.id))));
+          snaps.forEach((snap,i)=>{
+            if(snap.exists() && tripSig(snap.data().driverTrip)!==tripSig(stops[i].driverTrip))
+              throw new Error('A stop changed on another screen. Please try Clear route again.');
+          });
+          snaps.forEach((snap,i)=>{ if(snap.exists()) tx.update(doc(db,'deliveryJobs',stops[i].id),{driverTrip:deleteField(),updatedAt:serverTimestamp()}); });
+        });
+        optimizedExports.delete(tripKey(t));
+        setNotification(`${t.driver}’s route was cleared.`,'success');
+      },false);
+    }
+    async function resortTrip(t) {
+      if(getPreferredMapApp()==='google') {
+        await routeMutation(async()=>{
+          const stops=tripStops(t);
+          if(stops.length<2) return;
+          setNotification('Sorting with Google live traffic…','info');
+          setNotification(googleSortMessage(await refineWithGoogle(t,{order:stops},false),t.driver,stops.length),'success');
+        },false);
+        return;
+      }
+      await routeMutation(async()=>{
+        const stops=tripStops(t);
+        if(stops.length<2) return;
+        setNotification('Re-sorting the fastest route… this can take a few seconds.','info');
+        const plan=await planTripOrder([],stops,'full');
+        await saveTripOrder(t,plan.order,new Map(stops.map(j=>[j.id,j])));
+        setNotification('Checking live traffic with Google…','info'); await refineWithGoogle(t,plan);
+        announcePlan(plan,`${t.driver}’s route is sorted`);
+      },false);
+    }
+    function renderRoutePicker(content) {
+      const panel=routeElement('section',undefined,'card route-picker');
+      panel.append(routeElement('h2','Choose a driver, then tap deliveries'));
+      const names=routeElement('div',undefined,'route-driver-picker');
+      ROUTE_DRIVERS.forEach(driver=>{
+        const button=routeElement('button',driver);button.type='button';
+        button.classList.add('driver-'+driver.toLowerCase());
+        button.setAttribute('aria-pressed',String(selectedRouteDriver===driver));
+        button.addEventListener('click',()=>{selectedRouteDriver=driver;renderRoutes();});names.append(button);
+      });panel.append(names);
+      panel.append(routeElement('p',selectedRouteDriver?`Tap deliveries or Add whole run to add them to ${selectedRouteDriver}’s current route.`:'Choose Ricardo or Kevin above to start.'));
+      const runs=routeElement('div',undefined,'route-run-picker');
+      [['South Run','South'],['North / West Run','North/West'],['Local Delivery','Local']].forEach(([route,kind])=>{
+        const list=routeJobs().filter(j=>j.route===route&&!isJobCompleted(j));
+        const section=routeElement('section',undefined,'route-run');
+        const owners=new Set(list.map(j=>validTrip(j)?.driver||''));
+        if(owners.size===1 && !owners.has(''))section.classList.add('driver-'+[...owners][0].toLowerCase());
+        section.append(routeElement('h3',`${kind} · ${list.length}`));
+        section.append(routeButton('Add whole run',()=>addPickedDeliveries(list,kind),!selectedRouteDriver||!list.length||list.length>400));
+        list.forEach(job=>{
+          const t=validTrip(job), assigned=t&&t.driver===selectedRouteDriver;
+          const button=routeButton('',()=>addPickedDeliveries([job],kind),!selectedRouteDriver||assigned);
+          button.classList.add('route-delivery-choice');
+          if(t)button.classList.add('driver-'+t.driver.toLowerCase());
+          button.append(routeElement('strong',job.customerName),routeElement('span',`Job # ${job.jobNumber || '—'} · ${job.address}`),routeElement('small',assigned?'Added ✓':t?`${t.driver}’s route`:'Tap to add'));
+          section.append(button);
+        });
+        if(!list.length)section.append(routeElement('p','No pending deliveries.'));
+        runs.append(section);
+      });panel.append(runs);content.append(panel);
+    }
+    function renderRoutes() {
+      if (!routesPage || currentPageView !== 'routes') return;
+      const content = document.getElementById('driverRoutes'); content.replaceChildren();
+      document.getElementById('routesDate').value = routesDate;
+      const status = document.getElementById('routesStatus');
+      if (!canManageRoutes()) status.textContent = !currentUser
+        ? 'View only. Sign in to edit routes.'
+        : !currentUser.emailVerified
+          ? 'View only. Your email isn\'t verified yet — open User Settings, tap Send Verification Email, open the link, then tap I Verified My Email.'
+          : 'View only. Ricardo, Kevin, and admins can edit and optimize routes.';
+      else if (status.textContent.startsWith('View only.')) status.textContent = '';
+      renderRoutePicker(content);
+      for (const driver of ROUTE_DRIVERS.filter(d => d === selectedRouteDriver)) {
+        const section = routeElement('section', undefined, 'card driver-route-section driver-'+driver.toLowerCase()); section.append(routeElement('h2',driver));
+        const groups = new Map();
+        routeJobs().forEach(j => { const t=validTrip(j); if(t?.driver===driver) groups.set(tripKey(t),t); });
+        [...groups.values()].sort((a,b) => a.run-b.run || a.kind.localeCompare(b.kind)).forEach(t => {
+          const trip = routeElement('article',undefined,'driver-trip'); const stops = tripStops(t);
+          trip.append(routeElement('h3',`${driver}’s current route · ${stops.length} remaining`));
+          const resortRow=routeElement('div',undefined,'driver-route-controls');
+          resortRow.append(routeButton('Re-sort fastest route',()=>resortTrip(t),stops.length<2));
+          trip.append(resortRow);
+          const clearRow=routeElement('div',undefined,'driver-route-controls');
+          const clearBtn=routeButton('Clear route',()=>clearTrip(t),!stops.length);
+          clearBtn.classList.add('delete-btn');
+          clearRow.append(clearBtn);
+          trip.append(clearRow);
+          const list = routeElement('ol');
+          stops.forEach((job,i) => {
+            const li=routeElement('li',undefined,isJobCompleted(job)?'driver-stop completed':'driver-stop');
+            li.append(routeElement('strong',`${i+1}. ${job.customerName}${job.jobNumber?' · '+job.jobNumber:''}${isJobCompleted(job)?' · Delivered':''}`),routeElement('p',mapAddress(job.address) || job.address || 'Address missing'));
+            if(!mapAddress(job.address)){const w=routeElement('p','⚠ No street address with ZIP — this stop can’t be routed or mapped. Edit the delivery and put the address on its own lines.');w.style.color='#b91c1c';w.style.fontWeight='700';li.append(w);}
+            if(job.notes) li.append(routeElement('p',job.notes));
+            const actions=routeElement('div',undefined,'driver-route-controls');
+            actions.append(routeButton('↑ Move up',()=>routeMutation(()=>shiftTripStop(job,-1)),i===0),routeButton('↓ Move down',()=>routeMutation(()=>shiftTripStop(job,1)),i===stops.length-1),routeButton('Remove from trip',()=>routeMutation(()=>updateTripAssignment(job,null))));
+            actions.append(routeButton(isJobCompleted(job)?'Restore delivery':'Mark delivered',()=>routeMutation(()=>isJobCompleted(job)?restoreJobToActive(job):markJobDelivered(job),false)));
+            li.append(actions); list.append(li);
+          });
+          trip.append(list); renderTripExport(trip,stops); section.append(trip);
+        });
+        if(!groups.size) section.append(routeElement('p','Route clear. Tap deliveries above to start a new route.'));
+        content.append(section);
+      }
+    }
+    function showRoutesPage() {
+      showMainPage(); mainPage.style.display='none'; resetTopTabs();
+      currentPageView='routes'; routesPage.style.display='block'; routesPageBtn.classList.add('active');
+      updateMobileNavTitle('Routes'); updateQuickTotalsVisibility(); renderRoutes();
+    }
+    routesPageBtn.addEventListener('click',showRoutesPage);
+    document.getElementById('routesDate').addEventListener('change',e=>{
+      if(isValidDeliveryDate(e.target.value)) {routesDate=e.target.value;renderRoutes();}
+    });
+
     function resetTopTabs() {
+      routesPage.style.display = "none";
+      routesPageBtn.classList.remove("active");
       mainPageBtn.classList.remove("active");
       fullPageBtn.classList.remove("active");
       historyPageBtn.classList.remove("active");
@@ -6238,7 +7027,7 @@ Thank you.`;
 
     function getHistoryJobsForReport() {
       return jobs
-        .filter(job => isWithinLast30Days(job.deliveryDate))
+        .filter(job => matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
           const routeOrder = getRouteOrder(a.route) - getRouteOrder(b.route);
@@ -6279,13 +7068,13 @@ Thank you.`;
                   ${sortScheduleJobsList(routeGroups[route]).map(job => `
                     <div style="border:1px solid #dbe3ee; border-left:5px solid ${job.route === "South Run" ? "#0ea5e9" : job.route === "North / West Run" ? "#8b5cf6" : job.route === "Local Delivery" ? "#f59e0b" : job.route === "UPS" ? "#8b5cf6" : "#ec4899"}; border-radius:10px; padding:10px; background:${job.status === "delivered" ? "#f0fdf4" : "#fff"};">
                       <div style="font-weight:bold; font-size:15px;">
-                        ${job.customerName}
+                        ${escapeHtml(job.customerName)}
                         ${job.isRush ? `<span style="background:#dc2626;color:white;padding:2px 8px;border-radius:999px;font-size:11px;margin-left:8px;">RUSH</span>` : ""}
                       </div>
-                      ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${job.jobNumber}</div>` : ""}
+                      ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
                       <div style="margin-top:4px;"><strong>Status:</strong> ${job.status === "delivered" ? "Delivered" : "Active"}</div>
-                      <div style="margin-top:4px;"><strong>Address:</strong> ${job.address}</div>
-                      ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
+                      <div style="margin-top:4px;"><strong>Address:</strong> ${escapeHtml(job.address)}</div>
+                      ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
                     </div>
                   `).join("")}
                 </div>
@@ -6312,7 +7101,7 @@ Thank you.`;
           </head>
           <body style="font-family:Arial, sans-serif; color:#111827; padding:24px;">
             <h1 style="margin:0 0 6px;">Pioneer Delivery Tracker</h1>
-            <p style="margin:0 0 20px; color:#6b7280;">History Report - Last 30 Days (${getDenverDateTimeLabel()} Denver time)</p>
+            <p style="margin:0 0 20px; color:#6b7280;">History Report · ${escapeHtml(historyCriteria?.from || "")} through ${escapeHtml(historyCriteria?.to || "")} (${getDenverDateTimeLabel()} Denver time)</p>
 
             <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:24px;">
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">History Jobs</div><div style="font-size:24px; font-weight:bold;">${historyJobs.length}</div></div>
@@ -6320,7 +7109,7 @@ Thank you.`;
               <div style="border:1px solid #ddd; border-radius:10px; padding:12px;"><div style="font-size:12px; color:#666;">Days Covered</div><div style="font-size:24px; font-weight:bold;">${Object.keys(grouped).length}</div></div>
             </div>
 
-            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No shipment history in the last 30 days yet.</div>`}
+            ${sections || `<div style="border:1px dashed #d1d5db; border-radius:12px; padding:20px; color:#6b7280;">No shipments match this date range.</div>`}
           </body>
         </html>
       `;
@@ -6358,13 +7147,13 @@ Thank you.`;
             ${list.map(job => `
               <div style="border:1px solid #ddd; border-radius:10px; padding:10px; margin-bottom:10px;">
                 <div style="font-weight:bold; font-size:16px;">
-                  ${job.customerName}
+                  ${escapeHtml(job.customerName)}
                   ${job.isRush ? `<span style="background:#dc2626;color:white;padding:2px 8px;border-radius:999px;font-size:11px;margin-left:8px;">RUSH</span>` : ""}
                 </div>
-                ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${job.jobNumber}</div>` : ""}
-                <div style="margin-top:4px;"><strong>Address:</strong> ${job.address}</div>
-                <div style="margin-top:4px;"><strong>Route:</strong> ${job.route}</div>
-                ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${job.notes}</div>` : ""}
+                ${job.jobNumber ? `<div style="margin-top:4px;"><strong>Job #:</strong> ${escapeHtml(job.jobNumber)}</div>` : ""}
+                <div style="margin-top:4px;"><strong>Address:</strong> ${escapeHtml(job.address)}</div>
+                <div style="margin-top:4px;"><strong>Route:</strong> ${escapeHtml(job.route)}</div>
+                ${job.notes ? `<div style="margin-top:4px; white-space:pre-line;"><strong>Notes:</strong> ${escapeHtml(job.notes)}</div>` : ""}
               </div>
             `).join("")}
           </div>
@@ -6463,6 +7252,7 @@ Thank you.`;
         notes: deliveryNotesInput.value.trim(),
         route: routeValue,
         deliveryDate,
+        ...(document.getElementById("dueDate").value ? { dueDate: document.getElementById("dueDate").value } : {}),
         originalDeliveryDate: deliveryDate,
         status: "active",
         isRush,
@@ -6488,8 +7278,8 @@ Thank you.`;
         setNotification(`${ACTOR_NAME} added a ${newJob.isRush ? "rush " : ""}${newJob.isPickup ? "pickup " : ""}${newJob.route} delivery for ${formatDateLabel(newJob.deliveryDate)}.`, "success");
       } catch (error) {
         console.error(error);
-        statusMessage.textContent = "Could not add delivery.";
-        setNotification("Could not add delivery.", "danger");
+        statusMessage.textContent = describeSaveError(error, "Could not add delivery.");
+        setNotification(describeSaveError(error, "Could not add delivery."), "danger");
       }
     });
 
@@ -6531,6 +7321,7 @@ Thank you.`;
         const completedAtDate = completedAtValue ? new Date(completedAtValue) : null;
 
         const previousJob = jobs.find(job => job.id === editingJobId);
+        const newDueDate = document.getElementById("editDueDate").value || "";
         const editUpdates = {
           customerName: editCustomerNameInput.value.trim(),
           jobNumber: editJobNumberInput.value.trim(),
@@ -6539,6 +7330,7 @@ Thank you.`;
           notes: editDeliveryNotesInput.value.trim(),
           route: selectedRoute,
           deliveryDate: selectedDate,
+          ...(newDueDate ? { dueDate: newDueDate } : (previousJob?.dueDate ? { dueDate: deleteField() } : {})),
           status: selectedStatus,
           isRush,
           isPickup: editPickupDeliveryInput.checked,
@@ -6554,9 +7346,9 @@ Thank you.`;
         const changedFields = [
           ["customerName", "customer"], ["jobNumber", "job number"], ["poNumber", "PO number"],
           ["address", "address"], ["notes", "notes"], ["route", "route"],
-          ["deliveryDate", "delivery date"], ["status", "status"],
+          ["deliveryDate", "delivery date"], ["dueDate", "due date"], ["status", "status"],
           ["isRush", "rush"], ["isPickup", "pickup"]
-        ].filter(([key]) => previousJob?.[key] !== editUpdates[key]).map(([, label]) => label);
+        ].filter(([key]) => key === "dueDate" ? (previousJob?.dueDate || "") !== newDueDate : previousJob?.[key] !== editUpdates[key]).map(([, label]) => label);
         if (document.getElementById("editClearRollover").checked) changedFields.push("rollover correction");
         await updateDoc(doc(db, "deliveryJobs", editingJobId), editUpdates);
         await logActivity("edited", "Delivery updated", `${editCustomerNameInput.value.trim()}: ${changedFields.length ? "changed " + changedFields.join(", ") : "saved delivery details/completion time"}. Route: ${selectedRoute}; date: ${selectedDate}; status: ${selectedStatus}.`);
@@ -6566,8 +7358,8 @@ Thank you.`;
         setNotification("Delivery updated successfully.", "success");
       } catch (error) {
         console.error(error);
-        statusMessage.textContent = "Could not update delivery.";
-        setNotification("Could not update delivery.", "danger");
+        statusMessage.textContent = describeSaveError(error, "Could not update delivery.");
+        setNotification(describeSaveError(error, "Could not update delivery."), "danger");
       }
     });
 
@@ -6940,6 +7732,7 @@ Thank you.`;
     }
 
     function renderAll() {
+      renderRoutes();
       syncDateInputs();
       renderJobs();
       renderCompleted();
@@ -6969,6 +7762,7 @@ Thank you.`;
         managerDateInput.value = latestDenverDate;
         deliveryDateInput.value = latestDenverDate;
       }
+      if (routesDate === oldDate) routesDate = latestDenverDate;
       if (scheduleViewDate === oldDate) scheduleViewDate = latestDenverDate;
       if (adminViewDate === oldDate) adminViewDate = addDaysToDateKey(latestDenverDate, -1);
       if (outsideViewDate === oldDate) outsideViewDate = latestDenverDate;
