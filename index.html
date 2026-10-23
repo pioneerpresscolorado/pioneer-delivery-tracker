@@ -3682,7 +3682,12 @@
       serverTimestamp,
       runTransaction,
       setDoc,
-      deleteField
+      deleteField,
+      where,
+      getDocs,
+      initializeFirestore,
+      persistentLocalCache,
+      persistentMultipleTabManager
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
       getAuth,
@@ -3706,7 +3711,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // Keep a copy of downloaded deliveries on each device, so refreshing the page
+    // only downloads what changed instead of everything again.
+    let db;
+    try { db = initializeFirestore(app, {localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})}); }
+    catch (error) { console.warn("Offline cache unavailable; using standard loading.", error); db = getFirestore(app); }
     const auth = getAuth(app);
     const jobsCollection = collection(db, "deliveryJobs");
     const activityCollection = collection(db, "deliveryActivity");
@@ -3720,7 +3729,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.10.23 — Fastest-route ordering with Google live traffic";
+    const CODE_VERSION = "2026.10.23 — Lower database usage (recent deliveries live, older on search)";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let completedRolloverRepairInProgress = false;
@@ -3921,6 +3930,7 @@
     let adminCompanyFilter = "";
     let adminPushedOnly = false;
     let adminHasSearched = false;
+    let adminFetched = null;
     let activityEntries = [];
     let outsideViewDate = currentDenverDate;
     let pickupViewDate = currentDenverDate;
@@ -6012,6 +6022,17 @@
     document.getElementById('historyTo').value=historyToday;
     const historyStart=new Date(historyToday+'T12:00:00');historyStart.setDate(historyStart.getDate()-29);
     document.getElementById('historyFrom').value=`${historyStart.getFullYear()}-${String(historyStart.getMonth()+1).padStart(2,'0')}-${String(historyStart.getDate()).padStart(2,'0')}`;
+    let historyFetched=null, historyLoading=false;
+    function historySource() {
+      if(!historyFetched) return jobs;
+      const merged=new Map(historyFetched.map(j=>[j.id,j]));
+      jobs.forEach(j=>merged.set(j.id,j)); // live copies are newest
+      return [...merged.values()];
+    }
+    async function fetchJobsRange(from, to) {
+      const snap=await getDocs(query(jobsCollection, where('deliveryDate','>=',from), where('deliveryDate','<=',to)));
+      return snap.docs.map(d=>normalizeJob(d.id,d.data()));
+    }
     function matchesHistorySearch(job) {
       if(!historyCriteria || job.deliveryDate<historyCriteria.from || job.deliveryDate>historyCriteria.to) return false;
       const text=[job.customerName,job.jobNumber,job.poNumber,job.address,job.notes,job.route,job.deliveryDate,formatDateLabel(job.deliveryDate),formatDueDate(job.deliveryDate),job.dueDate,formatDueDate(job.dueDate),job.status].join(' ').toLowerCase();
@@ -6021,18 +6042,29 @@
       event.preventDefault();
       const from=document.getElementById('historyFrom').value,to=document.getElementById('historyTo').value;
       if(!isValidDeliveryDate(from)||!isValidDeliveryDate(to)||from>to){historySummaryChip.textContent='Choose a valid date range: From must be on or before Through.';return;}
-      historyCriteria={from,to,text:document.getElementById('historySearch').value.trim().toLowerCase()};renderHistory();
+      historyCriteria={from,to,text:document.getElementById('historySearch').value.trim().toLowerCase()};
+      historyFetched=null;
+      if(from<LIVE_CUTOFF){
+        const searchKey=historyCriteria;
+        historyLoading=true; renderHistory();
+        fetchJobsRange(from,to).then(list=>{ if(historyCriteria===searchKey){historyFetched=list;} })
+          .catch(error=>{ console.error(error); if(historyCriteria===searchKey) historySummaryChip.textContent='Could not load older deliveries. Check your connection and search again.'; })
+          .finally(()=>{ if(historyCriteria===searchKey){historyLoading=false; renderHistory();} });
+        return;
+      }
+      renderHistory();
     });
     document.getElementById('clearHistorySearch').addEventListener('click',()=>{
-      document.getElementById('historySearch').value='';historyCriteria=null;renderHistory();
+      document.getElementById('historySearch').value='';historyCriteria=null;historyFetched=null;historyLoading=false;renderHistory();
     });
 
     function renderHistory() {
       historyList.innerHTML = "";
       printHistoryBtn.disabled=!historyCriteria;
       if(!historyCriteria){historySummaryChip.textContent='Choose a date range and press Search.';return;}
+      if(historyLoading){historySummaryChip.textContent='Loading older deliveries…';printHistoryBtn.disabled=true;return;}
       const searching = true;
-      const historyJobs = jobs
+      const historyJobs = historySource()
         .filter(job => matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
@@ -6109,7 +6141,9 @@
       const hasMethod = !!adminMethodFilter;
       const hasCompany = !!companyNeedle;
 
-      return [...jobs]
+      const source = new Map((adminFetched||[]).map(j=>[j.id,j]));
+      jobs.forEach(j=>source.set(j.id,j));
+      return [...source.values()]
         .filter(job => {
           const dateMatch = !hasDate || job.deliveryDate === adminViewDate || job.rolledFromDate === adminViewDate;
           const methodMatch = !hasMethod || job.route === adminMethodFilter;
@@ -6185,6 +6219,7 @@
       adminSummary.innerHTML = `
         <div class="admin-summary-chip">${adminJobs.length} result${adminJobs.length === 1 ? "" : "s"}</div>
         ${filterBits.map(bit => `<div class="admin-summary-chip">${escapeHtml(bit)}</div>`).join("")}
+        ${!adminViewDate ? `<div class="admin-summary-chip">Searching the last ${LIVE_DAYS} days and upcoming — pick a Delivery Date to search older</div>` : ""}
       `;
 
       if (!adminJobs.length) {
@@ -7026,7 +7061,7 @@ Thank you.`;
 
 
     function getHistoryJobsForReport() {
-      return jobs
+      return historySource()
         .filter(job => matchesHistorySearch(job))
         .sort((a, b) => {
           if (a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? 1 : -1;
@@ -7565,12 +7600,31 @@ Thank you.`;
         adminCompanyFilter = adminCompanyInput?.value || "";
         adminPushedOnly = !!adminPushedOnlyInput?.checked;
         adminHasSearched = !!(adminViewDate || adminMethodFilter || adminCompanyFilter.trim() || adminPushedOnly);
+        adminFetched = null;
+        if (adminViewDate && adminViewDate < LIVE_CUTOFF) {
+          const day = adminViewDate;
+          adminSummary.innerHTML = `<div class="admin-summary-chip">Loading older deliveries…</div>`;
+          adminList.replaceChildren();
+          Promise.all([
+            getDocs(query(jobsCollection, where("deliveryDate", "==", day))),
+            getDocs(query(jobsCollection, where("rolledFromDate", "==", day)))
+          ]).then(([a, b]) => {
+            if (adminViewDate !== day) return;
+            adminFetched = [...a.docs, ...b.docs].map(d => normalizeJob(d.id, d.data()));
+            renderAdmin();
+          }).catch(error => {
+            console.error(error);
+            adminSummary.innerHTML = `<div class="admin-summary-chip">Could not load older deliveries. Check your connection and search again.</div>`;
+          });
+          return;
+        }
         renderAdmin();
       });
     }
 
     if (adminClearBtn) {
       adminClearBtn.addEventListener("click", () => {
+        adminFetched = null;
         adminViewDate = "";
         adminMethodFilter = "";
         adminCompanyFilter = "";
@@ -7773,10 +7827,15 @@ Thank you.`;
       setNotification(`Today's Schedule switched automatically to ${formatDateLabel(latestDenverDate)} using Denver time.`, "warning");
     }
 
-    const jobsQuery = query(jobsCollection, orderBy("createdAt", "desc"));
+    // Only recent and upcoming deliveries stay live on every screen (keeps database reads low).
+    // Older history is loaded on demand by History and Admin searches.
+    const LIVE_DAYS = 45;
+    const LIVE_CUTOFF = addDaysToDateKey(getDenverTodayString(), -LIVE_DAYS);
+    const jobsQuery = query(jobsCollection, where("deliveryDate", ">=", LIVE_CUTOFF));
 
     onSnapshot(
       jobsQuery,
+      { includeMetadataChanges: true },
       (snapshot) => {
         const changes = snapshot.docChanges();
         jobs = snapshot.docs.map(docItem => normalizeJob(docItem.id, docItem.data()));
@@ -7819,7 +7878,8 @@ Thank you.`;
           showLiveAlert(latestLiveAlert.kind, latestLiveAlert.job);
         }
 
-        hasLoadedInitialSnapshot = true;
+        // The first result may come from the on-device copy; only count the server result as "loaded" so saved changes don't pop up as new.
+        if (!snapshot.metadata.fromCache) hasLoadedInitialSnapshot = true;
       },
       (error) => {
         console.error(error);
