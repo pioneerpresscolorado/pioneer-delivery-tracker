@@ -3043,7 +3043,7 @@
     <section id="routesPage" style="display:none" aria-label="Driver routes">
       <div class="card"><h2>Routes</h2><label for="routesDate">Delivery date</label><input type="date" id="routesDate">
       <p>Return destination: Pioneer Press · 2965 S 27th Ave, Greeley, CO 80631.</p>
-      <p>Choose a driver below, then tap deliveries or add a whole run. New stops are placed in the fastest order from Pioneer and back; drivers can still move them. Export opens the trip in the map app chosen in your User Settings and returns to Pioneer. Each driver has one current route. Delivered stops clear automatically.</p></div>
+      <p>Tap a delivery, then choose Ricardo or Kevin, or choose a driver first and tap deliveries or add a whole run. New stops are placed in the fastest order from Pioneer and back; drivers can still move them. Export opens the trip in the map app chosen in your User Settings and returns to Pioneer. Each driver has one current route. Delivered stops clear automatically.</p></div>
       <p id="routesStatus" role="status" aria-live="polite"></p><div id="driverRoutes" class="driver-routes-grid"></div>
     </section>
     <div id="scheduleFullscreenArea">
@@ -3729,7 +3729,7 @@
     const ACTOR_NAME = "Shipping";
     const DENVER_TZ = "America/Denver";
     const HOME_BASE_ADDRESS = "2965 S 27th Ave, Greeley, CO";
-    const CODE_VERSION = "2026.10.23 — Lower database usage (recent deliveries live, older on search)";
+    const CODE_VERSION = "2026.10.27 — Routes job selection and assignment fix";
     const GEOCODE_CACHE_KEY = "pioneerDeliveryGeocodeCacheV1";
     let hasLoadedInitialSnapshot = false;
     let completedRolloverRepairInProgress = false;
@@ -4603,7 +4603,7 @@
       if (error?.code === "permission-denied") {
         return currentUser && !currentUser.emailVerified
           ? "Not saved: verify your email in User Settings first, then try again."
-          : "Not saved: the database rules haven't been updated for this feature yet. Your other data is unchanged.";
+          : "Not saved: Firebase denied this change. Check that you are signed in with the approved account and that the database rules allow this action.";
       }
       if (error?.code === "unavailable") return "Not saved: you appear to be offline. Check your connection and try again.";
       return fallback;
@@ -6333,6 +6333,7 @@
     }
     let routesDate = getDenverTodayString();
     let selectedRouteDriver = '';
+    let pendingRoutePick = null;
 
     let routeBusy = false;
     const optimizedExports = new Map();
@@ -6376,7 +6377,15 @@
     }
     function routeButton(text, action, disabled = false) {
       const b = routeElement('button', text); b.type = 'button';
-      b.disabled = disabled || routeBusy || !canManageRoutes(); b.addEventListener('click', action); return b;
+      b.disabled = disabled || routeBusy || !canManageRoutes();
+      b.addEventListener('click', async event => {
+        if (b.disabled || routeBusy || !requireRouteAccess()) return;
+        try { await action(event); }
+        catch (error) {
+          console.error(error);
+          setNotification(error.code ? describeSaveError(error, 'Could not save route. Please retry.') : (error.message || 'Could not save route. Please retry.'), 'danger');
+        }
+      }); return b;
     }
     function routeSelect(labelText, entries, value) {
       const wrap = routeElement('label', labelText); const select = document.createElement('select');
@@ -6671,7 +6680,7 @@
       setNotification(msg, plan.unlocated.length?'warning':'success');
     }
     async function addPickedDeliveries(list, kind) {
-      if (!selectedRouteDriver || !requireRouteAccess()) return;
+      if (routeBusy || !selectedRouteDriver || !requireRouteAccess()) return;
       const driver=selectedRouteDriver;
       const t={date:routesDate,driver,run:1,kind:'Extra'};
       const adding=list.filter(j=>!(validTrip(j) && tripKey(j.driverTrip)===tripKey(t)));
@@ -6738,17 +6747,47 @@
         announcePlan(plan,`${t.driver}’s route is sorted`);
       },false);
     }
+    function pickRouteDeliveries(list, kind) {
+      if (routeBusy || !requireRouteAccess()) return;
+      if (selectedRouteDriver) return addPickedDeliveries(list, kind);
+      pendingRoutePick = {ids: list.map(job => job.id), kind};
+      setNotification('Choose Ricardo or Kevin to assign the selected deliveries.', 'info');
+      renderRoutes();
+      document.querySelector('.route-driver-picker button')?.focus();
+    }
+    async function chooseRouteDriver(driver) {
+      if (routeBusy) return;
+      selectedRouteDriver = driver;
+      const pick = pendingRoutePick;
+      pendingRoutePick = null;
+      renderRoutes();
+      if (!pick || !requireRouteAccess()) return;
+      // Resolve fresh snapshot data; a job may have changed while choosing a driver.
+      const list = routeJobs().filter(job => pick.ids.includes(job.id));
+      if (list.length !== pick.ids.length) {
+        setNotification('A selected delivery changed. Please select the deliveries again.', 'warning');
+        return;
+      }
+      await addPickedDeliveries(list, pick.kind);
+    }
     function renderRoutePicker(content) {
       const panel=routeElement('section',undefined,'card route-picker');
-      panel.append(routeElement('h2','Choose a driver, then tap deliveries'));
+      panel.append(routeElement('h2','Tap a delivery or choose a driver'));
       const names=routeElement('div',undefined,'route-driver-picker');
       ROUTE_DRIVERS.forEach(driver=>{
         const button=routeElement('button',driver);button.type='button';
         button.classList.add('driver-'+driver.toLowerCase());
         button.setAttribute('aria-pressed',String(selectedRouteDriver===driver));
-        button.addEventListener('click',()=>{selectedRouteDriver=driver;renderRoutes();});names.append(button);
+        button.disabled = routeBusy;
+        button.addEventListener('click',async()=>{
+          try { await chooseRouteDriver(driver); }
+          catch(error) { console.error(error); setNotification('Could not assign delivery. Please retry.', 'danger'); }
+        });names.append(button);
       });panel.append(names);
-      panel.append(routeElement('p',selectedRouteDriver?`Tap deliveries or Add whole run to add them to ${selectedRouteDriver}’s current route.`:'Choose Ricardo or Kevin above to start.'));
+      panel.append(routeElement('p',selectedRouteDriver?`Tap deliveries or Add whole run to add them to ${selectedRouteDriver}’s current route.`:pendingRoutePick?`Choose Ricardo or Kevin above to assign ${pendingRoutePick.ids.length} selected deliver${pendingRoutePick.ids.length===1?'y':'ies'}.`:'Tap a delivery to select it, or choose Ricardo or Kevin above first.'));
+      if (pendingRoutePick) panel.append(routeButton('Cancel selection',()=>{
+        pendingRoutePick=null; setNotification('Selection cancelled.', 'info'); renderRoutes();
+      }));
       const runs=routeElement('div',undefined,'route-run-picker');
       [['South Run','South'],['North / West Run','North/West'],['Local Delivery','Local']].forEach(([route,kind])=>{
         const list=routeJobs().filter(j=>j.route===route&&!isJobCompleted(j));
@@ -6756,13 +6795,13 @@
         const owners=new Set(list.map(j=>validTrip(j)?.driver||''));
         if(owners.size===1 && !owners.has(''))section.classList.add('driver-'+[...owners][0].toLowerCase());
         section.append(routeElement('h3',`${kind} · ${list.length}`));
-        section.append(routeButton('Add whole run',()=>addPickedDeliveries(list,kind),!selectedRouteDriver||!list.length||list.length>400));
+        section.append(routeButton('Add whole run',()=>pickRouteDeliveries(list,kind),!list.length||list.length>400));
         list.forEach(job=>{
           const t=validTrip(job), assigned=t&&t.driver===selectedRouteDriver;
-          const button=routeButton('',()=>addPickedDeliveries([job],kind),!selectedRouteDriver||assigned);
+          const button=routeButton('',()=>pickRouteDeliveries([job],kind),!!assigned);
           button.classList.add('route-delivery-choice');
           if(t)button.classList.add('driver-'+t.driver.toLowerCase());
-          button.append(routeElement('strong',job.customerName),routeElement('span',`Job # ${job.jobNumber || '—'} · ${job.address}`),routeElement('small',assigned?'Added ✓':t?`${t.driver}’s route`:'Tap to add'));
+          button.append(routeElement('strong',job.customerName),routeElement('span',`Job # ${job.jobNumber || '—'} · ${job.address}`),routeElement('small',assigned?'Added ✓':pendingRoutePick?.ids.includes(job.id)?'Selected — choose a driver above':t?`${t.driver}’s route — tap to reassign`:'Tap to assign'));
           section.append(button);
         });
         if(!list.length)section.append(routeElement('p','No pending deliveries.'));
@@ -6820,7 +6859,7 @@
     }
     routesPageBtn.addEventListener('click',showRoutesPage);
     document.getElementById('routesDate').addEventListener('change',e=>{
-      if(isValidDeliveryDate(e.target.value)) {routesDate=e.target.value;renderRoutes();}
+      if(isValidDeliveryDate(e.target.value)) {routesDate=e.target.value;pendingRoutePick=null;renderRoutes();}
     });
 
     function resetTopTabs() {
@@ -7508,6 +7547,8 @@ Thank you.`;
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
+      pendingRoutePick = null;
+      selectedRouteDriver = '';
       watchAccountRole(user);
       await loadUserMapPreference(user);
     });
